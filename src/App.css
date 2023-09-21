@@ -36,3 +36,72 @@
     transform: rotate(360deg);
   }
 }
+/* Navbar.css */
+/* Add or modify the following styles to position the navbar and logo */
+
+/* Navbar container */
+.texas-a-m-branded {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 10px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo container (left corner) */
+.logo-container {
+  display: flex; /* Use flexbox */
+  align-items: center; /* Vertically center content */
+  
+}
+
+/* Logo */
+.maroon-logo {
+  max-width: 250px; /* Adjust the maximum width of your logo */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  margin-right: 20px; /* Add margin to push the buttons to the right corner */
+}
+
+/* Navbar button styles */
+.nav-button {
+  color: #030303; /* Text color */
+  text-decoration: none;
+  margin: 30px; /* Adjust the spacing between buttons */
+  font-weight: normal; /* Adjust the font weight */
+  font-size: 25px;
+}
+
+/* Navbar button hover effect */
+.nav-button:hover {
+  color: #4D0000; /* Change text color on hover */
+}
+
+/* App.css */
+@font-face {
+  font-family: 'TungstenMedium';
+  src: url('./fonts/Tungsten-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'TungstenMedium', sans-serif;
+  /* Other CSS styles for the body element */
+}
+.sub-bar {
+  background-color:   #4D0000; /* Background color */
+  padding: 10px; /* Padding for content */
+  text-align: center; /* Center the content */
+}
+.sub-bar p {
+  color: #FFFFFF; /* Change text color to black */
+  font-size: 1.3rem;
+}
+
+

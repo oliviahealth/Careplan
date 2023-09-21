@@ -1,0 +1,61 @@
+/* background.css */
+.background-container {
+    background-image: url('/src/assets/ana-tablas-oB0xbLwcaMw-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 78vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.text-container {
+  text-align: center; 
+  color: #000; 
+  padding: 20px; 
+
+}
+.text {
+    font-size: 6rem; /* Adjust the font size as needed */
+    margin-top: 40px;
+    animation: fadeIn 2s;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  button {
+    display: inline-block;
+    border-radius: 4px;
+    background-color:#5f1b1bd2;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 30px;
+    padding: 20px;
+    width: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 50px ;
+    animation: fadeInButton 1.5s;
+  }
+  
+  button:hover {
+    transform: scale(1.05); /* Increase size on hover */
+  }
+
+@keyframes fadeInButton {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

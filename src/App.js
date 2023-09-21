@@ -7,6 +7,14 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Navbar2 from "./Navbar2";
+import Home from "./Home";
+import PlanOfSafeCare from "./PlanOfSafeCare";
+import YourDocumentation from "./YourDocumentation";
+import About from "./About";
+import SubBar from "./SubBar";
+import Home2 from "./HomeAuthenticated";
+
 
 function App() {
   const [data, setData] = useState([{}]);
@@ -23,18 +31,24 @@ function App() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link as={Link} to="/">Sign In</Nav.Link>
+            <Nav.Link as={Link} to="/signin">Sign In</Nav.Link>
             <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
             {/* ... other nav links ... */}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-
+      <Navbar2 />
       <Routes>
-        <Route path="/" element={<SignInSide />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/home2" element={<Home2 />} />
+        <Route path="/plan-of-safe-care" element={<PlanOfSafeCare />} />
+        <Route path="/your-documentation" element={<YourDocumentation />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/signin" element={<SignInSide />} />
         <Route path="/signup" element={<SignUp />} />
         {/* ... other routes ... */}
       </Routes>
+      <SubBar />
     </Router>
   );
 }
