@@ -12,7 +12,9 @@ const Navbar2 = () => {
           alt: "Logo"
         })
       ),
-      React.createElement("div", { className: "nav-buttons" },
+        React.createElement("div", { className: "nav-buttons" },
+        React.createElement(Link, { to: "/signin", className: "nav-button" }, "Signin"),
+        React.createElement(Link, { to: "/signup", className: "nav-button" }, "Signup"),
         React.createElement(Link, { to: "/", className: "nav-button" }, "Home"),
         React.createElement(Link, { to: "/plan-of-safe-care", className: "nav-button" }, "Plan of Safe Care"),
         React.createElement(Link, { to: "/your-documentation", className: "nav-button" }, "Your Documentation"),
