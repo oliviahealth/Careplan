@@ -1,28 +1,43 @@
+// Navbar2.js
 import React from "react";
 import { Link } from "react-router-dom";
 import "./App.css"; // Import the CSS file
 
 const Navbar2 = () => {
   return (
-    React.createElement("div", { className: "texas-a-m-branded" },
-      React.createElement("div", { className: "logo-container" },
-        React.createElement("img", {
-          className: "maroon-logo",
-          src: "./TAM-PrimaryMarkB.png",
-          alt: "Logo"
-        })
-      ),
-        React.createElement("div", { className: "nav-buttons" },
-        React.createElement(Link, { to: "/signin", className: "nav-button" }, "Signin"),
-        React.createElement(Link, { to: "/signup", className: "nav-button" }, "Signup"),
-        React.createElement(Link, { to: "/", className: "nav-button" }, "Home"),
-        React.createElement(Link, { to: "/plan-of-safe-care", className: "nav-button" }, "Plan of Safe Care"),
-        React.createElement(Link, { to: "/your-documentation", className: "nav-button" }, "Your Documentation"),
-        React.createElement(Link, { to: "/about", className: "nav-button" }, "About"),
-        React.createElement("a", { href: "https://oliviahealth.org/", className: "nav-button", target: "_blank", rel: "noopener noreferrer" }, "OliviaHealth")
-      )
-    )
+    <div className="texas-a-m-branded">
+      <div className="logo-container">
+        <img
+          className="maroon-logo"
+          src="./Group.png"
+          alt="Logo"
+        />
+      </div>
+      <div className="nav-buttons">
+        <Link to="/signin" className="nav-button">Signin</Link>
+        <Link to="/signup" className="nav-button">Signup</Link>
+        <Link to="/" className="nav-button">
+          <img
+            src="Pageone.png" 
+            alt="Home"
+            style={{ width: '100px' }}
+          />
+        </Link>
+        <Link to="/plan-of-safe-care" className="nav-button">Plan of Safe Care</Link>
+        <Link to="/your-documentation" className="nav-button">Your Documentation</Link>
+        <Link to="/about" className="nav-button">About</Link>
+        <a
+          href="https://oliviahealth.org/"
+          className="nav-button"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          OliviaHealth
+        </a>
+      </div>
+    </div>
   );
 };
 
 export default Navbar2;
+
