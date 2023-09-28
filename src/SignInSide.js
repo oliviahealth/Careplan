@@ -12,6 +12,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 function Copyright(props) {
   return (
@@ -31,6 +34,8 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
+  const { login } = useAuth();
+  const navigate = useNavigate(); 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -53,8 +58,11 @@ export default function SignInSide() {
   
       if (response.status === 200) {
         // Login successful
-        console.log(responseData.message);
+        console.log("access")
+        login(); 
         // You can redirect the user or show a success message
+        navigate('/home2'); 
+
       } else {
         // Login failed
         console.error(responseData.message);

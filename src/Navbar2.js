@@ -1,9 +1,11 @@
-// Navbar2.js
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from './AuthContext'; // Import the useAuth hook
 import "./App.css"; // Import the CSS file
 
 const Navbar2 = () => {
+  const { authenticated } = useAuth(); // Get the authenticated state from the context
+
   return (
     <div className="texas-a-m-branded">
       <div className="logo-container">
@@ -14,18 +16,34 @@ const Navbar2 = () => {
         />
       </div>
       <div className="nav-buttons">
-        <Link to="/signin" className="nav-button">Signin</Link>
-        <Link to="/signup" className="nav-button">Signup</Link>
-        <Link to="/" className="nav-button">
-          <img
-            src="Pageone.png" 
-            alt="Home"
-            style={{ width: '100px' }}
-          />
+        {authenticated ? ( // Render different buttons based on authentication state
+          <>
+            {/* Buttons for authenticated users */}
+            <Link to="/plan-of-safe-care" className="nav-button">
+          Plan of Safe Care
         </Link>
-        <Link to="/plan-of-safe-care" className="nav-button">Plan of Safe Care</Link>
-        <Link to="/your-documentation" className="nav-button">Your Documentation</Link>
-        <Link to="/about" className="nav-button">About</Link>
+        <Link to="/your-documentation" className="nav-button">
+          Your Documentation
+        </Link>
+        <Link to="/about" className="nav-button">
+          About
+        </Link>
+          </>
+        ) : (
+          <>
+            {/* Buttons for non-authenticated users */}
+            <Link to="/signin" className="nav-button">
+              Signin
+            </Link>
+            <Link to="/signup" className="nav-button">
+              Signup
+            </Link>
+          </>
+        )}
+        {/* Common buttons */}
+        <Link to="/" className="nav-button">
+          <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
+        </Link>
         <a
           href="https://oliviahealth.org/"
           className="nav-button"

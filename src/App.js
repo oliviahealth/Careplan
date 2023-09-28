@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignInSide from './SignInSide';
 import SignUp from './SignUp';
 import Container from 'react-bootstrap/Container';
@@ -14,17 +14,10 @@ import YourDocumentation from "./YourDocumentation";
 import About from "./About";
 import SubBar from "./SubBar";
 import Home2 from "./HomeAuthenticated";
-
+import { AuthProvider } from './AuthContext'; // Import the AuthProvider
 
 function App() {
-  const [data, setData] = useState([{}]);
-
-  useEffect(() => {
-    // ... (your fetch code remains unchanged)
-  }, []);
-
   return (
-    
     <Router>
       <Navbar2 />
       <Routes>
@@ -42,4 +35,9 @@ function App() {
   );
 }
 
-export default App;
+export default () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
+
