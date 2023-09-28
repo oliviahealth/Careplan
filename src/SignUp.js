@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -31,6 +32,7 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -54,6 +56,7 @@ export default function SignUp() {
       const result = await response.json();
       if (response.ok) {
         alert("User created successfully!"); // You can replace this with a more user-friendly feedback mechanism
+        navigate('/home2');
       } else {
         alert(result.message); // Display the error message from the backend
       }
