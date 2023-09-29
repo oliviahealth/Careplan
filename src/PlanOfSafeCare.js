@@ -1,11 +1,15 @@
 import React from "react";
+import MaternalDemographicsCard from "./MaternalDemographicsCard"; // Import the MaternalDemographicsCard component
 
 const PlanOfSafeCare = () => {
   return (
-    React.createElement("div", null,
-      React.createElement("h1", null, "Plan of Safe Care"),
-      React.createElement("p", null, "This is the Plan of Safe Care page.")
-    )
+    <div>
+      <h1>Plan of Safe Care</h1>
+      <p>This is the Plan of Safe Care page.</p>
+
+      {/* Include the MaternalDemographicsCard component */}
+      <MaternalDemographicsCard />
+    </div>
   );
 };
 
