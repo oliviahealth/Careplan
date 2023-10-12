@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import 'typeface-open-sans';
 
 .map-container {
   height: 100%;
@@ -118,6 +118,11 @@
   src: url('./fonts/Tungsten-Medium.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+}
+.open-sans-button {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px; 
+  /* Other button styles go here */
 }
 
 body {

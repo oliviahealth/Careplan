@@ -19,42 +19,50 @@ const Navbar2 = () => {
         {authenticated ? ( // Render different buttons based on authentication state
           <>
             {/* Buttons for authenticated users */}
-            <Link to="/plan-of-safe-care" className="nav-button">
+            <Link to="/home2" className="nav-button open-sans-button">
+              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
+            </Link>
+            <Link to="/plan-of-safe-care" className="nav-button open-sans-button">
               Plan of Safe Care
             </Link>
-            <Link to="/your-documentation" className="nav-button">
+            <Link to="/your-documentation" className="nav-button open-sans-button">
               Your Documentation
             </Link>
-            <Link to="/about" className="nav-button">
+            <Link to="/about" className="nav-button open-sans-button">
               About
             </Link>
-            <Link to="/home2" className="nav-button">
-              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
-            </Link>
-          </>
-        ) : (
-          <>
-            {/* Buttons for non-authenticated users */}
-            <Link to="/signin" className="nav-button">
-              Signin
-            </Link>
-            <Link to="/signup" className="nav-button">
-              Signup
-            </Link>
-            <Link to="/" className="nav-button">
-              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
-            </Link>
-          </>
-        )}
-        {/* Common buttons */}
-        <a
+
+            <a
           href="https://oliviahealth.org/"
-          className="nav-button"
+          className="nav-button open-sans-button"
           target="_blank"
           rel="noopener noreferrer"
         >
           OliviaHealth
         </a>
+          </>
+        ) : (
+          <>
+            {/* Buttons for non-authenticated users */}
+
+            <Link to="/" className="nav-button open-sans-button">
+              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
+            </Link>
+            <a
+          href="https://oliviahealth.org/"
+          className="nav-button open-sans-button"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          OliviaHealth
+        </a>
+            <Link to="/signin" className="nav-button open-sans-button">
+              Signin/Signup
+            </Link>
+          </>
+        )}
+        {/* Common buttons */}
+
       </div>
     </div>
   );
