@@ -15,6 +15,8 @@ import About from "./About";
 import SubBar from "./SubBar";
 import Home2 from "./HomeAuthenticated";
 import { AuthProvider } from './AuthContext'; // Import the AuthProvider
+import MaternalDemographicsCard from './MaternalDemographicsCard';
+import MedicalHistory from './MedicalHistory';
 
 function App() {
   return (
@@ -28,7 +30,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/signin" element={<SignInSide />} />
         <Route path="/signup" element={<SignUp />} />
-        {/* ... other routes ... */}
+        <Route path="/plan-of-safe-care/maternal-demographics" element={<MaternalDemographicsCard />} />
+        <Route path="/plan-of-safe-care/medical-history" element={<MedicalHistory />} />
       </Routes>
       <SubBar />
     </Router>

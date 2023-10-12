@@ -184,4 +184,39 @@ body {
 .question-container button:hover {
   background-color: #761414; /* Change button color on hover */
 }
+/* Add this CSS to your App.css file */
+
+.button-container {
+  display: flex;
+  flex-direction: column; /* Arrange rows vertically */
+  align-items: center; /* Center align rows horizontally */
+  gap: 20px; /* Adjust the gap between rows as needed */
+}
+
+.button-row {
+  display: flex;
+  justify-content: center; /* Center align buttons horizontally within the row */
+}
+
+.circular-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center; /* Center align button content vertically and horizontally */
+  width: 140px;
+  height: 140px;
+  background-color: #4d0000;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  text-decoration: none;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  margin: 5px; /* Adjust the margin between buttons as needed */
+}
+
+.circular-button:hover {
+  background-color: #830707; /* Change the background color on hover */
+}
 

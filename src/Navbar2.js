@@ -28,6 +28,9 @@ const Navbar2 = () => {
         <Link to="/about" className="nav-button">
           About
         </Link>
+        <Link to="/home2" className="nav-button">
+          <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
+        </Link>
           </>
         ) : (
           <>
@@ -38,12 +41,13 @@ const Navbar2 = () => {
             <Link to="/signup" className="nav-button">
               Signup
             </Link>
+            <Link to="/" className="nav-button">
+            <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
+           </Link>
           </>
         )}
         {/* Common buttons */}
-        <Link to="/" className="nav-button">
-          <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
-        </Link>
+  
         <a
           href="https://oliviahealth.org/"
           className="nav-button"
