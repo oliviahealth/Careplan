@@ -1,5 +1,6 @@
 import React from "react";
 import './background.css'; // Import the CSS
+import { Link } from 'react-router-dom'; // Import Navigate
 
 const Home = () => {
   const handleButtonClick = (buttonId) => {
@@ -10,7 +11,9 @@ const Home = () => {
     React.createElement("div", { className: "background-container" },
       React.createElement("div", { className: "text-container" },
         React.createElement("div", { className: "text" }, "Welcome to PageOne!"),
-        React.createElement("button", { id: "button1", onClick: () => handleButtonClick("button1") }, "Get started")
+        <Link to="/signin">
+        <button id="button1">Get started</button>
+      </Link>
       )
     )
   );

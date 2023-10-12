@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 import './background.css'; // Import the CSS
-import { Navigate } from 'react-router-dom'; // Import Navigate
+import { Navigate,Link } from 'react-router-dom'; // Import Navigate
 
 const Home2 = () => {
   const { authenticated } = useAuth(); // Get the authenticated state from the context
@@ -18,9 +18,15 @@ const Home2 = () => {
     <div className="background-container">
       <div className="text-container">
         <div className="text">Welcome to Page one!</div>
-        <button id="button1" onClick={() => handleButtonClick("button1")}>Plan of safe care</button>
-        <button id="button2" onClick={() => handleButtonClick("button2")}>Your Documentation</button>
-        <button id="button3" onClick={() => handleButtonClick("button3")}>About</button>
+        <Link to="/plan-of-safe-care">
+          <button id="button1">Plan of safe care</button>
+        </Link>
+        <Link to="/your-documentation">
+          <button id="button2">Your Documentation</button>
+        </Link>
+        <Link to="/about">
+          <button id="button3">About</button>
+        </Link>
       </div>
     </div>
   );
