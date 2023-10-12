@@ -58,7 +58,8 @@ export default function SignInSide() {
   
       if (response.status === 200) {
         // Login successful
-        console.log(responseData.message);
+        console.log("access")
+        login(); 
         // You can redirect the user or show a success message
         navigate('/home2'); 
 
