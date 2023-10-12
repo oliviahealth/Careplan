@@ -11,7 +11,7 @@ const Navbar2 = () => {
       <div className="logo-container">
         <img
           className="maroon-logo"
-          src="./Group.png"
+          src="/Group.png" // Use an absolute path
           alt="Logo"
         />
       </div>
@@ -20,17 +20,17 @@ const Navbar2 = () => {
           <>
             {/* Buttons for authenticated users */}
             <Link to="/plan-of-safe-care" className="nav-button">
-          Plan of Safe Care
-        </Link>
-        <Link to="/your-documentation" className="nav-button">
-          Your Documentation
-        </Link>
-        <Link to="/about" className="nav-button">
-          About
-        </Link>
-        <Link to="/home2" className="nav-button">
-          <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
-        </Link>
+              Plan of Safe Care
+            </Link>
+            <Link to="/your-documentation" className="nav-button">
+              Your Documentation
+            </Link>
+            <Link to="/about" className="nav-button">
+              About
+            </Link>
+            <Link to="/home2" className="nav-button">
+              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
+            </Link>
           </>
         ) : (
           <>
@@ -42,12 +42,11 @@ const Navbar2 = () => {
               Signup
             </Link>
             <Link to="/" className="nav-button">
-            <img src="Pageone.png" alt="Home" style={{ width: '100px' }} />
-           </Link>
+              <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
+            </Link>
           </>
         )}
         {/* Common buttons */}
-  
         <a
           href="https://oliviahealth.org/"
           className="nav-button"
@@ -62,4 +61,5 @@ const Navbar2 = () => {
 };
 
 export default Navbar2;
+
 
