@@ -17,6 +17,7 @@ import Home2 from "./HomeAuthenticated";
 import { AuthProvider } from './AuthContext'; // Import the AuthProvider
 import MaternalDemographicsCard from './MaternalDemographicsCard';
 import MedicalHistory from './MedicalHistory';
+import SocialSupportCard from './SocialSupportCard';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/plan-of-safe-care/maternal-demographics" element={<MaternalDemographicsCard />} />
         <Route path="/plan-of-safe-care/medical-history" element={<MedicalHistory />} />
+        <Route path="/plan-of-safe-care/social-support" element={<SocialSupportCard />} />
       </Routes>
       <SubBar />
     </Router>

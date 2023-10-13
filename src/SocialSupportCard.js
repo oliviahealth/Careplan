@@ -1,0 +1,156 @@
+import React, { useState } from 'react';
+
+const SocialSupportCard = () => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [peopleCount, setPeopleCount] = useState(0);
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [goals, setGoals] = useState('');
+  const [provideAdditionalInfo, setProvideAdditionalInfo] = useState('');
+  const [currentSupport, setCurrentSupport] = useState('');
+  const [relationshipFeelings, setRelationshipFeelings] = useState('');
+
+  const questions = [
+    'How many people live in your home?',
+    'Details of People in Home (Full Name, Date of Birth, Relationship)',
+    'Do any of your children live out of your home? If so select how many:',
+    'Details of Children Outside Home (Full Name, Date of Birth, Address)',
+    'What are your goals? (Parenting, Breastfeeding, Recovery, Etc.)',
+    'Would you like to provide additional information about your support system?',
+    'Who is there as your current support? (Can be friends, family, community, recovery, etc. members)',
+    'How do these relationships make you feel?',
+    'Thank you!',
+  ];
+
+  const handleNextClick = () => {
+    if (
+      (currentQuestionIndex === 0 && peopleCount === 0) ||
+      (currentQuestionIndex === 2 && childrenCount === 0)
+    ) {
+      // Skip the next question if 0 is selected in the dropdown
+      setCurrentQuestionIndex(currentQuestionIndex + 2);
+    } else {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handleEnterClick = () => {
+    handleNextClick();
+  };
+
+  return (
+    <div className="maternal-demographics-card">
+      <h2>Social Support</h2>
+      <div className="question-container">
+        <p>{questions[currentQuestionIndex]}</p>
+        {currentQuestionIndex === 0 && (
+          <>
+            <select onChange={(e) => setPeopleCount(Number(e.target.value))}>
+              {[...Array(11).keys()].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+        {currentQuestionIndex === 1 &&
+          [...Array(peopleCount)].map((_, idx) => (
+            <div key={idx}>
+              <p>Person {idx + 1}:</p>
+              <label></label>
+              <input placeholder="Full name" />
+              <label></label>
+              <input type="date" placeholder="Date of Birth" />
+              <label></label>
+              <input placeholder="Relationship" />
+            </div>
+          ))}
+        {currentQuestionIndex === 2 && (
+          <>
+            <select onChange={(e) => setChildrenCount(Number(e.target.value))}>
+              {[...Array(11).keys()].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+        {currentQuestionIndex === 3 && childrenCount !== 0 && (
+          // Check if childrenCount is not 0 before showing the details
+          [...Array(childrenCount)].map((_, idx) => (
+            <div key={idx}>
+              <p>Child {idx + 1}:</p>
+              <label></label>
+              <input placeholder="Full name" />
+              <label></label>
+              <input type="date" placeholder="Date of Birth" />
+              <label></label>
+              <input placeholder="Address" />
+            </div>
+          ))
+        )}
+        {currentQuestionIndex === 4 && (
+          <input
+            type="text"
+            value={goals}
+            onChange={(e) => setGoals(e.target.value)}
+            placeholder="Goals"
+          />
+        )}
+        {currentQuestionIndex === 5 && (
+          <>
+            <label>
+              <input
+                type="radio"
+                value="yes"
+                checked={provideAdditionalInfo === 'yes'}
+                onChange={() => setProvideAdditionalInfo('yes')}
+              />
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="no"
+                checked={provideAdditionalInfo === 'no'}
+                onChange={() => {
+                  setProvideAdditionalInfo('no');
+                  setCurrentQuestionIndex(8); // Skip to the end when "No" is selected
+                }}
+              />
+              No
+            </label>
+          </>
+        )}
+        {(currentQuestionIndex === 6 || currentQuestionIndex === 7) && (
+          <textarea
+            placeholder={
+              currentQuestionIndex === 6
+                ? 'Who is there as your current support? (Can be friends, family, community, recovery, etc. members)'
+                : 'How do these relationships make you feel?'
+            }
+            value={
+              currentQuestionIndex === 6 ? currentSupport : relationshipFeelings
+            }
+            onChange={(e) => {
+              if (currentQuestionIndex === 6) {
+                setCurrentSupport(e.target.value);
+              } else {
+                setRelationshipFeelings(e.target.value);
+              }
+            }}
+          />
+        )}
+        {currentQuestionIndex !== 8 && (
+          <div>
+            <button onClick={handleEnterClick}>Enter</button>
+            <button onClick={handleNextClick}>Next</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SocialSupportCard;

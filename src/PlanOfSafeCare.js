@@ -33,9 +33,9 @@ const PlanOfSafeCare = () => {
         </Link>
         </div>
         <div className="button-row">
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/social-support" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
-          Family Supports
+          Social Supports
         </Link>
         <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>

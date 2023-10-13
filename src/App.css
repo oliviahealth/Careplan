@@ -139,56 +139,91 @@ body {
   font-size: 1.3rem;
 }
 
-
-/* MaternalDemographicsCard.css */
+ /* MaternalDemographicsCard.css USE THIS FOR ALL CARDS!!! */
 
 /* Container for the card */
 .maternal-demographics-card {
-  background-color: #ffffff; /* Background color */
-  border: 2px solid #4d0000; /* Border color */
-  border-radius: 10px; /* Rounded corners */
-  padding: 20px; /* Padding for content */
-  margin: 20px; /* Margin around the card */
-  text-align: center; /* Center text */
+  background-color: #ffffff;
+  border: 2px solid #4d0000;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 800px; /* Optional: Limit the width on very large screens */
+  width: 90%; /* Take up 90% of the screen width, but no more than 800px */
+  margin-left: auto;
+  margin-right: auto; /* Center the card horizontally */
 }
 
 /* Title style */
 .maternal-demographics-card h2 {
-  color: #4d0000; /* Title text color */
-  font-size: 1.5rem; /* Title font size */
-  margin-bottom: 10px; /* Spacing below title */
+  color: #4d0000;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
 }
 
 /* Question style */
 .question-container p {
-  font-weight: bold; /* Bold text for questions */
-  font-size: 1.2rem; /* Question font size */
-  margin-bottom: 10px; /* Spacing below questions */
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 /* Input field style */
 .question-container input {
-  width: 100%; /* Full width */
-  padding: 10px; /* Padding for input fields */
-  margin-bottom: 20px; /* Spacing between input fields */
-  border: 1px solid #4d0000; /* Border color for input fields */
-  border-radius: 5px; /* Rounded corners for input fields */
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #4d0000;
+  border-radius: 10px;
 }
 
 /* Next button style */
 .question-container button {
-  background-color: #4d0000; /* Button background color */
-  color: #ffffff; /* Button text color */
-  border: none; /* Remove button border */
-  padding: 10px 20px; /* Button padding */
-  cursor: pointer; /* Cursor style on hover */
-  font-size: 1rem; /* Button font size */
+  background-color: #4d0000;
+  color: #ffffff;
+  border: none;
+  padding: 12px 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 10px;
+  align-self: flex-end;
+  margin-top: auto;
 }
 
 /* Next button hover effect */
 .question-container button:hover {
-  background-color: #761414; /* Change button color on hover */
+  background-color: #4d0000;
 }
+
+/* Media Query for Tablets and Smaller Desktop Screens */
+@media (max-width: 1024px) {
+  .maternal-demographics-card {
+    width: 95%; /* Allow it to take up a little more space */
+  }
+}
+
+/* Media Query for Mobile Screens */
+@media (max-width: 768px) {
+  .maternal-demographics-card {
+    width: 100%;
+    border-radius: 0; /* Optional: full-width cards on mobile often don't have rounded corners */
+    padding: 15px; /* Decrease padding a bit for more space */
+  }
+
+  /* Adjust the title font size for smaller screens */
+  .maternal-demographics-card h2 {
+    font-size: 1.3rem;
+  }
+}
+
+
+
+
+
 /* Add this CSS to your App.css file */
 
 .button-container {
@@ -203,6 +238,8 @@ body {
   justify-content: center; /* Center align buttons horizontally within the row */
   gap: 10px; /* Adjust the gap between buttons as needed */
 }
+
+
 
 .circular-button {
   display: inline-flex;
