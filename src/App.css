@@ -201,6 +201,7 @@ body {
 .button-row {
   display: flex;
   justify-content: center; /* Center align buttons horizontally within the row */
+  gap: 10px; /* Adjust the gap between buttons as needed */
 }
 
 .circular-button {
@@ -224,4 +225,47 @@ body {
 .circular-button:hover {
   background-color: #830707; /* Change the background color on hover */
 }
+.rectangular-button {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center; /* Centers content vertically */
+  align-items: center;     /* Centers content horizontally */
+  width: 200px; /* Adjust width as needed */
+  height: 100px; /* Adjust height as needed */
+  background-color: #4d0000;
+  color: white;
+  border-radius: 10px; /* Adjust for slight rounded corners */
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px; /* Adjust font size as needed */
+  font-weight: bold;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
+  position: relative; /* Optional: Makes the shadow appear above other elements */
+  overflow: hidden; /* Optional: Hide any overflowed content */
+}
+
+.rectangular-button:hover {
+  background-color: rgba(131, 7, 7, 0.7); /* Add a semi-transparent tint on hover */
+}
+
+.rectangular-button:hover .button-bg-image {
+  transform: translateY(0); /* Slide the image into view on hover */
+}
+
+.button-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transform: translateY(-100%); /* Initially position the image above the button */
+  transition: transform 0.3s ease; /* Smooth transition for the slide-in effect */
+  z-index: -1; /* Ensure the image stays behind the text */
+}
+
 

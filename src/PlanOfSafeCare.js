@@ -15,31 +15,39 @@ const PlanOfSafeCare = () => {
     <div>
       <div className="button-container">
         <div className="button-row">
-        <Link to="/plan-of-safe-care/maternal-demographics" className="circular-button">
+        <Link to="/plan-of-safe-care/maternal-demographics" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Maternal Demographics
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Medical History
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Services for Substance Use
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Services for Substance Use
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Drug Screening Results
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Drug Screening Results
         </Link>
         </div>
         <div className="button-row">
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Family Supports
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Family Supports
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Infant Information
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Infant Information
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Referrals and Services
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Referrals and Services
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="circular-button">
-        Relapse Prevention Plan
+        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+          <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
+          Relapse Prevention Plan
         </Link>
         </div>
       </div>
