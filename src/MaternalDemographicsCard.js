@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 const MaternalDemographicsCard = () => {
   const { authenticated } = useAuth();
-
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(9).fill(''));
   const [emergencyContact, setEmergencyContact] = useState({
@@ -57,6 +57,37 @@ const MaternalDemographicsCard = () => {
     // Move to the next question
     setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
   };
+  
+  const handlePreviousClick = () => {
+    // Move to the previous question
+    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+  };
+
+  const handleFinalSubmit = async () => {
+    console.log(answers, emergencyContact);
+    setFormSubmitted(true);
+
+    try {
+        const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                answers: answers,
+                emergencyContact: emergencyContact,
+            }),
+        });
+
+        if (response.status === 200) {
+            console.log('Data sent successfully');
+        } else {
+            console.error('Error sending data');
+        }
+    } catch (error) {
+        console.error('There was an error sending the data:', error);
+    }
+  };
 
   const handleInputChange = (event) => {
     const newAnswers = [...answers];
@@ -79,137 +110,125 @@ const MaternalDemographicsCard = () => {
     setEmergencyContact(updatedEmergencyContact);
   };
 
-  const handleEnterClick = () => {
-    // Record the data and move to the next question when the Enter button is clicked
-    handleNextClick();
-  };
-
   return (
     <div className="maternal-demographics-card">
-      {authenticated ? ( // Check if the user is authenticated
-        <>
-          <h2>Maternal Demographics - Section to be included</h2>
-          <div className="question-container">
-            {currentQuestionIndex < questions.length ? (
-              <>
-                <p>{questions[currentQuestionIndex]}</p>
-                {answerTypes[currentQuestionIndex] === 'text' ? (
-                  <>
-                    <input
-                      type="text"
-                      value={answers[currentQuestionIndex]}
-                      onChange={handleInputChange}
-                    />
-                    <div>
-                      <button onClick={handleEnterClick}>Enter</button>
-                      <button onClick={handleNextClick}>Next</button>
+        {authenticated ? (
+            <>
+                <h2>Maternal Demographics - Section to be included</h2>
+                {formSubmitted ? (
+                    <p>Thank you for submitting the form!</p>
+                ) : (
+                    <div className="question-container">
+                        <p>{questions[currentQuestionIndex]}</p>
+
+                        {answerTypes[currentQuestionIndex] === 'text' && (
+                            <input
+                                type="text"
+                                value={answers[currentQuestionIndex]}
+                                onChange={handleInputChange}
+                            />
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'date' && (
+                            <input
+                                type="date"
+                                value={answers[currentQuestionIndex]}
+                                onChange={handleInputChange}
+                            />
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 2 && (
+                            currentLivingArrangementOptions.map((option) => (
+                                <label key={option}>
+                                    <input
+                                        type="radio"
+                                        value={option}
+                                        checked={answers[currentQuestionIndex] === option}
+                                        onChange={handleRadioChange}
+                                    />
+                                    {option}
+                                </label>
+                            ))
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 7 && (
+                            maritalStatusOptions.map((option) => (
+                                <label key={option}>
+                                    <input
+                                        type="radio"
+                                        value={option}
+                                        checked={answers[currentQuestionIndex] === option}
+                                        onChange={handleRadioChange}
+                                    />
+                                    {option}
+                                </label>
+                            ))
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 8 && (
+                            insuranceOptions.map((option) => (
+                                <label key={option}>
+                                    <input
+                                        type="radio"
+                                        value={option}
+                                        checked={answers[currentQuestionIndex] === option}
+                                        onChange={handleRadioChange}
+                                    />
+                                    {option}
+                                </label>
+                            ))
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'tel' && (
+                            <input
+                                type="tel"
+                                value={answers[currentQuestionIndex]}
+                                onChange={handleInputChange}
+                            />
+                        )}
+
+                        {answerTypes[currentQuestionIndex] === 'group' && (
+                            <>
+                                <input
+                                    type="text"
+                                    placeholder="Name"
+                                    value={emergencyContact.name}
+                                    onChange={(e) => handleGroupInputChange(e, 'name')}
+                                />
+                                <input
+                                    type="tel"
+                                    placeholder="Phone Number"
+                                    value={emergencyContact.phone}
+                                    onChange={(e) => handleGroupInputChange(e, 'phone')}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Address"
+                                    value={emergencyContact.address}
+                                    onChange={(e) => handleGroupInputChange(e, 'address')}
+                                />
+                            </>
+                        )}
+
+                        <div>
+                            {currentQuestionIndex > 0 && (
+                                <button onClick={handlePreviousClick}>Previous</button>
+                            )}
+                            {currentQuestionIndex < questions.length - 1 ? (
+                                <button onClick={handleNextClick}>Next</button>
+                            ) : (
+                                <button onClick={handleFinalSubmit}>Enter</button>
+                            )}
+                        </div>
                     </div>
-                  </>
-                ) : answerTypes[currentQuestionIndex] === 'date' ? (
-                  <>
-                    <input
-                      type="date"
-                      value={answers[currentQuestionIndex]}
-                      onChange={handleInputChange}
-                    />
-                    <div>
-                      <button onClick={handleEnterClick}>Enter</button>
-                      <button onClick={handleNextClick}>Next</button>
-                    </div>
-                  </>
-                ) : answerTypes[currentQuestionIndex] === 'radio' ? (
-                  <div>
-                    {currentQuestionIndex === 2 ? ( // Check if it's the 'Current Living Arrangement' question
-                      currentLivingArrangementOptions.map((option) => (
-                        <label key={option}>
-                          <input
-                            type="radio"
-                            value={option}
-                            checked={answers[currentQuestionIndex] === option}
-                            onChange={handleRadioChange}
-                          />
-                          {option}
-                        </label>
-                      ))
-                    ) : currentQuestionIndex === 7 ? ( // Check if it's the 'Marital Status' question
-                      maritalStatusOptions.map((option) => (
-                        <label key={option}>
-                          <input
-                            type="radio"
-                            value={option}
-                            checked={answers[currentQuestionIndex] === option}
-                            onChange={handleRadioChange}
-                          />
-                          {option}
-                        </label>
-                      ))
-                    ) : currentQuestionIndex === 8 ? ( // Check if it's the 'Do you have insurance?' question
-                      insuranceOptions.map((option) => (
-                        <label key={option}>
-                          <input
-                            type="radio"
-                            value={option}
-                            checked={answers[currentQuestionIndex] === option}
-                            onChange={handleRadioChange}
-                          />
-                          {option}
-                        </label>
-                      ))
-                    ) : null}
-                    <div>
-                      <button onClick={handleEnterClick}>Enter</button>
-                      <button onClick={handleNextClick}>Next</button>
-                    </div>
-                  </div>
-                ) : answerTypes[currentQuestionIndex] === 'tel' ? (
-                  <>
-                    <input
-                      type="tel" // Use 'tel' type for phone number
-                      value={answers[currentQuestionIndex]}
-                      onChange={handleInputChange}
-                    />
-                    <div>
-                      <button onClick={handleEnterClick}>Enter</button>
-                      <button onClick={handleNextClick}>Next</button>
-                    </div>
-                  </>
-                ) : answerTypes[currentQuestionIndex] === 'group' ? (
-                  <>
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={emergencyContact.name}
-                      onChange={(e) => handleGroupInputChange(e, 'name')}
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone Number"
-                      value={emergencyContact.phone}
-                      onChange={(e) => handleGroupInputChange(e, 'phone')}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Address"
-                      value={emergencyContact.address}
-                      onChange={(e) => handleGroupInputChange(e, 'address')}
-                    />
-                    <div>
-                      <button onClick={handleEnterClick}>Enter</button>
-                      <button onClick={handleNextClick}>Next</button>
-                    </div>
-                  </>
-                ) : null}
-              </>
-            ) : (
-              <p> Thank you!</p>
-            )}
-          </div>
-        </>
-      ) : (
-        <p>You are not authorized to access this page.</p>
-      )}
+                )}
+            </>
+        ) : (
+            <p>You are not authorized to access this page.</p>
+        )}
     </div>
   );
+
 };
 
 export default MaternalDemographicsCard;
