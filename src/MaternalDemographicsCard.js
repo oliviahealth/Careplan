@@ -114,7 +114,7 @@ const MaternalDemographicsCard = () => {
     <div className="maternal-demographics-card">
         {authenticated ? (
             <>
-                <h2>Maternal Demographics - Section to be included</h2>
+                <h2>Maternal Demographics </h2>
                 {formSubmitted ? (
                     <p>Thank you for submitting the form!</p>
                 ) : (

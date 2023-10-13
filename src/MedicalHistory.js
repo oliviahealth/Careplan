@@ -89,7 +89,7 @@ const MedicalHistory = () => {
   };
 
   return (
-    <div className="medical-history">
+    <div className="maternal-demographics-card">
         {authenticated ? (
             <>
                 <h2>Medical History</h2>
