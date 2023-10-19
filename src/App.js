@@ -18,6 +18,9 @@ import { AuthProvider } from './AuthContext'; // Import the AuthProvider
 import MaternalDemographicsCard from './MaternalDemographicsCard';
 import MedicalHistory from './MedicalHistory';
 import SocialSupportCard from './SocialSupportCard';
+import ChildInformationCard from './ChildInformationCard';
+import ServicesCard from './ServicesCard';
+import RelapsePlanCard from './RelapsePlanCard';
 
 function App() {
   return (
@@ -34,6 +37,11 @@ function App() {
         <Route path="/plan-of-safe-care/maternal-demographics" element={<MaternalDemographicsCard />} />
         <Route path="/plan-of-safe-care/medical-history" element={<MedicalHistory />} />
         <Route path="/plan-of-safe-care/social-support" element={<SocialSupportCard />} />
+        <Route path="/plan-of-safe-care/infant-demographics" element={<ChildInformationCard />} />
+        <Route path="/plan-of-safe-care/services-card" element={<ServicesCard />} />
+        <Route path="/plan-of-safe-care/relapse-card" element={<RelapsePlanCard />} />
+        
+
       </Routes>
       <SubBar />
     </Router>

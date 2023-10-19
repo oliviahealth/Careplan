@@ -37,15 +37,15 @@ const PlanOfSafeCare = () => {
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Social Supports
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/infant-demographics" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Infant Information
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/services-card" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Referrals and Services
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/relapse-card" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Relapse Prevention Plan
         </Link>
