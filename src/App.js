@@ -21,7 +21,8 @@ import SocialSupportCard from './SocialSupportCard';
 import ChildInformationCard from './ChildInformationCard';
 import ServicesCard from './ServicesCard';
 import RelapsePlanCard from './RelapsePlanCard';
-
+import SubstanceUseServices from'./Substanceuse';
+import DrugScreeningResult from './Drugscreening'
 function App() {
   return (
     <Router>
@@ -40,7 +41,8 @@ function App() {
         <Route path="/plan-of-safe-care/infant-demographics" element={<ChildInformationCard />} />
         <Route path="/plan-of-safe-care/services-card" element={<ServicesCard />} />
         <Route path="/plan-of-safe-care/relapse-card" element={<RelapsePlanCard />} />
-        
+        <Route path="/plan-of-safe-care/services-for-substance-use" element={<SubstanceUseServices/>} />
+        <Route path="/plan-of-safe-care/drug-screening-results" element={<DrugScreeningResult/>} />
 
       </Routes>
       <SubBar />

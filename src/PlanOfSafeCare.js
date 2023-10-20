@@ -23,11 +23,11 @@ const PlanOfSafeCare = () => {
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Medical History
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/services-for-substance-use" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Services for Substance Use
         </Link>
-        <Link to="/plan-of-safe-care/medical-history" className="rectangular-button">
+        <Link to="/plan-of-safe-care/drug-screening-results" className="rectangular-button">
           <div className="button-bg-image" style={{ backgroundImage: 'url(/MaternalDemographics.jpg)' }}></div>
           Drug Screening Results
         </Link>
