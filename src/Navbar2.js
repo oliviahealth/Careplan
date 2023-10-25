@@ -1,24 +1,30 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from './AuthContext'; // Import the useAuth hook
-import "./App.css"; // Import the CSS file
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import './App.css'; // Import custom CSS
+import { Dropdown } from 'react-bootstrap';
 
 const Navbar2 = () => {
-  const { authenticated } = useAuth(); // Get the authenticated state from the context
+  const { authenticated } = useAuth();
+  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+
+  const toggleAboutDropdown = () => {
+    setShowAboutDropdown(!showAboutDropdown);
+  };
 
   return (
     <div className="texas-a-m-branded">
       <div className="logo-container">
         <img
           className="maroon-logo"
-          src="/Group.png" // Use an absolute path
+          src="/Group.png"
           alt="Logo"
         />
       </div>
       <div className="nav-buttons">
-        {authenticated ? ( // Render different buttons based on authentication state
+        {authenticated ? (
           <>
-            {/* Buttons for authenticated users */}
             <Link to="/home2" className="nav-button open-sans-button">
               <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
             </Link>
@@ -28,46 +34,61 @@ const Navbar2 = () => {
             <Link to="/your-documentation" className="nav-button open-sans-button">
               Your Documentation
             </Link>
-            <Link to="/about" className="nav-button open-sans-button">
-              About
-            </Link>
-
+            <Dropdown
+              show={showAboutDropdown}
+              onMouseEnter={() => setShowAboutDropdown(true)}
+              onMouseLeave={() => setShowAboutDropdown(false)}
+            >
+<Dropdown.Toggle
+  variant="none"
+  id="about-dropdown"
+  className="custom-about-toggle about-toggle-button open-sans-button"
+>
+  About
+</Dropdown.Toggle>
+              <Dropdown.Menu className={`custom-dropdown-menu ${showAboutDropdown ? 'show' : ''}`}>
+                <Dropdown.Item className="custom-dropdown-item">
+                  <Link to="/faq" className="custom-dropdown-link">
+                    FAQ
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item className="custom-dropdown-item">
+                  <Link to="/contact" className="custom-dropdown-link">
+                    Contact
+                  </Link>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
             <a
-          href="https://oliviahealth.org/"
-          className="nav-button open-sans-button"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OliviaHealth
-        </a>
+              href="https://oliviahealth.org/"
+              className="nav-button open-sans-button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OliviaHealth
+            </a>
           </>
         ) : (
           <>
-            {/* Buttons for non-authenticated users */}
-
             <Link to="/" className="nav-button open-sans-button">
               <img src="/Pageone.png" alt="Home" style={{ width: '100px' }} />
             </Link>
             <a
-          href="https://oliviahealth.org/"
-          className="nav-button open-sans-button"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          OliviaHealth
-        </a>
+              href="https://oliviahealth.org/"
+              className="nav-button open-sans-button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OliviaHealth
+            </a>
             <Link to="/signin" className="nav-button open-sans-button">
               Signin/Signup
             </Link>
           </>
         )}
-        {/* Common buttons */}
-
       </div>
     </div>
   );
 };
 
 export default Navbar2;
-
-

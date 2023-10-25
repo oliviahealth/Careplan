@@ -306,3 +306,80 @@ body {
 }
 
 
+
+/* Default style for hiding the dropdown */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Show the dropdown when it's active */
+.dropdown-content.show {
+  display: block;
+}
+
+/* Custom styles for the About dropdown */
+.custom-about-toggle {
+  background: transparent;
+  border: none;
+  padding: 5px 10px;
+  font-size: 20px;
+  cursor: pointer;
+  margin: -20px; /* Adjust the margin to match the distance of other buttons */
+}
+
+.custom-about-toggle:focus {
+  background: transparent;
+  box-shadow: none;
+}
+
+#faq-dropdown,
+#contact-dropdown {
+  background-color: #fff !important; /* Set the background color to white */
+  border: 2px solid #4d0000 !important; /* Add a border for visibility */
+  padding: 5px 10px !important; /* Adjust padding as needed */
+  font-size: 18px !important;
+  cursor: pointer !important;
+  width: auto !important;
+  text-align: center; /* Center the text horizontally */
+  display: flex;
+  align-items: center; /* Center the text vertically */
+  justify-content: center; /* Center the text horizontally */
+  position: absolute; /* Position the dropdowns absolutely */
+  top: 0; /* Place them at the top */
+  right: 20px; /* Adjust the right value for horizontal positioning */
+  z-index: 1; /* Ensure they are above other content */
+}
+
+#faq-dropdown:focus,
+#contact-dropdown:focus {
+  background-color: #fff !important;
+  box-shadow: none !important;
+}
+
+.custom-dropdown-menu {
+  margin-left: 18px; /* Adjust the margin-left value as needed to align with "About" */
+  margin-top: -8px;
+  background-color: #fff !important;
+  border: none !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.custom-dropdown-item {
+  text-align: center;
+}
+
+.custom-dropdown-link {
+  color: #000 !important;
+  font-weight: normal;
+  font-size: 18px !important;
+}
+
+.custom-dropdown-item:hover {
+  background-color: #f0f0f0 !important;
+}

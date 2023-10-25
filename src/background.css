@@ -59,3 +59,7 @@
       transform: translateY(0);
     }
   }
+  .about-toggle-button {
+    animation: none; /* Remove the animation */
+    /* Add any other styles as needed */
+  }
