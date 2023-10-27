@@ -26,15 +26,38 @@ const SocialSupportCard = () => {
       (currentQuestionIndex === 0 && peopleCount === 0) ||
       (currentQuestionIndex === 2 && childrenCount === 0)
     ) {
-      // Skip the next question if 0 is selected in the dropdown
       setCurrentQuestionIndex(currentQuestionIndex + 2);
     } else {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     }
   };
 
-  const handleEnterClick = () => {
-    handleNextClick();
+  const handlePreviousClick = () => {
+    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+  };
+
+  const handleSubmit = () => {
+    const formData = {
+      peopleCount,
+      childrenCount,
+      goals,
+      provideAdditionalInfo,
+      currentSupport,
+      relationshipFeelings,
+    };
+    console.log(formData);
+
+    // fetch('/backend-endpoint', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(formData),
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log(data);
+    //   });
   };
 
   return (
@@ -43,53 +66,41 @@ const SocialSupportCard = () => {
       <div className="question-container">
         <p>{questions[currentQuestionIndex]}</p>
         {currentQuestionIndex === 0 && (
-          <>
-            <select onChange={(e) => setPeopleCount(Number(e.target.value))}>
-              {[...Array(11).keys()].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-          </>
+          <select onChange={(e) => setPeopleCount(Number(e.target.value))}>
+            {[...Array(11).keys()].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
         )}
         {currentQuestionIndex === 1 &&
           [...Array(peopleCount)].map((_, idx) => (
             <div key={idx}>
               <p>Person {idx + 1}:</p>
-              <label></label>
               <input placeholder="Full name" />
-              <label></label>
               <input type="date" placeholder="Date of Birth" />
-              <label></label>
               <input placeholder="Relationship" />
             </div>
           ))}
         {currentQuestionIndex === 2 && (
-          <>
-            <select onChange={(e) => setChildrenCount(Number(e.target.value))}>
-              {[...Array(11).keys()].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-          </>
+          <select onChange={(e) => setChildrenCount(Number(e.target.value))}>
+            {[...Array(11).keys()].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
         )}
-        {currentQuestionIndex === 3 && childrenCount !== 0 && (
-          // Check if childrenCount is not 0 before showing the details
+        {currentQuestionIndex === 3 && childrenCount !== 0 &&
           [...Array(childrenCount)].map((_, idx) => (
             <div key={idx}>
               <p>Child {idx + 1}:</p>
-              <label></label>
               <input placeholder="Full name" />
-              <label></label>
               <input type="date" placeholder="Date of Birth" />
-              <label></label>
               <input placeholder="Address" />
             </div>
-          ))
-        )}
+          ))}
         {currentQuestionIndex === 4 && (
           <input
             type="text"
@@ -116,7 +127,7 @@ const SocialSupportCard = () => {
                 checked={provideAdditionalInfo === 'no'}
                 onChange={() => {
                   setProvideAdditionalInfo('no');
-                  setCurrentQuestionIndex(8); // Skip to the end when "No" is selected
+                  setCurrentQuestionIndex(8);
                 }}
               />
               No
@@ -127,7 +138,7 @@ const SocialSupportCard = () => {
           <textarea
             placeholder={
               currentQuestionIndex === 6
-                ? 'Who is there as your current support? (Can be friends, family, community, recovery, etc. members)'
+                ? 'Who is there as your current support?'
                 : 'How do these relationships make you feel?'
             }
             value={
@@ -144,9 +155,14 @@ const SocialSupportCard = () => {
         )}
         {currentQuestionIndex !== 8 && (
           <div>
-            <button onClick={handleEnterClick}>Enter</button>
+            {currentQuestionIndex !== 0 && (
+              <button onClick={handlePreviousClick}>Previous</button>
+            )}
             <button onClick={handleNextClick}>Next</button>
           </div>
+        )}
+        {currentQuestionIndex === 8 && (
+          <button onClick={handleSubmit}>Enter</button>
         )}
       </div>
     </div>
