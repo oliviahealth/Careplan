@@ -383,3 +383,15 @@ body {
 .custom-dropdown-item:hover {
   background-color: #f0f0f0 !important;
 }
+
+
+.question-number-indicator {
+  top: 10px; /* Adjust this value as needed */
+  right: 10px; /* Adjust this value as needed */
+  background-color: #4d0000; 
+  color: #ffffff; /* White text */
+  padding: 5px 10px; /* Some padding around the text */
+  border-radius: 4px; 
+  font-weight: bold; /* Make the text bold */
+  z-index: 10; /* Ensure it's above other elements */
+}

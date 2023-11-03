@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ProgressNavBar from './ProgressNavBar';
 
 class ServicesCard extends Component {
     constructor(props) {
@@ -54,7 +55,29 @@ class ServicesCard extends Component {
            "Specialty Court"
            // Add more questions as needed
             ],
+            categories: {
+                0: 'SUPPORT SERVICES',
+                9: 'FOOD/NUTRITION',
+                13: 'HEALTHCARE',
+                19: 'SUBSTANCE USE TREATMENT',
+                25: 'CHILD RELATED',
+                30: 'LEGAL ASSISTANCE',
+                // Add more categories as needed
+            },
         };
+    }
+   
+    getCategoryLabel(index) {
+        const { categories } = this.state;
+        let categoryLabel = '';
+        for (const [key, value] of Object.entries(categories).sort((a, b) => a[0] - b[0])) {
+            if (index >= key) {
+                categoryLabel = value;
+            } else {
+                break;
+            }
+        }
+        return categoryLabel;
     }
 
     handleNextClick = () => {
@@ -79,14 +102,27 @@ class ServicesCard extends Component {
         this.setState({ answers: updatedAnswers });
     };
 
+    navigateToQuestion = (index) => {
+        this.setState({ currentQuestionIndex: index });
+    };
+
     render() {
         const { currentQuestionIndex, questions, answers } = this.state;
         const currentQuestion = questions[currentQuestionIndex];
+        const categoryLabel = this.getCategoryLabel(currentQuestionIndex);
         const options = ['Needed', 'Referred', 'Participating', 'Completed'];
+        const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
         return (
             <div className="maternal-demographics-card">
+                 <ProgressNavBar 
+                  totalQuestions={questions.length}
+                  currentQuestionIndex={currentQuestionIndex}
+                  onNavigate={this.navigateToQuestion}
+                />
                 <h2>Service Needs</h2>
+                {/* Display category label for all questions within the category */}
+                <h3>{categoryLabel}</h3>
                 <div className="question-container">
                     <p>{currentQuestion}</p>
                     <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -95,7 +131,7 @@ class ServicesCard extends Component {
                                 <label>
                                     <input 
                                         type="radio" 
-                                        name="response"
+                                        name={`response_${currentQuestionIndex}`}
                                         value={option}
                                         checked={answers[currentQuestionIndex] === option}
                                         onChange={this.handleOptionChange} 
@@ -106,20 +142,24 @@ class ServicesCard extends Component {
                         ))}
                     </div>
                     <div className="info-inputs" style={{ marginTop: '10px' }}>
-                    <div style={{ marginBottom: '10px' }}>
-                        <label>Organization Name: </label>
-                        <input type="text" placeholder="Enter Organization Name" />
+                        <div style={{ marginBottom: '10px' }}>
+                            <label>Organization Name: </label>
+                            <input type="text" placeholder="Enter Organization Name" />
+                        </div>
+                        <div>
+                            <label>Organization Contact Information: </label>
+                            <input type="text" placeholder="Enter Contact Information" />
+                        </div>
                     </div>
-                    <div>
-                        <label>Organization Contact Information: </label>
-                        <input type="text" placeholder="Enter Contact Information" />
-                    </div>
-                </div>
                 </div>
                 <div>
-                    <button  onClick={this.handlePrevClick}>Previous</button>
-                    <button  onClick={this.handleNextClick}>Next</button>
+                    <button onClick={this.handlePrevClick}>Previous</button>
+                    <button onClick={this.handleNextClick}>Next</button>
+                    
                 </div>
+                <div className="question-number-indicator">
+                     Question {currentQuestionIndex + 1}
+                 </div>
             </div>
         );
     }
