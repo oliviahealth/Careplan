@@ -1,0 +1,102 @@
+/* ProgressNavBar.css */
+
+.progress-meter {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    position: fixed;
+    right: 10px; /* Align with the sidebar navigation position */
+    top: 130px; /* Position above the sidebar navigation */
+    width: 200px; /* Match the sidebar navigation width */
+    z-index: 15; /* Ensure it's above the sidebar navigation */
+  }
+  
+  .progress-bar {
+    height: 20px;
+    background-color: #4d0000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: width 0.4s ease;
+  }
+
+  /* Sidebar navigation styles */
+.sidebar-navigation {
+    position: fixed;
+    right: 10px;
+    top: 150px;
+    width: 200px;
+    max-height: 50vh;
+    background: white;
+    border: 2px solid #4d0000;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px; /* Padding inside the sidebar for content */
+  }
+  
+  /* Style adjustments for the question list within the sidebar */
+  .question-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+  
+  /* Individual question button styles */
+  .question-button {
+    background: white;
+    color: #4d0000; /* Dark red color for button text */
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 2px 0;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+  }
+  
+  /* Style for the active question button */
+  .question-button.active {
+    background: #4d0000;
+    color: white;
+    font-weight: bold;
+  }
+  
+  /* Hover effect for buttons */
+  .question-button:hover {
+    background-color: #4d0000; /* Dark red background on hover */
+    color: white; /* Text color on hover */
+  }
+  
+  /* Custom scrollbar styles for the sidebar */
+  .sidebar-navigation::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  .sidebar-navigation::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .sidebar-navigation::-webkit-scrollbar-thumb {
+    background: #4d0000;
+    border-radius: 5px;
+  }
+  
+  .sidebar-navigation::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* If you need to reset any padding or margins on the ul or li elements that are commonly used for lists, you might want to add: */
+  .sidebar-navigation ul {
+    padding-left: 0;
+    list-style-type: none; /* Removes default list styling */
+  }
+  
+  .sidebar-navigation li {
+    list-style-type: none; /* Ensures no bullets */
+  }
+  
+  
