@@ -23,6 +23,7 @@ import ServicesCard from './ServicesCard';
 import RelapsePlanCard from './RelapsePlanCard';
 import SubstanceUseServices from'./Substanceuse';
 import DrugScreeningResult from './Drugscreening'
+import Profile  from './profile';
 function App() {
   return (
     <Router>
@@ -43,6 +44,7 @@ function App() {
         <Route path="/plan-of-safe-care/relapse-card" element={<RelapsePlanCard />} />
         <Route path="/plan-of-safe-care/services-for-substance-use" element={<SubstanceUseServices/>} />
         <Route path="/plan-of-safe-care/drug-screening-results" element={<DrugScreeningResult/>} />
+        <Route path="/profile" element={<Profile/>} />
 
       </Routes>
       <SubBar />

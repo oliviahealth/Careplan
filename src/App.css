@@ -383,3 +383,40 @@ body {
 .custom-dropdown-item:hover {
   background-color: #f0f0f0 !important;
 }
+.profile-container {
+  display: flex;
+  height: 100vh;
+}
+
+.left-bar {
+  background-color: #4d0000;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-button {
+  margin-bottom: -15px;
+  padding: 5px 20px;
+  font-size: 22px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.section-button.active {
+  background-color: #4d0000;
+  color: white;
+}
+
+.right-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.section-details {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
