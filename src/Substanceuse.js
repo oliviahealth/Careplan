@@ -65,10 +65,10 @@ const SubstanceUseServices = () => {
   };
 
   return (
-    <div className="maternal-demographics-card">
+    <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
       {authenticated ? (
         <>
-          <h2>Services for Substance Use</h2>
+          <h2 className = "headerstyle" >Services for Substance Use</h2>
           {formSubmitted ? (
             <p>Thank you for submitting the form!</p>
           ) : (

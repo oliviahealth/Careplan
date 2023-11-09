@@ -6,23 +6,41 @@ const MaternalDemographicsCard = () => {
   const { authenticated } = useAuth();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState(Array(9).fill(''));
+  const [answers, setAnswers] = useState(Array(8).fill(''));
   const [emergencyContact, setEmergencyContact] = useState({
+    firstName: '',
+    lastName: '',
     phone: '',
-    address: '',
-    name: '',
+    street: '',
+    city: '',
+    zip: '',
+    state: '',
   });
 
+  const [phoneNum, setPhone] = useState({
+    phone: '',
+  });
+  const [name, setName] = useState({
+    firstName: '',
+    lastName: '',
+  });
+  
+  const [address, setAddress] = useState({
+    street: '',
+    city: '',
+    zip: '',
+    state: '',
+  });
+  
   const questions = [
     'Name:',
     'Date of Birth:',
     'Current Living Arrangement:',
     'Street Address:',
     'Primary Phone Number:',
-    'Phone Number:',
     'Emergency Contact (Name, Phone number, Address):',
     'Marital Status:',
-    'Do you have insurance:',
+    'Do you have insurance?',
   ];
 
   const answerTypes = [
@@ -31,7 +49,6 @@ const MaternalDemographicsCard = () => {
     'radio', // Current Living Arrangement
     'text', // Street Address
     'tel', // Updated input type for Primary Phone Number
-    'tel', // Updated input type for Phone Number
     'group', // Group for Emergency Contact
     'radio', // Marital Status
     'radio', // Do you have insurance
@@ -57,6 +74,7 @@ const MaternalDemographicsCard = () => {
     // Move to the next question
     setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
   };
+
   
   const handlePreviousClick = () => {
     // Move to the previous question
@@ -67,6 +85,7 @@ const MaternalDemographicsCard = () => {
     console.log(answers, emergencyContact);
     setFormSubmitted(true);
 
+    
     try {
         const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
             method: 'POST',
@@ -97,6 +116,8 @@ const MaternalDemographicsCard = () => {
     setAnswers(newAnswers);
   };
 
+
+
   const handleRadioChange = (event) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = event.target.value;
@@ -105,9 +126,35 @@ const MaternalDemographicsCard = () => {
     setAnswers(newAnswers);
   };
 
-  const handleGroupInputChange = (event, field) => {
-    const updatedEmergencyContact = { ...emergencyContact, [field]: event.target.value };
-    setEmergencyContact(updatedEmergencyContact);
+  const handlePhoneInputChange = (event) => {
+    const { value } = event.target;
+    // Remove all non-digit characters
+    const numericValue = value.replace(/\D/g, '');
+    // Update the phoneNum state with the numeric value
+    setPhone({ phone: numericValue });
+  };
+  
+  
+
+  const handleGroupInputChange = (event, fieldName) => {
+    const { value } = event.target;
+  
+    // If the field is 'phone', we want to ensure it's only numbers
+    if (fieldName === 'phone') {
+      // Check if the entered value is numeric by trying to convert it to a number
+      const numericValue = value.replace(/\D/g, ''); // Remove non-digits
+      // Now, update only if the value is numeric
+      setEmergencyContact((prevState) => ({
+        ...prevState,
+        [fieldName]: numericValue
+      }));
+    } else {
+      // For all other fields, update the state normally
+      setEmergencyContact((prevState) => ({
+        ...prevState,
+        [fieldName]: value
+      }));
+    }
   };
 
   useEffect(() => {
@@ -144,22 +191,31 @@ const MaternalDemographicsCard = () => {
   }
 
   return (
-    <div className="maternal-demographics-card">
+    <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
         {authenticated ? (
             <>
-                <h2>Maternal Demographics </h2>
+                <h2 className = "headerstyle"> Maternal Demographics </h2>
                 {formSubmitted ? (
                     <p>Thank you for submitting the form!</p>
                 ) : (
                     <div className="question-container">
                         <p>{questions[currentQuestionIndex]}</p>
 
-                        {answerTypes[currentQuestionIndex] === 'text' && (
-                            <input
-                                type="text"
-                                value={answers[currentQuestionIndex]}
-                                onChange={handleInputChange}
-                            />
+                        {answerTypes[currentQuestionIndex] === 'text' && currentQuestionIndex == 0 &&(
+                           <>
+                           <input
+                             type="text"
+                             placeholder="First Name"
+                             value={name.firstName}
+                             onChange={(e) => setName({ ...name, firstName: e.target.value })}
+                           />
+                           <input
+                             type="text"
+                             placeholder="Last Name"
+                             value={name.lastName}
+                             onChange={(e) => setName({ ...name, lastName: e.target.value })}
+                           />
+                         </>
                         )}
 
                         {answerTypes[currentQuestionIndex] === 'date' && (
@@ -184,7 +240,37 @@ const MaternalDemographicsCard = () => {
                             ))
                         )}
 
-                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 7 && (
+                        {answerTypes[currentQuestionIndex] === 'text' && currentQuestionIndex === 3 && (
+                        <>
+                            <input
+                            type="text"
+                            placeholder="Street"
+                            value={address.street}
+                            onChange={(e) => setAddress({ ...address, street: e.target.value })}
+                            />
+                            <input
+                            type="text"
+                            placeholder="City"
+                            value={address.city}
+                            onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                            />
+                            <input
+                            type="text"
+                            placeholder="ZIP"
+                            value={address.zip}
+                            onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+                            />
+                            <input
+                            type="text"
+                            placeholder="State"
+                            value={address.state}
+                            onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                            />
+                        </>
+                        )}
+
+
+                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 6 && (
                             maritalStatusOptions.map((option) => (
                                 <label key={option}>
                                     <input
@@ -198,7 +284,7 @@ const MaternalDemographicsCard = () => {
                             ))
                         )}
 
-                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 8 && (
+                        {answerTypes[currentQuestionIndex] === 'radio' && currentQuestionIndex === 7 && (
                             insuranceOptions.map((option) => (
                                 <label key={option}>
                                     <input
@@ -212,36 +298,78 @@ const MaternalDemographicsCard = () => {
                             ))
                         )}
 
+                         
                         {answerTypes[currentQuestionIndex] === 'tel' && (
-                            <input
-                                type="tel"
-                                value={answers[currentQuestionIndex]}
-                                onChange={handleInputChange}
-                            />
+                        <input
+                            type="tel"
+                            inputMode="numeric"
+                            maxLength="15" // Keep the maxLength as 15 to prevent more digits from being entered
+                            pattern="[0-9]*"
+                            value={phoneNum.phone} // Use the phoneNum state here
+                            onChange={handlePhoneInputChange}
+                            placeholder="Enter phone number"
+                        />
                         )}
 
-                        {answerTypes[currentQuestionIndex] === 'group' && (
-                            <>
-                                <input
-                                    type="text"
-                                    placeholder="Name"
-                                    value={emergencyContact.name}
-                                    onChange={(e) => handleGroupInputChange(e, 'name')}
-                                />
-                                <input
-                                    type="tel"
-                                    placeholder="Phone Number"
-                                    value={emergencyContact.phone}
-                                    onChange={(e) => handleGroupInputChange(e, 'phone')}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Address"
-                                    value={emergencyContact.address}
-                                    onChange={(e) => handleGroupInputChange(e, 'address')}
-                                />
-                            </>
+                                            
+                      {answerTypes[currentQuestionIndex] === 'group' && (
+                        <>
+                            <h3>Emergency Contact Name</h3>
+                            <input
+                            type="text"
+                            placeholder="First Name"
+                            value={emergencyContact.firstName}
+                            onChange={(e) => handleGroupInputChange(e, 'firstName')}
+                            />
+                            <input
+                            type="text"
+                            placeholder="Last Name"
+                            value={emergencyContact.lastName}
+                            onChange={(e) => handleGroupInputChange(e, 'lastName')}
+                            />
+                            
+                            <h3>Phone Information</h3>
+                            <input
+                            type="tel"
+                            inputMode="numeric"
+                            placeholder="Phone Number"
+                            pattern="[0-9]*"
+                            maxLength="15"
+                            value={emergencyContact.phone}
+                            onChange={(e) => handleGroupInputChange(e, 'phone')}
+                            />
+
+                            <h3>Address Information</h3>
+                            <input
+                            type="text"
+                            placeholder="Street"
+                            value={emergencyContact.street}
+                            onChange={(e) => handleGroupInputChange(e, 'street')}
+                            />
+                            <input
+                            type="text"
+                            placeholder="City"
+                            value={emergencyContact.city}
+                            onChange={(e) => handleGroupInputChange(e, 'city')}
+                            />
+                            <input
+                            type="text"
+                            placeholder="ZIP"
+                            pattern="\d{5}(-\d{4})?"
+                            maxLength="10"
+                            value={emergencyContact.zip}
+                            onChange={(e) => handleGroupInputChange(e, 'zip')}
+                            />
+                            
+                            <input
+                            type="text"
+                            placeholder="State"
+                            value={emergencyContact.state}
+                            onChange={(e) => handleGroupInputChange(e, 'state')}
+                            />
+                        </>
                         )}
+
 
                         <div>
                             {currentQuestionIndex > 0 && (
@@ -257,7 +385,7 @@ const MaternalDemographicsCard = () => {
                 )}
             </>
         ) : (
-            <p>You are not authorized to access this page.</p>
+            <p>Thank You!</p>
         )}
     </div>
   );

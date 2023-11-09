@@ -59,6 +59,9 @@ const Navbar2 = () => {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
+            <Link to="/profile" className="nav-button open-sans-button">
+              Profile
+            </Link>
             <a
               href="https://oliviahealth.org/"
               className="nav-button open-sans-button"

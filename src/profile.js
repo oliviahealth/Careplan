@@ -1,0 +1,55 @@
+import React, { useState } from 'react';
+import "./App.css"; 
+import { useAuth } from './AuthContext';
+import MaternalDemographicsprofile from './maternaldemoprofile';
+import MedicalHistoryprofile from './medicalhistoryprofile';
+const Profile = () => {
+  const [selectedSection, setSelectedSection] = useState(null);
+  const { authenticated } = useAuth();
+  const sections = [
+    "Maternal Demographics",
+    "Medical History",
+    "Services for Substance Use",
+    "Drug Screening Results",
+    "Social Supports",
+    "Infant Information",
+    "Referrals and Services",
+    "Relapse Prevention Plan",
+  ];
+
+  const handleSectionClick = (section) => {
+    setSelectedSection(section);
+  };
+
+  if (!authenticated) {
+    // Redirect or show a message for unauthenticated users
+    return <div>You need to be logged in to access this page.</div>;
+  }
+
+  return (
+    <div className="profile-container">
+      <div className="left-bar">
+        {sections.map((section, index) => (
+          <button
+            key={index}
+            className={`section-button ${selectedSection === section ? 'active' : ''}`}
+            onClick={() => handleSectionClick(section)}
+          >
+            {section}
+          </button>
+        ))}
+      </div>
+      <div className="right-content">
+        {selectedSection && (
+          <div className="section-details">
+            {selectedSection === "Maternal Demographics" && <MaternalDemographicsprofile />}
+            {selectedSection === 'Medical History' && <MedicalHistoryprofile />}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
+

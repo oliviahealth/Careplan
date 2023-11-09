@@ -1,5 +1,4 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,7 +7,18 @@ export default {
     extend: {
       fontFamily: {
         tungsten: ['Tungsten', 'sans-serif']
-      }
+      },
+      backgroundColor: {
+        'black': '#4d0000', // Black background
+        'white': '#fff',    // White background
+      },
+      textColor: {
+        'black': '#4d0000', // Black text
+        'white': '#fff',    // White text
+      },
+      borderColor: {
+        '4d0000': '#4d0000', // Custom border color
+      },
     },
   },
   plugins: [require("daisyui")],
@@ -16,11 +26,12 @@ export default {
     themes: [
       {
         mytheme: {
-          "primary": "#661429",
-          "secondary": "#003c71",
+          "primary": "#4d0000", // Set primary color to black
+          "secondary": "#fff",   // Set secondary color to white
           "neutral": "#3D4451",
         }
       }
     ]
   }
 }
+
