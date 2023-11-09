@@ -58,7 +58,14 @@ export default function SignInSide() {
   
       if (response.status === 200) {
         // Login successful
-        console.log("access")
+        // Store the user's ID and email in the browser's local storage
+        localStorage.setItem('userId', responseData.userID);
+        // Store the user's ID and email in the app state
+        // setUserID = responseData.userId;
+        // setEmail = responseData.email;
+        //print user id
+        console.log(responseData.userID);
+        
         login(); 
         // You can redirect the user or show a success message
         navigate('/home2'); 

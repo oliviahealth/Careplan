@@ -118,10 +118,42 @@ class ChildInformationCard extends Component {
     }));
   };
 
-  handleEnterClick = () => {
-    // Record the data and move to the next question when the Enter button is clicked
-    this.handleNextClick();
+  handleEnterClick = async() => {
+    if (this.state.currentQuestionIndex === this.state.questions.length - 1) {
+        // Prepare the form data to be sent to the backend
+        const formData = {
+            answers: this.state.answers,
+            infantMedications: this.state.infantMedications,
+        };
+
+        try {
+          // Send the form data to the backend
+          const response = await fetch('/api/plan-of-safe-care/child-information', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+          });
+
+          // Check if the response is successful
+          if (!response.ok) {
+              throw new Error(`Server responded with status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data);
+
+          // Handle the response data as needed
+          // For example, you can update the component state or navigate to another page
+
+      } catch (error) {
+          console.error("There was an error submitting the form:", error);
+      }
+    }
   };
+
+
 
   render() {
     const {
@@ -148,7 +180,7 @@ class ChildInformationCard extends Component {
                     onChange={this.handleInputChange}
                   />
                   <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
+                    {/* <button onClick={this.handlePreviousClick}>Previous</button> */}
                     {currentQuestionIndex < questions.length - 1 && (
                       <button onClick={this.handleNextClick}>Next</button>
                     )}
@@ -162,7 +194,7 @@ class ChildInformationCard extends Component {
                     onChange={this.handleInputChange}
                   />
                   <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
+                    <button onClick={this.handlePreviousClick}>Previous</button>
                     {currentQuestionIndex < questions.length - 1 && (
                       <button onClick={this.handleNextClick}>Next</button>
                     )}
@@ -209,7 +241,7 @@ class ChildInformationCard extends Component {
                         No
                       </label>
                     </>
-                  ) : currentQuestionIndex === 9 && provideAdditionalInfo === 'yes' ? (
+                  ) : currentQuestionIndex === 9 ? (
                     // NICU days input (only shown if 'Yes' is selected)
                     <>
                       <p>How many days in NICU?</p>
@@ -218,12 +250,16 @@ class ChildInformationCard extends Component {
                         value={answers[currentQuestionIndex]}
                         onChange={this.handleInputChange}
                         placeholder="Enter number of days"
+                        disabled={provideAdditionalInfo === 'no'} // Disable the input if "No" is selected for NICU visit
                       />
                       <div>
-                        <button onClick={this.handleEnterClick}>Enter</button>
+                        <button onClick={this.handlePreviousClick}>Previous</button>
                         {currentQuestionIndex < questions.length - 1 && (
                           <button onClick={this.handleNextClick}>Next</button>
                         )}
+                        {/* {currentQuestionIndex < questions.length - 1 && (
+                          <button onClick={this.handlePreviousClick}>Previous</button>
+                        )} */}
                       </div>
                     </>
                   ) : currentQuestionIndex === 10 ? (
@@ -273,7 +309,7 @@ class ChildInformationCard extends Component {
                     </>
                   ) : null}
                   <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
+                    <button onClick={this.handlePreviousClick}>Previous</button>
                     {currentQuestionIndex < questions.length - 1 && (
                       <button onClick={this.handleNextClick}>Next</button>
                     )}
@@ -287,7 +323,7 @@ class ChildInformationCard extends Component {
                     onChange={this.handleInputChange}
                   />
                   <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
+                    <button onClick={this.handlePreviousClick}>Previous</button>
                     {currentQuestionIndex < questions.length - 1 && (
                       <button onClick={this.handleNextClick}>Next</button>
                     )}
@@ -333,10 +369,15 @@ class ChildInformationCard extends Component {
                     </div>
                   ))}
                   <button onClick={this.handleAddMedication}>Add Medication</button>
+                  <button onClick={this.handlePreviousClick}>Previous</button>
                   <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
+                    
                     {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
+                      <button onClick={this.handleEnterClick}>Enter</button>
+                    )}
+                    {/* add enter button if indext = question length -1 */}
+                    {currentQuestionIndex === questions.length - 1 && (
+                      <button onClick={this.handleEnterClick}>Enter</button>
                     )}
                   </div>
                 </>

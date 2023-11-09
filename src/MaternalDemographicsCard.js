@@ -110,6 +110,39 @@ const MaternalDemographicsCard = () => {
     setEmergencyContact(updatedEmergencyContact);
   };
 
+  useEffect(() => {
+    const checkIfFormSubmitted = async () => {
+      const userId = localStorage.getItem('userId'); // Retrieve the user ID from local storage
+      try {
+        const response = await fetch(`/api/check-form-submission/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setFormSubmitted(data.submitted); // Set the form submission status
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error checking form submission:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false after the check
+      }
+    };
+    checkIfFormSubmitted();
+    }, []);
+
+  if (formSubmitted) {
+    return (
+        <div className="maternal-demographics-card">
+            <p>Thank you for submitting the form!</p>
+        </div>
+    );
+  }
+
   return (
     <div className="maternal-demographics-card">
         {authenticated ? (
