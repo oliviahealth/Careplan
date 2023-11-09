@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -159,6 +160,12 @@ body {
 
 /* Title style */
 .maternal-demographics-card h2 {
+  color: #4d0000;
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.headerstyle {
   color: #4d0000;
   font-size: 1.5rem;
   margin-bottom: 15px;

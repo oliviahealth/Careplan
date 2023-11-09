@@ -114,13 +114,16 @@ class ServicesCard extends Component {
         const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
         return (
-            <div className="maternal-demographics-card">
+            <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md lg:max-w-screen-lg text-center">
+                    <div className="relative">
+             
+
                  <ProgressNavBar 
                   totalQuestions={questions.length}
                   currentQuestionIndex={currentQuestionIndex}
                   onNavigate={this.navigateToQuestion}
                 />
-                <h2>Service Needs</h2>
+                <h2 className = "headerstyle" >Service Needs</h2>
                 {/* Display category label for all questions within the category */}
                 <h3>{categoryLabel}</h3>
                 <div className="question-container">
@@ -160,6 +163,14 @@ class ServicesCard extends Component {
                 <div className="question-number-indicator">
                      Question {currentQuestionIndex + 1}
                  </div>
+                 <div className="flex-none">
+        <ProgressNavBar 
+            totalQuestions={questions.length}
+            currentQuestionIndex={currentQuestionIndex}
+            onNavigate={this.navigateToQuestion}
+        />
+    </div>
+            </div>
             </div>
         );
     }

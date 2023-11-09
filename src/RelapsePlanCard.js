@@ -66,7 +66,7 @@ class RelapsePlanCard extends Component {
     const { currentQuestionIndex, questions, answerTypes, listAnswers, safeCaregivers } = this.state;
 
     return (
-      <div className="maternal-demographics-card">
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
         <h2>Relapse Plan</h2>
         <div className="question-container">
           {currentQuestionIndex < questions.length ? (
