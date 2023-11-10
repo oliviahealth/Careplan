@@ -174,8 +174,8 @@ class ChildInformationCard extends Component {
     } = this.state;
 
     return (
-      <div className="maternal-demographics-card">
-        <h2>Child Information</h2>
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className = "headerstyle">Child Information</h2>
         <div className="question-container">
           {currentQuestionIndex < questions.length ? (
             <>
