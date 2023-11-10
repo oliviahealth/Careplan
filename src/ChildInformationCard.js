@@ -4,6 +4,12 @@ class ChildInformationCard extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      // ... (existing state properties)
+      isNICUQuestion: false, // State to track whether NICU question should be displayed
+      nicuStayDays: '', // State to store the number of NICU days
+      NICUanswerr: 'No', // State for NICU answer (default to 'No')
+    };
 
     this.state = {
       currentQuestionIndex: 0,
@@ -45,8 +51,7 @@ class ChildInformationCard extends Component {
       provideAdditionalInfo: '', // Added state for skipping
       firstName: '', // Declare firstName state
       lastName: '', // Declare lastName state
-      isNICUQuestion: false, // State to track whether NICU question should be displayed
-  nicuStayDays: '', // State to store the number of NICU days
+      
     };
 
     // Options for 'Child's Gender'
@@ -65,6 +70,15 @@ class ChildInformationCard extends Component {
     this.medicationOptions = ['1', '2', '3', '4', '5']; // You can update this list as needed
   }
 
+ 
+  
+  handlePreviousClick = () => {
+    // Move to the previous question
+    this.setState((prevState) => ({
+      currentQuestionIndex: prevState.currentQuestionIndex - 1,
+    }));
+  };
+
   handleNextClick = () => {
     // Move to the next question
     this.setState((prevState) => ({
@@ -72,12 +86,22 @@ class ChildInformationCard extends Component {
     }));
   };
 
-  handlePreviousClick = () => {
-    // Move to the previous question
-    this.setState((prevState) => ({
-      currentQuestionIndex: prevState.currentQuestionIndex - 1,
-    }));
+  handleFinalSubmit = async () => {
+    console.log(this.state.answers, this.state.emergencyContact);
+    // Assuming you have a function to set form submission state
+    this.setFormSubmitted(true);
   };
+
+  handleNICUAnswerChange = (event) => {
+    const { value } = event.target;
+    // Update the state for NICU answer
+    this.setState({
+      NICUanswerr: value,
+      isNICUQuestion: value === 'Yes', // Show the NICU days question if 'Yes' is selected
+      nicuStayDays: value === 'Yes' ? '' : this.state.nicuStayDays, // Reset NICU days if 'No' is selected
+    });
+  };
+  
 
 
 
@@ -106,20 +130,7 @@ class ChildInformationCard extends Component {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = event.target.value;
   
-    if (currentQuestionIndex === 8 && event.target.value === 'Yes') {
-      // If "Yes" is selected, show the NICU days question
-      this.setState({
-        answers: newAnswers,
-        isNICUQuestion: true,
-      });
-    } else {
-      // If "No" is selected, hide the NICU days question
-      this.setState({
-        answers: newAnswers,
-        isNICUQuestion: false,
-        nicuStayDays: '', // Reset the NICU days
-      });
-    }
+    this.setState({ answers: newAnswers });
   };
   
 
@@ -147,10 +158,6 @@ class ChildInformationCard extends Component {
     }));
   };
 
-  handleEnterClick = () => {
-    // Record the data and move to the next question when the Enter button is clicked
-    this.handleNextClick();
-  };
 
   render() {
     const {
@@ -159,11 +166,11 @@ class ChildInformationCard extends Component {
       answerTypes,
       answers,
       infantMedications,
-      provideAdditionalInfo,
       firstName,
       lastName,
-      isNICUQuestion, // State to track whether NICU question should be displayed
-      nicuStayDays, // State to store the number of NICU days
+      isNICUQuestion,
+      nicuStayDays,
+      NICUanswerr,
     } = this.state;
 
     return (
@@ -201,12 +208,6 @@ class ChildInformationCard extends Component {
                       onChange={this.handleInputChange}
                     />
                   )}
-                  <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </>
               ) : answerTypes[currentQuestionIndex] === 'date' ? (
                 <>
@@ -215,12 +216,6 @@ class ChildInformationCard extends Component {
                     value={answers[currentQuestionIndex]}
                     onChange={this.handleInputChange}
                   />
-                  <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </>
               ) : answerTypes[currentQuestionIndex] === 'radio' ? (
                 <div>
@@ -237,9 +232,36 @@ class ChildInformationCard extends Component {
                       </label>
                     ))
                   ) : currentQuestionIndex === 8 ? (
-                    <>
-                   
-                  </>
+                    <div>
+                      <label>
+                        <input
+                          type="radio"
+                          value="Yes"
+                          checked={NICUanswerr === 'Yes'}
+                          onChange={this.handleNICUAnswerChange}
+                        />
+                        Yes
+                      </label>
+                      <label>
+                        <input
+                          type="radio"
+                          value="No"
+                          checked={NICUanswerr === 'No'}
+                          onChange={this.handleNICUAnswerChange}
+                        />
+                        No
+                      </label>
+                      {isNICUQuestion && (
+                        <input
+                          type="text"
+                          placeholder="Number of NICU days"
+                          value={nicuStayDays}
+                          onChange={(e) =>
+                            this.setState({ nicuStayDays: e.target.value })
+                          }
+                        />
+                      )}
+                  </div>
 
                   ) : currentQuestionIndex === 9 ? (
                     this.urineScreeningOptions.map((option) => (
@@ -287,12 +309,6 @@ class ChildInformationCard extends Component {
                       </label>
                     </>
                   ) : null}
-                  <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </div>
               ) : answerTypes[currentQuestionIndex] === 'tel' ? (
                 <>
@@ -301,12 +317,7 @@ class ChildInformationCard extends Component {
                     value={answers[currentQuestionIndex]}
                     onChange={this.handleInputChange}
                   />
-                  <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
+                 
                 </>
               ) : answerTypes[currentQuestionIndex] === 'group' ? (
                 <>
@@ -348,20 +359,28 @@ class ChildInformationCard extends Component {
                     </div>
                   ))}
                   <button onClick={this.handleAddMedication}>Add Medication</button>
-                  <div>
-                    <button onClick={this.handleEnterClick}>Enter</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </>
               ) : null}
             </>
           ) : (
             <p>Thank you for submitting the form!</p>
           )}
-        </div>
-      </div>
+          </div>
+
+{/* Place the navigation/submit buttons here */}
+<div>
+  {currentQuestionIndex > 0 && (
+    <button onClick={this.handlePreviousClick}>Previous</button>
+  )}
+  {currentQuestionIndex < questions.length - 1 ? (
+    <button onClick={this.handleNextClick}>Next</button>
+  ) : (
+    <button onClick={this.handleFinalSubmit}>Enter</button>
+  )}
+</div>
+</div>
+            
+   
     );
   }
 }
