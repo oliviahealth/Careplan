@@ -60,11 +60,14 @@ export default function SignInSide() {
         // Login successful
         // Store the user's ID and email in the browser's local storage
         localStorage.setItem('userId', responseData.userID);
+        localStorage.setItem('formsStatus', JSON.stringify(responseData.formsStatus));
+
         // Store the user's ID and email in the app state
         // setUserID = responseData.userId;
         // setEmail = responseData.email;
         //print user id
         console.log(responseData.userID);
+        console.log(responseData.formsStatus);
         
         login(); 
         // You can redirect the user or show a success message

@@ -6,8 +6,10 @@ const MaternalDemographicsCard = () => {
   //get userId from localStoage
   const userId = localStorage.getItem('userId');
   const { authenticated } = useAuth();
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
+  const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(maternalDemographicsSubmitted);
   const [answers, setAnswers] = useState(Array(8).fill(''));
   const [emergencyContact, setEmergencyContact] = useState({
     firstName: '',
@@ -82,33 +84,6 @@ const MaternalDemographicsCard = () => {
     // Move to the previous question
     setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
   };
-
-  // const handleFinalSubmit = async () => {
-  //   console.log(answers, emergencyContact);
-  //   setFormSubmitted(true);
-
-    
-  //   try {
-  //       const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({
-  //               answers: answers,
-  //               emergencyContact: emergencyContact,
-  //           }),
-  //       });
-
-  //       if (response.status === 200) {
-  //           console.log('Data sent successfully');
-  //       } else {
-  //           console.error('Error sending data');
-  //       }
-  //   } catch (error) {
-  //       console.error('There was an error sending the data:', error);
-  //   }
-  // };
 
   const handleFinalSubmit = async () => {
     // Assuming you have all the necessary state variables defined and updated
@@ -247,13 +222,26 @@ const MaternalDemographicsCard = () => {
   //   );
   // }
 
+  // useEffect(() => {
+  //   if (maternalDemographicsSubmitted) {
+  //     // Show a message or handle the case when the form is already submitted
+  //     setFormAlreadySubmitted(true);
+  //   }
+  // }, [maternalDemographicsSubmitted]);
+
+  // if (maternalDemographicsSubmitted) {
+  //   return <div>Form already submitted.</div>;
+  // }
+
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
         {authenticated ? (
             <>
                 <h2 className = "headerstyle"> Maternal Demographics </h2>
-                {formSubmitted ? (
-                    <p>Thank you for submitting the form!</p>
+                { maternalDemographicsSubmitted ? (
+                    <div className="maternal-demographics-card question-container">
+                        <p>Thank you for submitting the form!</p>
+                    </div>
                 ) : (
                     <div className="question-container">
                         <p>{questions[currentQuestionIndex]}</p>
