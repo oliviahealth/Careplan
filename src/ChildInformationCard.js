@@ -5,6 +5,13 @@ class ChildInformationCard extends Component {
     super(props);
 
     this.state = {
+      // ... (existing state properties)
+      isNICUQuestion: false, // State to track whether NICU question should be displayed
+      nicuStayDays: '', // State to store the number of NICU days
+      NICUanswerr: 'No', // State for NICU answer (default to 'No')
+    };
+
+    this.state = {
       currentQuestionIndex: 0,
       questions: [
         "Child's Full Name:",
@@ -15,8 +22,7 @@ class ChildInformationCard extends Component {
         "Child's Doctor's Name:",
         "Doctor's Phone Number:", // Added Doctor's Phone Number question
         "Date of Last Doctor Visit:",
-        "Did your infant visit NICU?:", // Updated NICU Visit question
-        "How many days in NICU?", // Added "How many days in NICU?" question
+        "Did your infant stay at the Neonatal Intensive Care Unit (NICU)?:", // Updated NICU Visit question
         'Infant Urine Drug Screening at Birth', // Updated Infant Urine Drug Screening at Birth
         'Meconium Results', // Updated Meconium Results
         'Neonatal Opioid Withdraw/Neonatal Abstinence Syndrome', // Updated Neonatal Opioid Withdraw/Neonatal Abstinence Syndrome
@@ -32,7 +38,6 @@ class ChildInformationCard extends Component {
         'tel', // Doctor's Phone Number (Added as tel)
         'date', // Date of Last Doctor Visit
         'radio', // NICU Visit? (Updated to radio)
-        'text', // If Yes, how long?
         'radio', // Infant Urine Drug Screening at Birth (Updated to radio)
         'radio', // Meconium Results (Updated to radio)
         'radio', // Neonatal Opioid Withdraw/Neonatal Abstinence Syndrome (Updated to radio)
@@ -44,6 +49,9 @@ class ChildInformationCard extends Component {
         { medication: '', dose: '', prescriber: '' },
       ],
       provideAdditionalInfo: '', // Added state for skipping
+      firstName: '', // Declare firstName state
+      lastName: '', // Declare lastName state
+      
     };
 
     // Options for 'Child's Gender'
@@ -62,13 +70,8 @@ class ChildInformationCard extends Component {
     this.medicationOptions = ['1', '2', '3', '4', '5']; // You can update this list as needed
   }
 
-  handleNextClick = () => {
-    // Move to the next question
-    this.setState((prevState) => ({
-      currentQuestionIndex: prevState.currentQuestionIndex + 1,
-    }));
-  };
-
+ 
+  
   handlePreviousClick = () => {
     // Move to the previous question
     this.setState((prevState) => ({
@@ -76,23 +79,60 @@ class ChildInformationCard extends Component {
     }));
   };
 
+  handleNextClick = () => {
+    // Move to the next question
+    this.setState((prevState) => ({
+      currentQuestionIndex: prevState.currentQuestionIndex + 1,
+    }));
+  };
+
+  handleFinalSubmit = async () => {
+    console.log(this.state.answers, this.state.emergencyContact);
+    // Assuming you have a function to set form submission state
+    this.setFormSubmitted(true);
+  };
+
+  handleNICUAnswerChange = (event) => {
+    const { value } = event.target;
+    // Update the state for NICU answer
+    this.setState({
+      NICUanswerr: value,
+      isNICUQuestion: value === 'Yes', // Show the NICU days question if 'Yes' is selected
+      nicuStayDays: value === 'Yes' ? '' : this.state.nicuStayDays, // Reset NICU days if 'No' is selected
+    });
+  };
+  
+
+
+
   handleInputChange = (event) => {
     const { currentQuestionIndex, answers } = this.state;
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = event.target.value;
-
-    // Update the answers array when the user types
-    this.setState({ answers: newAnswers });
+  
+    // Check if it's the "Child's Full Name" question
+    if (currentQuestionIndex === 0) {
+      // Separate the input into first and last name
+      const [firstName, lastName] = event.target.value.split(' ');
+      this.setState({
+        answers: newAnswers,
+        firstName,
+        lastName,
+      });
+    } else {
+      // For other text-type questions, update the answers array
+      this.setState({ answers: newAnswers });
+    }
   };
 
   handleRadioChange = (event) => {
     const { currentQuestionIndex, answers } = this.state;
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = event.target.value;
-
-    // Update the answers array when the user selects a radio option
+  
     this.setState({ answers: newAnswers });
   };
+  
 
   handleGroupInputChange = (event, field, index) => {
     const { infantMedications } = this.state;
@@ -162,29 +202,48 @@ class ChildInformationCard extends Component {
       answerTypes,
       answers,
       infantMedications,
-      provideAdditionalInfo,
+      firstName,
+      lastName,
+      isNICUQuestion,
+      nicuStayDays,
+      NICUanswerr,
     } = this.state;
 
     return (
-      <div className="maternal-demographics-card">
-        <h2>Child Information</h2>
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className = "headerstyle">Child Information</h2>
         <div className="question-container">
           {currentQuestionIndex < questions.length ? (
             <>
               <p>{questions[currentQuestionIndex]}</p>
               {answerTypes[currentQuestionIndex] === 'text' ? (
                 <>
-                  <input
-                    type="text"
-                    value={answers[currentQuestionIndex]}
-                    onChange={this.handleInputChange}
-                  />
-                  <div>
-                    {/* <button onClick={this.handlePreviousClick}>Previous</button> */}
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
+                  {currentQuestionIndex === 0 ? ( // Check if it's "Child's Full Name" question
+                    <>
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        value={firstName}
+                        onChange={(e) =>
+                          this.setState({ firstName: e.target.value })
+                        }
+                      />
+                      <input
+                        type="text"
+                        placeholder="Last Name"
+                        value={lastName}
+                        onChange={(e) =>
+                          this.setState({ lastName: e.target.value })
+                        }
+                      />
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      value={answers[currentQuestionIndex]}
+                      onChange={this.handleInputChange}
+                    />
+                  )}
                 </>
               ) : answerTypes[currentQuestionIndex] === 'date' ? (
                 <>
@@ -193,12 +252,6 @@ class ChildInformationCard extends Component {
                     value={answers[currentQuestionIndex]}
                     onChange={this.handleInputChange}
                   />
-                  <div>
-                    <button onClick={this.handlePreviousClick}>Previous</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </>
               ) : answerTypes[currentQuestionIndex] === 'radio' ? (
                 <div>
@@ -215,54 +268,47 @@ class ChildInformationCard extends Component {
                       </label>
                     ))
                   ) : currentQuestionIndex === 8 ? (
-                    // NICU visit radio options with skipping logic
-                    <>
+                    <div>
                       <label>
                         <input
                           type="radio"
-                          value="yes"
-                          checked={provideAdditionalInfo === 'yes'}
-                          onChange={() => {
-                            this.setState({ provideAdditionalInfo: 'yes' });
-                          }}
+                          value="Yes"
+                          checked={NICUanswerr === 'Yes'}
+                          onChange={this.handleNICUAnswerChange}
                         />
                         Yes
                       </label>
                       <label>
                         <input
                           type="radio"
-                          value="no"
-                          checked={provideAdditionalInfo === 'no'}
-                          onChange={() => {
-                            this.setState({ provideAdditionalInfo: 'no' });
-                            this.setState({ currentQuestionIndex: 10 }); 
-                          }}
+                          value="No"
+                          checked={NICUanswerr === 'No'}
+                          onChange={this.handleNICUAnswerChange}
                         />
                         No
                       </label>
-                    </>
+                     
+                      {isNICUQuestion && (
+                        <div>
+                        <label>
+                          Enter the number of days your infant stayed at the NICU:
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Number of days infant has stayed at the NICU?"
+                          value={nicuStayDays}
+                          onChange={(e) =>
+                            this.setState({ nicuStayDays: e.target.value })
+                          }
+                        />
+                        </div>
+                      )}
+                    
+                    
+
+                  </div>
+
                   ) : currentQuestionIndex === 9 ? (
-                    // NICU days input (only shown if 'Yes' is selected)
-                    <>
-                      <p>How many days in NICU?</p>
-                      <input
-                        type="text"
-                        value={answers[currentQuestionIndex]}
-                        onChange={this.handleInputChange}
-                        placeholder="Enter number of days"
-                        disabled={provideAdditionalInfo === 'no'} // Disable the input if "No" is selected for NICU visit
-                      />
-                      <div>
-                        <button onClick={this.handlePreviousClick}>Previous</button>
-                        {currentQuestionIndex < questions.length - 1 && (
-                          <button onClick={this.handleNextClick}>Next</button>
-                        )}
-                        {/* {currentQuestionIndex < questions.length - 1 && (
-                          <button onClick={this.handlePreviousClick}>Previous</button>
-                        )} */}
-                      </div>
-                    </>
-                  ) : currentQuestionIndex === 10 ? (
                     this.urineScreeningOptions.map((option) => (
                       <label key={option}>
                         <input
@@ -274,7 +320,7 @@ class ChildInformationCard extends Component {
                         {option}
                       </label>
                     ))
-                  ) : currentQuestionIndex === 11 ? (
+                  ) : currentQuestionIndex === 10? (
                     this.meconiumResultsOptions.map((option) => (
                       <label key={option}>
                         <input
@@ -286,7 +332,7 @@ class ChildInformationCard extends Component {
                         {option}
                       </label>
                     ))
-                  ) : currentQuestionIndex === 12 ? (
+                  ) : currentQuestionIndex === 11 ? (
                     <>
                       <label>
                         <input
@@ -308,12 +354,6 @@ class ChildInformationCard extends Component {
                       </label>
                     </>
                   ) : null}
-                  <div>
-                    <button onClick={this.handlePreviousClick}>Previous</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
                 </div>
               ) : answerTypes[currentQuestionIndex] === 'tel' ? (
                 <>
@@ -322,12 +362,7 @@ class ChildInformationCard extends Component {
                     value={answers[currentQuestionIndex]}
                     onChange={this.handleInputChange}
                   />
-                  <div>
-                    <button onClick={this.handlePreviousClick}>Previous</button>
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleNextClick}>Next</button>
-                    )}
-                  </div>
+                 
                 </>
               ) : answerTypes[currentQuestionIndex] === 'group' ? (
                 <>
@@ -369,25 +404,30 @@ class ChildInformationCard extends Component {
                     </div>
                   ))}
                   <button onClick={this.handleAddMedication}>Add Medication</button>
-                  <button onClick={this.handlePreviousClick}>Previous</button>
-                  <div>
-                    
-                    {currentQuestionIndex < questions.length - 1 && (
-                      <button onClick={this.handleEnterClick}>Enter</button>
-                    )}
-                    {/* add enter button if indext = question length -1 */}
-                    {currentQuestionIndex === questions.length - 1 && (
-                      <button onClick={this.handleEnterClick}>Enter</button>
-                    )}
-                  </div>
                 </>
               ) : null}
             </>
           ) : (
             <p>Thank you for submitting the form!</p>
           )}
+          </div>
+
+        {/* Place the navigation/submit buttons here */}
+        <div className="question-container">
+                  <div>
+                    {currentQuestionIndex > 0 && (
+                      <button onClick={this.handlePreviousClick}>Previous</button>
+                    )}
+                    {currentQuestionIndex < questions.length - 1 ? (
+                      <button onClick={this.handleNextClick}>Next</button>
+                    ) : (
+                      <button onClick={this.handleFinalSubmit}>Enter</button>
+                    )}
+                  </div>
         </div>
-      </div>
+        </div>
+            
+   
     );
   }
 }

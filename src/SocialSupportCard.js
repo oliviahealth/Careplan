@@ -1,172 +1,132 @@
 import React, { useState } from 'react';
 
-const SocialSupportCard = () => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [peopleCount, setPeopleCount] = useState(0);
-  const [childrenCount, setChildrenCount] = useState(0);
-  const [goals, setGoals] = useState('');
-  const [provideAdditionalInfo, setProvideAdditionalInfo] = useState('');
-  const [currentSupport, setCurrentSupport] = useState('');
-  const [relationshipFeelings, setRelationshipFeelings] = useState('');
+const SocialSupportsCard = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState({
+    peopleInHome: [{ firstName: '', lastName: '', dob: '', relationship: '' }],
+    goals: '',
+    support: '',
+    feelings: '',
+  });
 
-  const questions = [
-    'How many people live in your home?',
-    'Details of People in Home (Full Name, Date of Birth, Relationship)',
-    'Do any of your children live out of your home? If so select how many:',
-    'Details of Children Outside Home (Full Name, Date of Birth, Address)',
-    'What are your goals? (Parenting, Breastfeeding, Recovery, Etc.)',
-    'Would you like to provide additional information about your support system?',
-    'Who is there as your current support? (Can be friends, family, community, recovery, etc. members)',
-    'How do these relationships make you feel?',
-    'Thank you!',
-  ];
+  const handleChange = (index, key, value) => {
+    const updatedPeopleInHome = answers.peopleInHome.map((person, i) => {
+      if (i === index) {
+        return { ...person, [key]: value };
+      }
+      return person;
+    });
 
-  const handleNextClick = () => {
-    if (
-      (currentQuestionIndex === 0 && peopleCount === 0) ||
-      (currentQuestionIndex === 2 && childrenCount === 0)
-    ) {
-      setCurrentQuestionIndex(currentQuestionIndex + 2);
-    } else {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    }
+    setAnswers({ ...answers, peopleInHome: updatedPeopleInHome });
   };
 
-  const handlePreviousClick = () => {
-    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+  const addPerson = () => {
+    setAnswers({
+      ...answers,
+      peopleInHome: [
+        ...answers.peopleInHome,
+        { firstName: '', lastName: '', dob: '', relationship: '' },
+      ],
+    });
   };
 
-  const handleSubmit = () => {
-    const formData = {
-      peopleCount,
-      childrenCount,
-      goals,
-      provideAdditionalInfo,
-      currentSupport,
-      relationshipFeelings,
-    };
-    console.log(formData);
+  const removePerson = (index) => {
+    const updatedPeopleInHome = answers.peopleInHome.filter((_, i) => i !== index);
+    setAnswers({ ...answers, peopleInHome: updatedPeopleInHome });
+  };
 
-    // fetch('/backend-endpoint', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(formData),
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
+  const handleInputChange = (value, field) => {
+    setAnswers({ ...answers, [field]: value });
+  };
+
+  const nextStep = () => {
+    setCurrentStep((prevCurrentStep) => Math.min(prevCurrentStep + 1, 3));
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prevCurrentStep) => Math.max(prevCurrentStep - 1, 0));
   };
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
-      <h2 className = "headerstyle">Social Support</h2>
+      <h2 className = "headerstyle">Social Supports</h2>
       <div className="question-container">
-        <p>{questions[currentQuestionIndex]}</p>
-        {currentQuestionIndex === 0 && (
-          <select onChange={(e) => setPeopleCount(Number(e.target.value))}>
-            {[...Array(11).keys()].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
-        )}
-        {currentQuestionIndex === 1 &&
-          [...Array(peopleCount)].map((_, idx) => (
-            <div key={idx}>
-              <p>Person {idx + 1}:</p>
-              <input placeholder="Full name" />
-              <input type="date" placeholder="Date of Birth" />
-              <input placeholder="Relationship" />
-            </div>
-          ))}
-        {currentQuestionIndex === 2 && (
-          <select onChange={(e) => setChildrenCount(Number(e.target.value))}>
-            {[...Array(11).keys()].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
-        )}
-        {currentQuestionIndex === 3 && childrenCount !== 0 &&
-          [...Array(childrenCount)].map((_, idx) => (
-            <div key={idx}>
-              <p>Child {idx + 1}:</p>
-              <input placeholder="Full name" />
-              <input type="date" placeholder="Date of Birth" />
-              <input placeholder="Address" />
-            </div>
-          ))}
-        {currentQuestionIndex === 4 && (
-          <input
-            type="text"
-            value={goals}
-            onChange={(e) => setGoals(e.target.value)}
-            placeholder="Goals"
-          />
-        )}
-        {currentQuestionIndex === 5 && (
+        {currentStep === 0 && (
           <>
-            <label>
-              <input
-                type="radio"
-                value="yes"
-                checked={provideAdditionalInfo === 'yes'}
-                onChange={() => setProvideAdditionalInfo('yes')}
-              />
-              Yes
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="no"
-                checked={provideAdditionalInfo === 'no'}
-                onChange={() => {
-                  setProvideAdditionalInfo('no');
-                  setCurrentQuestionIndex(8);
-                }}
-              />
-              No
-            </label>
+            <h3>Enter the contact information of people in Home (First Name, Last Name, Date of Birth, Relationship)</h3>
+            {answers.peopleInHome.map((person, index) => (
+              <div key={index} className="contact-entry">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={person.firstName}
+                  onChange={(e) => handleChange(index, 'firstName', e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={person.lastName}
+                  onChange={(e) => handleChange(index, 'lastName', e.target.value)}
+                />
+                <input
+                  type="date"
+                  value={person.dob}
+                  onChange={(e) => handleChange(index, 'dob', e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Relationship"
+                  value={person.relationship}
+                  onChange={(e) => handleChange(index, 'relationship', e.target.value)}
+                />
+                <button onClick={() => removePerson(index)}>Remove</button>
+              </div>
+            ))}
+            <button onClick={addPerson}>Add Person</button>
           </>
         )}
-        {(currentQuestionIndex === 6 || currentQuestionIndex === 7) && (
-          <textarea
-            placeholder={
-              currentQuestionIndex === 6
-                ? 'Who is there as your current support?'
-                : 'How do these relationships make you feel?'
-            }
-            value={
-              currentQuestionIndex === 6 ? currentSupport : relationshipFeelings
-            }
-            onChange={(e) => {
-              if (currentQuestionIndex === 6) {
-                setCurrentSupport(e.target.value);
-              } else {
-                setRelationshipFeelings(e.target.value);
-              }
-            }}
-          />
+        {currentStep === 1 && (
+          <>
+            <h3>What are your goals? (Parenting, Breastfeeding, Recovery, Etc.)</h3>
+            <textarea
+              className="w-full p-2 rounded-md border border-black focus:outline-none focus:ring focus:border-transparent"
+              value={answers.goals}
+              onChange={(e) => handleInputChange(e.target.value, 'goals')}
+              placeholder="Describe your goals..."
+            />
+          </>
         )}
-        {currentQuestionIndex !== 8 && (
-          <div>
-            {currentQuestionIndex !== 0 && (
-              <button onClick={handlePreviousClick}>Previous</button>
-            )}
-            <button onClick={handleNextClick}>Next</button>
-          </div>
+        {currentStep === 2 && (
+          <>
+            <h3>Who is there as your current support? (Can be friends, family, community, recovery, etc. members)</h3>
+            <textarea
+              className="w-full p-2 rounded-md border border-black focus:outline-none focus:ring focus:border-transparent"
+              value={answers.support}
+              onChange={(e) => handleInputChange(e.target.value, 'support')}
+              placeholder="Who supports you..."
+            />
+          </>
         )}
-        {currentQuestionIndex === 8 && (
-          <button onClick={handleSubmit}>Enter</button>
+        {currentStep === 3 && (
+          <>
+           <h3>How do these relationships make you feel?</h3>
+            <textarea
+              className="w-full p-2 rounded-md border border-black focus:outline-none focus:ring focus:border-transparent"
+              value={answers.feelings}
+              onChange={(e) => handleInputChange(e.target.value, 'feelings')}
+              placeholder="How do you feel about your relationships..."
+            />
+
+
+          </>
         )}
+      </div>
+      <div className="question-container">
+        {currentStep > 0 && <button onClick={prevStep}>Previous</button>}
+        {currentStep < 3 && <button onClick={nextStep}>Next</button>}
       </div>
     </div>
   );
 };
 
-export default SocialSupportCard;
+export default SocialSupportsCard;
