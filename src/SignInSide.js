@@ -10,10 +10,9 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 function Copyright(props) {
@@ -21,7 +20,7 @@ function Copyright(props) {
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        PageOne
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -29,19 +28,38 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
+const customTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#4d0000', // Your primary color
+    },
+    text: {
+      primary: '#000000', // Your text color
+    },
+  },
+  typography: {
+    fontFamily: 'Tungsten Medium', // Set the default font family
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Open Sans', // Set the font family for buttons
+        },
+      },
+    },
+  },
+});
 
 export default function SignInSide() {
   const { login } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get('email');
     const password = data.get('password');
-  
+
     try {
       const response = await fetch('/signin', {
         method: 'POST',
@@ -53,15 +71,15 @@ export default function SignInSide() {
           password: password,
         }),
       });
-  
+
       const responseData = await response.json();
-  
+
       if (response.status === 200) {
         // Login successful
         console.log("access")
-        login(); 
+        login();
         // You can redirect the user or show a success message
-        navigate('/home2'); 
+        navigate('/home2');
 
       } else {
         // Login failed
@@ -73,10 +91,10 @@ export default function SignInSide() {
       // Handle the error (e.g., show an error message to the user)
     }
   };
-  
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
+      <CssBaseline />
       <Grid container component="main" sx={{ height: '100vh' }}>
         <Grid
           item
@@ -84,7 +102,7 @@ export default function SignInSide() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://cdn.cdnparenting.com/articles/2018/03/459985822-H.jpg)',
+            backgroundImage: 'url(/babymotherbg.png)', // https://unsplash.com/photos/girl-in-black-and-pink-dress-blowing-bubbles-KbnZgOtM3FI
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -102,10 +120,10 @@ export default function SignInSide() {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <Avatar sx={{ m: 1, bgcolor: customTheme.palette.primary.main }}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography component="h1" variant="h5" color="text.primary">
               Sign in
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -137,19 +155,24 @@ export default function SignInSide() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: customTheme.palette.primary.main,
+                  color: 'white', // Set the button text color to white
+                }}
               >
                 Sign In
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2">
+                  <Link href="#" variant="body2" color="text.primary">
                     Forgot password?
                   </Link>
                 </Grid>
                 <Grid item>
                   <RouterLink to="/signup" style={{ textDecoration: 'none' }}>
-                    <Link variant="body2">
+                    <Link variant="body2" color="text.primary">
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </RouterLink>
