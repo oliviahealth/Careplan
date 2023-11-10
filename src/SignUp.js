@@ -10,25 +10,32 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
+// Reuse the custom theme defined in SignIn
+const customTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#4d0000', // Your primary color
+    },
+    text: {
+      primary: '#000000', // Your text color
+    },
+  },
+  typography: {
+    fontFamily: 'Tungsten Medium', // Set the default font family
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Open Sans', // Set the font family for buttons
+        },
+      },
+    },
+  },
+});
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -47,9 +54,9 @@ export default function SignUp() {
       const response = await fetch('/signup', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(userData),
       });
 
       const result = await response.json();
@@ -62,12 +69,13 @@ export default function SignUp() {
       }
     } catch (error) {
       console.error('There was an error:', error);
-      alert("There was an error. Please try again later.");
+      alert('There was an error. Please try again later.');
     }
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
+      <CssBaseline />
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
@@ -77,10 +85,10 @@ export default function SignUp() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: customTheme.palette.primary.main }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" color="text.primary">
             Sign up
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -142,20 +150,24 @@ export default function SignUp() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: customTheme.palette.primary.main,
+                color: 'white', // Set the button text color to white
+              }}
             >
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" color="text.primary">
                   Already have an account? Sign in
                 </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
       </Container>
     </ThemeProvider>
   );
