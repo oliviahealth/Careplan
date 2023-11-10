@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 
 const MaternalDemographicsCard = () => {
+  //get userId from localStoage
+  const userId = localStorage.getItem('userId');
   const { authenticated } = useAuth();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -81,32 +83,87 @@ const MaternalDemographicsCard = () => {
     setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
   };
 
-  const handleFinalSubmit = async () => {
-    console.log(answers, emergencyContact);
-    setFormSubmitted(true);
+  // const handleFinalSubmit = async () => {
+  //   console.log(answers, emergencyContact);
+  //   setFormSubmitted(true);
 
     
-    try {
-        const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                answers: answers,
-                emergencyContact: emergencyContact,
-            }),
-        });
+  //   try {
+  //       const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //               answers: answers,
+  //               emergencyContact: emergencyContact,
+  //           }),
+  //       });
 
-        if (response.status === 200) {
-            console.log('Data sent successfully');
-        } else {
-            console.error('Error sending data');
-        }
+  //       if (response.status === 200) {
+  //           console.log('Data sent successfully');
+  //       } else {
+  //           console.error('Error sending data');
+  //       }
+  //   } catch (error) {
+  //       console.error('There was an error sending the data:', error);
+  //   }
+  // };
+
+  const handleFinalSubmit = async () => {
+    // Assuming you have all the necessary state variables defined and updated
+    // with the user's input as they interact with the form.
+  
+    // Construct the payload to match the backend's expected structure
+    const payload = {
+      userId: userId, // Replace with actual user ID variable
+      name: {
+        firstName: name.firstName,
+        lastName: name.lastName,
+      },
+      address: {
+        street: address.street,
+        city: address.city,
+        zip: address.zip,
+        state: address.state,
+      },
+      phoneNum: {
+        phone: phoneNum.phone,
+      },
+      emergencyContact: {
+        firstName: emergencyContact.firstName,
+        lastName: emergencyContact.lastName,
+        phone: emergencyContact.phone,
+        street: emergencyContact.street,
+        city: emergencyContact.city,
+        zip: emergencyContact.zip,
+        state: emergencyContact.state,
+      },
+      maritalStatus: answers[6], // Replace with actual state variable if available
+      hasInsurance: answers[7], // Replace with actual state variable if available
+      dateOfBirth: answers[1], // Replace with actual state variable if available
+      currentLivingArrangement: answers[2], // Replace with actual state variable if available
+    };
+  
+    try {
+      const response = await fetch('/api/plan-of-safe-care/maternal-demographics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.status === 200) {
+        console.log('Data sent successfully');
+      } else {
+        console.error('Error sending data');
+      }
     } catch (error) {
-        console.error('There was an error sending the data:', error);
+      console.error('There was an error sending the data:', error);
     }
   };
+  
 
   const handleInputChange = (event) => {
     const newAnswers = [...answers];
@@ -157,38 +214,38 @@ const MaternalDemographicsCard = () => {
     }
   };
 
-  useEffect(() => {
-    const checkIfFormSubmitted = async () => {
-      const userId = localStorage.getItem('userId'); // Retrieve the user ID from local storage
-      try {
-        const response = await fetch(`/api/check-form-submission/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setFormSubmitted(data.submitted); // Set the form submission status
-        } else {
-          throw new Error(data.message);
-        }
-      } catch (error) {
-        console.error('Error checking form submission:', error);
-      } finally {
-        setIsLoading(false); // Set loading to false after the check
-      }
-    };
-    checkIfFormSubmitted();
-    }, []);
+  // useEffect(() => {
+  //   const checkIfFormSubmitted = async () => {
+  //     const userId = localStorage.getItem('userId'); // Retrieve the user ID from local storage
+  //     try {
+  //       const response = await fetch(`/api/check-form-submission/${userId}`, {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //       });
+  //       const data = await response.json();
+  //       if (response.ok) {
+  //         setFormSubmitted(data.submitted); // Set the form submission status
+  //       } else {
+  //         throw new Error(data.message);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking form submission:', error);
+  //     } finally {
+  //       setIsLoading(false); // Set loading to false after the check
+  //     }
+  //   };
+  //   checkIfFormSubmitted();
+  //   }, []);
 
-  if (formSubmitted) {
-    return (
-        <div className="maternal-demographics-card">
-            <p>Thank you for submitting the form!</p>
-        </div>
-    );
-  }
+  // if (formSubmitted) {
+  //   return (
+  //       <div className="maternal-demographics-card">
+  //           <p>Thank you for submitting the form!</p>
+  //       </div>
+  //   );
+  // }
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
