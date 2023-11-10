@@ -155,7 +155,7 @@ class ServicesCard extends Component {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className='question-container'>
                     <button onClick={this.handlePrevClick}>Previous</button>
                     <button onClick={this.handleNextClick}>Next</button>
                     

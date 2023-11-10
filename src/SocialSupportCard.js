@@ -48,8 +48,8 @@ const SocialSupportsCard = () => {
   };
 
   return (
-    <div className="maternal-demographics-card">
-      <h2>Social Supports</h2>
+    <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <h2 className = "headerstyle">Social Supports</h2>
       <div className="question-container">
         {currentStep === 0 && (
           <>
