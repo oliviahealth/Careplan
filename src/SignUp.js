@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 // Reuse the custom theme defined in SignIn
 const customTheme = createTheme({
@@ -38,6 +39,7 @@ const customTheme = createTheme({
 });
 
 export default function SignUp() {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -63,6 +65,9 @@ export default function SignUp() {
       if (response.ok) {
         alert("User created successfully!"); // You can replace this with a more user-friendly feedback mechanism
         localStorage.setItem('userId', result.userID);
+        localStorage.setItem('formsStatus', JSON.stringify(result.formsStatus));
+        console.log(result.formsStatus);
+        login(); // Set the user as authenticated
         navigate('/home2');
       } else {
         alert(result.message); // Display the error message from the backend

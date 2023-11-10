@@ -6,10 +6,14 @@ const MaternalDemographicsCard = () => {
   //get userId from localStoage
   const userId = localStorage.getItem('userId');
   const { authenticated } = useAuth();
-  const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
-  const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
+  // const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
+  // const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
+  const maternalDemographicsSubmitted = localStorage.getItem('maternalDemographicsSubmitted');
+  // console.log(maternalDemographicsSubmitted);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(maternalDemographicsSubmitted);
+  // const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(maternalDemographicsSubmitted);
+  const [formSubmitted, setFormSubmitted] = useState(maternalDemographicsSubmitted === 'true');
+
   const [answers, setAnswers] = useState(Array(8).fill(''));
   const [emergencyContact, setEmergencyContact] = useState({
     firstName: '',
@@ -131,6 +135,10 @@ const MaternalDemographicsCard = () => {
   
       if (response.status === 200) {
         console.log('Data sent successfully');
+        // Update the form submission status in local storage
+        localStorage.setItem('maternalDemographicsSubmitted', true);
+        setFormSubmitted(true);
+        
       } else {
         console.error('Error sending data');
       }
@@ -229,20 +237,30 @@ const MaternalDemographicsCard = () => {
   //   }
   // }, [maternalDemographicsSubmitted]);
 
-  // if (maternalDemographicsSubmitted) {
-  //   return <div>Form already submitted.</div>;
-  // }
+  if (maternalDemographicsSubmitted === 'true') {
+    return <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <h2 className = "headerstyle"> Maternal Demographics </h2>
+        <p>Thank you for submitting the form!</p>
+    </div>;
+  }
+
+  if (formSubmitted) {
+    return (
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className="headerstyle">Maternal Demographics</h2>
+        <p>Thank you for submitting the form!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
         {authenticated ? (
             <>
                 <h2 className = "headerstyle"> Maternal Demographics </h2>
-                { maternalDemographicsSubmitted ? (
-                    <div className="maternal-demographics-card question-container">
-                        <p>Thank you for submitting the form!</p>
-                    </div>
-                ) : (
+                { formSubmitted ? (
+                    <p>Thank you for submitting the form!</p>
+                  ):(
                     <div className="question-container">
                         <p>{questions[currentQuestionIndex]}</p>
 

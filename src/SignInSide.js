@@ -79,6 +79,11 @@ export default function SignInSide() {
         // Store the user's ID and email in the browser's local storage
         localStorage.setItem('userId', responseData.userID);
         localStorage.setItem('formsStatus', JSON.stringify(responseData.formsStatus));
+        const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
+        localStorage.setItem('maternalDemographicsSubmitted', formsSubmitted.maternal_demographics_submitted);
+        localStorage.setItem('medicalHistorySubmitted', formsSubmitted.medical_history_submitted);
+        // const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
+        // const maternalHistorySubmitted = formsSubmitted.maternal_history_submitted;
 
         // Store the user's ID and email in the app state
         // setUserID = responseData.userId;
@@ -86,6 +91,8 @@ export default function SignInSide() {
         //print user id
         console.log(responseData.userID);
         console.log(responseData.formsStatus);
+        console.log(localStorage.getItem('maternalDemographicsSubmitted'));
+        console.log(localStorage.getItem('medicalHistorySubmitted'));
         
         login(); 
         // You can redirect the user or show a success message
