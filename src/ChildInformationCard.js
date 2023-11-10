@@ -251,16 +251,25 @@ class ChildInformationCard extends Component {
                         />
                         No
                       </label>
+                     
                       {isNICUQuestion && (
+                        <div>
+                        <label>
+                          Enter the number of days your infant stayed at the NICU:
+                        </label>
                         <input
-                          type="text"
-                          placeholder="Number of NICU days"
+                          type="number"
+                          placeholder="Number of days infant has stayed at the NICU?"
                           value={nicuStayDays}
                           onChange={(e) =>
                             this.setState({ nicuStayDays: e.target.value })
                           }
                         />
+                        </div>
                       )}
+                    
+                    
+
                   </div>
 
                   ) : currentQuestionIndex === 9 ? (
@@ -367,18 +376,20 @@ class ChildInformationCard extends Component {
           )}
           </div>
 
-{/* Place the navigation/submit buttons here */}
-<div>
-  {currentQuestionIndex > 0 && (
-    <button onClick={this.handlePreviousClick}>Previous</button>
-  )}
-  {currentQuestionIndex < questions.length - 1 ? (
-    <button onClick={this.handleNextClick}>Next</button>
-  ) : (
-    <button onClick={this.handleFinalSubmit}>Enter</button>
-  )}
-</div>
-</div>
+        {/* Place the navigation/submit buttons here */}
+        <div className="question-container">
+                  <div>
+                    {currentQuestionIndex > 0 && (
+                      <button onClick={this.handlePreviousClick}>Previous</button>
+                    )}
+                    {currentQuestionIndex < questions.length - 1 ? (
+                      <button onClick={this.handleNextClick}>Next</button>
+                    ) : (
+                      <button onClick={this.handleFinalSubmit}>Enter</button>
+                    )}
+                  </div>
+        </div>
+        </div>
             
    
     );
