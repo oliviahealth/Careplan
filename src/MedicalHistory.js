@@ -7,6 +7,8 @@ const MedicalHistory = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(11).fill(''));
   const [additionalQuestionsVisible, setAdditionalQuestionsVisible] = useState(false);
+const [locationAnswer, setLocationAnswer] = useState('');
+const [dateCompletedAnswer, setDateCompletedAnswer] = useState('');
   const questions = [
     'Prenatal Care (for current or most recent pregnancy)',
     'Age at Entry of Care (When you join POSC):',
@@ -78,13 +80,12 @@ const MedicalHistory = () => {
       console.error('An error occurred while sending data to the backend:', error);
     }
   };
-
   const handleInputChange = (event) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = event.target.value;
     setAnswers(newAnswers);
   };
-
+  
 
   const handleRadioChange = (event) => {
     const newAnswers = [...answers];
@@ -162,23 +163,22 @@ const MedicalHistory = () => {
                   )}
                 </div>
               )}
-              {currentQuestionIndex === 6 && additionalQuestionsVisible && (
-                // Render additional questions if "Yes" is selected for attending Postpartum Visit
-                <>
-                  <p>Location:</p>
-                  <input
-                    type="text"
-                    value={answers[currentQuestionIndex + 1]}
-                    onChange={(event) => handleInputChange(event, currentQuestionIndex + 1)}
-                  />
-                  <p>Date Completed:</p>
-                  <input
-                    type="date"
-                    value={answers[currentQuestionIndex + 2]}
-                    onChange={(event) => handleInputChange(event, currentQuestionIndex + 2)}
-                  />
-                </>
-              )}
+ {currentQuestionIndex === 6 && additionalQuestionsVisible && (
+      <>
+        <p>Location:</p>
+        <input
+          type="text"
+          value={locationAnswer}
+          onChange={(event) => setLocationAnswer(event.target.value)}
+        />
+        <p>Date Completed:</p>
+        <input
+          type="date"
+          value={dateCompletedAnswer}
+          onChange={(event) => setDateCompletedAnswer(event.target.value)}
+        />
+      </>
+    )}
               <div>
                 {currentQuestionIndex > 0 && (
                   <button onClick={handlePreviousClick}>Previous</button>

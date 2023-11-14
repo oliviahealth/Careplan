@@ -6,6 +6,7 @@ const SubstanceUseServices = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(4).fill(''));
+  const [additionalDetails, setAdditionalDetails] = useState(['', '', '']);
 
   const questions = [
     'Medication Assisted Treatment (MAT) Engaged:',
@@ -29,7 +30,6 @@ const SubstanceUseServices = () => {
     // Log the answers
     console.log(answers);
     setFormSubmitted(true);
-
     // Prepare the data to be sent to the backend
     const formData = {
       answers: answers,
@@ -58,20 +58,24 @@ const SubstanceUseServices = () => {
     }
   };
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event, index) => {
     const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = event.target.value;
+    newAnswers[index] = event.target.value;
     setAnswers(newAnswers);
+  };
+
+  const handleDetailsChange = (event, index) => {
+    const newDetails = [...additionalDetails];
+    newDetails[index] = event.target.value;
+    setAdditionalDetails(newDetails);
   };
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
       {authenticated ? (
         <>
-          <h2 className = "headerstyle" >Services for Substance Use</h2>
-          {formSubmitted ? (
-            <p>Thank you for submitting the form!</p>
-          ) : (
+          <h2 className="headerstyle">Services for Substance Use</h2>
+          {!formSubmitted && (
             <div className="question-container">
               <p>{questions[currentQuestionIndex]}</p>
               {answerTypes[currentQuestionIndex] === 'radio' && (
@@ -82,7 +86,7 @@ const SubstanceUseServices = () => {
                         type="radio"
                         value={option}
                         checked={answers[currentQuestionIndex] === option}
-                        onChange={handleInputChange}
+                        onChange={(e) => handleInputChange(e, currentQuestionIndex)}
                       />
                       {option}
                     </label>
@@ -93,36 +97,36 @@ const SubstanceUseServices = () => {
                 <input
                   type="text"
                   value={answers[currentQuestionIndex]}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange(e, currentQuestionIndex)}
                 />
               )}
               {/* Additional questions */}
-              {answers[0] === 'Prior Use' && currentQuestionIndex === 0 && (
-             <div>
-                 <p>Date of Last use:</p>
-                <input
-                     type="text"
-                     value={answers[1]}
-                     onChange={(event) => handleInputChange(event, 1)}
-                 />
-                 <p>Medication(s) and Dose:</p>
-                <input
+              {answers[currentQuestionIndex] === 'Prior Use' && currentQuestionIndex === 0 && (
+                <div>
+                  <p>Date of Last use:</p>
+                  <input
                     type="text"
-                    value={answers[2]}
-                    onChange={(event) => handleInputChange(event, 2)}
-                 />
+                    value={additionalDetails[0]}
+                    onChange={(e) => handleDetailsChange(e, 0)}
+                  />
+                  <p>Medication(s) and Dose:</p>
+                  <input
+                    type="text"
+                    value={additionalDetails[1]}
+                    onChange={(e) => handleDetailsChange(e, 1)}
+                  />
                 </div>
-                )}
-                {answers[1] === 'Prior Use' && currentQuestionIndex === 1 && (
-                 <div>
-                    <p>Date of Last Appointment:</p>
-                    <input
-                        type="text"
-                        value={answers[2]}
-                        onChange={(event) => handleInputChange(event, 2)}
-                    />
-                 </div>
-                        )}
+              )}
+              {answers[currentQuestionIndex] === 'Prior Use' && currentQuestionIndex === 1 && (
+                <div>
+                  <p>Date of Last Appointment:</p>
+                  <input
+                    type="text"
+                    value={additionalDetails[2]}
+                    onChange={(e) => handleDetailsChange(e, 2)}
+                  />
+                </div>
+              )}
               <div>
                 {currentQuestionIndex > 0 && (
                   <button onClick={handlePreviousClick}>Previous</button>
@@ -135,6 +139,9 @@ const SubstanceUseServices = () => {
               </div>
             </div>
           )}
+            {formSubmitted && (
+            <p>Thank you for submitting the form!</p>
+          )}
         </>
       ) : (
         <p>You are not authorized to access this page.</p>
@@ -144,4 +151,3 @@ const SubstanceUseServices = () => {
 };
 
 export default SubstanceUseServices;
-
