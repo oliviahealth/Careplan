@@ -127,7 +127,7 @@
 }
 
 body {
-  font-family: 'TungstenMedium', sans-serif;
+  font-family: 'Open Sans', sans-serif; /* Change the font to Open Sans */
   /* Other CSS styles for the body element */
 }
 .sub-bar {

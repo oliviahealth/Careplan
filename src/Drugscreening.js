@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-
 const DrugScreeningResult = () => {
   const { authenticated } = useAuth();
   const [formSubmitted, setFormSubmitted] = useState(false);
