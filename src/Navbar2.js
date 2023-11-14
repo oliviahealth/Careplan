@@ -6,7 +6,7 @@ import './App.css'; // Import custom CSS
 import { Dropdown } from 'react-bootstrap';
 
 const Navbar2 = () => {
-  const { authenticated } = useAuth();
+  const { authenticated,logout } = useAuth();
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
 
   const toggleAboutDropdown = () => {
@@ -39,13 +39,13 @@ const Navbar2 = () => {
               onMouseEnter={() => setShowAboutDropdown(true)}
               onMouseLeave={() => setShowAboutDropdown(false)}
             >
-<Dropdown.Toggle
-  variant="none"
-  id="about-dropdown"
-  className="custom-about-toggle about-toggle-button open-sans-button"
->
-  About
-</Dropdown.Toggle>
+            <Dropdown.Toggle
+              variant="none"
+              id="about-dropdown"
+              className="custom-about-toggle about-toggle-button open-sans-button"
+              >
+              About
+              </Dropdown.Toggle>
               <Dropdown.Menu className={`custom-dropdown-menu ${showAboutDropdown ? 'show' : ''}`}>
                 <Dropdown.Item className="custom-dropdown-item">
                   <Link to="/faq" className="custom-dropdown-link">
@@ -70,6 +70,9 @@ const Navbar2 = () => {
             >
               OliviaHealth
             </a>
+            <Link to="/" className="nav-button open-sans-button" onClick={logout}>
+              Logout
+            </Link>
           </>
         ) : (
           <>

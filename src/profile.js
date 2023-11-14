@@ -3,6 +3,8 @@ import "./App.css";
 import { useAuth } from './AuthContext';
 import MaternalDemographicsprofile from './maternaldemoprofile';
 import MedicalHistoryprofile from './medicalhistoryprofile';
+import Substanceuseprofile from './substanceuseprofile';
+import DrugScreeningProfile from './Drugscreeningprofile';
 const Profile = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const { authenticated } = useAuth();
@@ -44,6 +46,8 @@ const Profile = () => {
           <div className="section-details">
             {selectedSection === "Maternal Demographics" && <MaternalDemographicsprofile />}
             {selectedSection === 'Medical History' && <MedicalHistoryprofile />}
+            {selectedSection === 'Services for Substance Use' && <Substanceuseprofile />}
+            {selectedSection === 'Drug Screening Results' && <DrugScreeningProfile />}
           </div>
         )}
       </div>
