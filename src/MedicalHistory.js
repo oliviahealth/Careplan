@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 
 const MedicalHistory = () => {
+  const userId = localStorage.getItem('userId');
   const { authenticated } = useAuth();
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const medicalHistorySubmitted = localStorage.getItem('medicalHistorySubmitted');
+  const [formSubmitted, setFormSubmitted] = useState(medicalHistorySubmitted === 'true');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(11).fill(''));
   const [additionalQuestionsVisible, setAdditionalQuestionsVisible] = useState(false);
@@ -47,15 +49,33 @@ const MedicalHistory = () => {
   };
 
   const handleFinalSubmit = async () => {
-    // Log the answers
     console.log(answers);
-    setFormSubmitted(true);
 
     // Prepare the data to be sent to the backend
     const formData = {
-      answers: answers,
-      // Add any other data you want to send
+      user_id: userId, // Assuming you have the user's ID stored in the state or context
+      prenatal_care: answers[0],
+      age_at_entry_of_care: answers[1],
+      weeks_pregnant: parseInt(answers[2]),
+      anticipated_delivery_date: answers[3],
+      planned_mode_of_delivery: answers[4],
+      actual_mode_of_delivery: answers[5],
+      attended_postpartum_visit: answers[6] === 'Yes',
+      obstetric_history: answers[7],
+      total_number_of_pregnancies: parseInt(answers[8]),
+      number_of_live_births: parseInt(answers[9]),
+      number_of_children_currently_living_with_mother: parseInt(answers[10]),
     };
+
+    // Include additional answers if the user attended a postpartum visit
+    if (answers[6] === 'Yes') {
+      formData.postpartum_visit_location = answers[11]; // Assuming this is the index for the location
+      formData.postpartum_visit_date = answers[12];     // Assuming this is the index for the date
+    }
+    else {
+      formData.postpartum_visit_location = null;
+      formData.postpartum_visit_date = null;
+    }
 
     try {
       // Send a POST request to the backend
@@ -70,6 +90,7 @@ const MedicalHistory = () => {
       // Check if the request was successful
       if (response.ok) {
         console.log('Data sent successfully!');
+        localStorage.setItem('medicalHistorySubmitted', 'true');
         setFormSubmitted(true); // Mark the form as submitted
       } else {
         console.error('Failed to send data to the backend:', await response.text());
@@ -77,7 +98,9 @@ const MedicalHistory = () => {
     } catch (error) {
       console.error('An error occurred while sending data to the backend:', error);
     }
-  };
+};
+
+  
 
   const handleInputChange = (event) => {
     const newAnswers = [...answers];
@@ -102,6 +125,24 @@ const MedicalHistory = () => {
       }
     }
   };
+
+  if (medicalHistorySubmitted === 'true') {
+    return <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <h2 className = "headerstyle"> Medical History </h2>
+        <p>Thank you for submitting the form!</p>
+    </div>;
+  }
+
+  if (formSubmitted) {
+    return (
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className="headerstyle">Medical History</h2>
+        <p>Thank you for submitting the form!</p>
+      </div>
+    );
+  }
+
+
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
       {authenticated ? (
