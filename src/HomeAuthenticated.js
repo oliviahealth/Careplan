@@ -17,7 +17,7 @@ const Home2 = () => {
   return (
     <div className="background-container">
       <div className="text-container">
-        <div className="text">Welcome to Page one!</div>
+        <div className="text">Welcome to PageOne!</div>
         <Link to="/plan-of-safe-care">
           <button id="button1">Plan of safe care</button>
         </Link>
