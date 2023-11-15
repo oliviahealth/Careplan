@@ -6,6 +6,8 @@ class ChildInformationCard extends Component {
 
     this.state = {
       // ... (existing state properties)
+      userId: localStorage.getItem('userId'), // Get the user ID from local storage
+      formSubmitted: false, // State to track whether the form has been submitted
       isNICUQuestion: false, // State to track whether NICU question should be displayed
       nicuStayDays: '', // State to store the number of NICU days
       NICUanswerr: 'No', // State for NICU answer (default to 'No')
@@ -158,40 +160,108 @@ class ChildInformationCard extends Component {
     }));
   };
 
-  handleEnterClick = async() => {
-    if (this.state.currentQuestionIndex === this.state.questions.length - 1) {
-        // Prepare the form data to be sent to the backend
-        const formData = {
-            answers: this.state.answers,
-            infantMedications: this.state.infantMedications,
-        };
+  // handleEnterClick = async() => {
+  //   if (this.state.currentQuestionIndex === this.state.questions.length - 1) {
+  //       // Prepare the form data to be sent to the backend
+  //       const formData = {
+  //           answers: this.state.answers,
+  //           infantMedications: this.state.infantMedications,
+  //       };
 
-        try {
-          // Send the form data to the backend
-          const response = await fetch('/api/plan-of-safe-care/child-information', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formData),
-          });
+  //       try {
+  //         // Send the form data to the backend
+  //         const response = await fetch('/api/plan-of-safe-care/child-information', {
+  //             method: 'POST',
+  //             headers: {
+  //                 'Content-Type': 'application/json',
+  //             },
+  //             body: JSON.stringify(formData),
+  //         });
 
-          // Check if the response is successful
-          if (!response.ok) {
-              throw new Error(`Server responded with status: ${response.status}`);
-          }
+  //         // Check if the response is successful
+  //         if (!response.ok) {
+  //             throw new Error(`Server responded with status: ${response.status}`);
+  //         }
 
-          const data = await response.json();
-          console.log(data);
+  //         const data = await response.json();
+  //         console.log(data);
 
-          // Handle the response data as needed
-          // For example, you can update the component state or navigate to another page
+  //         // Handle the response data as needed
+  //         // For example, you can update the component state or navigate to another page
 
-      } catch (error) {
-          console.error("There was an error submitting the form:", error);
+  //     } catch (error) {
+  //         console.error("There was an error submitting the form:", error);
+  //     }
+  //   }
+  // };
+
+  handleFinalSubmit = async () => {
+    const {
+      answers,
+      firstName,
+      lastName,
+      nicuStayDays,
+      NICUanswerr,
+      infantMedications,
+    } = this.state;
+
+    // Prepare the child information data
+    const childInfoData = {
+      user_id: localStorage.getItem('userId'),
+      first_name: firstName,
+      last_name: lastName,
+      date_of_birth: answers[1],
+      gender: answers[2],
+      relationship_to_you: answers[3],
+      medical_conditions: answers[4],
+      doctor_first_name: answers[5].split(' ')[0], // Assuming doctor's name is entered as "First Last"
+      doctor_last_name: answers[5].split(' ')[1],
+      doctor_phone_number: answers[6],
+      last_doctor_visit: answers[7],
+      visited_nicu: NICUanswerr,
+      days_in_nicu: nicuStayDays === '' ? null : parseInt(nicuStayDays),
+      urine_drug_screening: answers[9],
+      meconium_results: answers[10],
+      neonatal_withdraw: answers[11],
+    };
+
+    // Prepare the form data to be sent to the backend
+    const formData = {
+      childInformation: childInfoData,
+      infantMedications: infantMedications,
+    };
+
+    try {
+      // Send the form data to the backend
+      console.log(formData);
+      const response = await fetch('/api/plan-of-safe-care/child-information', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+      });
+
+      // Check if the response is successful
+      if(response.ok) {
+        console.log('Data sent successfully!');
+        this.setState({ formSubmitted: true }); // Mark the form as submitted
       }
+      if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      // Handle the response data as needed
+      // For example, you can update the component state or navigate to another page
+
+    } catch (error) {
+      console.error("There was an error submitting the form:", error);
     }
-  };
+};
+
 
 
 
@@ -208,6 +278,15 @@ class ChildInformationCard extends Component {
       nicuStayDays,
       NICUanswerr,
     } = this.state;
+
+    if (this.state.formSubmitted) {
+      return (
+        <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+          <h2 className="headerstyle">Infant Information</h2>
+          <p>Thank you for submitting the form!</p>
+        </div>
+      );
+    }
 
     return (
       <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">

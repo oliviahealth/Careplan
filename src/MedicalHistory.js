@@ -9,8 +9,8 @@ const MedicalHistory = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(11).fill(''));
   const [additionalQuestionsVisible, setAdditionalQuestionsVisible] = useState(false);
-const [locationAnswer, setLocationAnswer] = useState('');
-const [dateCompletedAnswer, setDateCompletedAnswer] = useState('');
+  const [locationAnswer, setLocationAnswer] = useState('');
+  const [dateCompletedAnswer, setDateCompletedAnswer] = useState('');
   const questions = [
     'Prenatal Care (for current or most recent pregnancy)',
     'Age at Entry of Care (When you join POSC):',
@@ -68,15 +68,13 @@ const [dateCompletedAnswer, setDateCompletedAnswer] = useState('');
       number_of_live_births: parseInt(answers[9]),
       number_of_children_currently_living_with_mother: parseInt(answers[10]),
     };
-
-    // Include additional answers if the user attended a postpartum visit
-    if (answers[6] === 'Yes') {
-      formData.postpartum_visit_location = answers[11]; // Assuming this is the index for the location
-      formData.postpartum_visit_date = answers[12];     // Assuming this is the index for the date
+    if (answers[6] === 'Yes'){
+      formData.postpartum_visit_location = locationAnswer;
+      formData.postpartum_visit_date = dateCompletedAnswer;
     }
-    else {
-      formData.postpartum_visit_location = null;
-      formData.postpartum_visit_date = null;
+    else{
+      formData.postpartum_visit_location = '';
+      formData.postpartum_visit_date = '';
     }
 
     try {
