@@ -440,3 +440,7 @@ body {
   font-weight: bold; /* Make the text bold */
   z-index: 10; /* Ensure it's above other elements */
 }
+
+.answer {
+  font-weight: normal;
+}

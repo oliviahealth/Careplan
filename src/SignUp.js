@@ -72,6 +72,7 @@ export default function SignUp() {
         localStorage.setItem('socialSupportSubmitted', formsSubmitted.social_supports_submitted);
         localStorage.setItem('substanceUseServicesSubmitted', formsSubmitted.substance_use_services_submitted);
         localStorage.setItem('serviceNeedsSubmitted', formsSubmitted.service_needs_submitted);
+        localStorage.setItem('relapse_plan_submitted', formsSubmitted.relapse_plan_submitted)
         // localStorage.setItem('drugScreeningResultsSubmitted', formsSubmitted.drug_screening_results_submitted);
         console.log(result.formsStatus);
         console.log(result.userID);
@@ -81,6 +82,7 @@ export default function SignUp() {
         console.log(localStorage.getItem('socialSupportSubmitted'));
         console.log(localStorage.getItem('substanceUseServicesSubmitted'));
         console.log(localStorage.getItem('serviceNeedsSubmitted'));
+        console.log(localStorage.getItem('relapse_plan_submitted'));
         // console.log(localStorage.getItem('drugScreeningResultsSubmitted'));
         login(); // Set the user as authenticated
         navigate('/home2');

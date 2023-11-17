@@ -85,6 +85,7 @@ export default function SignInSide() {
         localStorage.setItem('socialSupportSubmitted', formsSubmitted.social_supports_submitted);
         localStorage.setItem('substanceUseServicesSubmitted', formsSubmitted.substance_use_services_submitted);
         localStorage.setItem('serviceNeedsSubmitted', formsSubmitted.service_needs_submitted);
+        localStorage.setItem('relapse_plan_submitted', formsSubmitted.relapse_plan_submitted);
         // localStorage.setItem('drugScreeningResultsSubmitted', formsSubmitted.drug_screening_results_submitted);
         // const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
         // const maternalHistorySubmitted = formsSubmitted.maternal_history_submitted;
@@ -100,6 +101,7 @@ export default function SignInSide() {
         console.log(localStorage.getItem('socialSupportSubmitted'));
         console.log(localStorage.getItem('substanceUseServicesSubmitted'));
         console.log(localStorage.getItem('serviceNeedsSubmitted'));
+        console.log(localStorage.getItem('relapse_plan_submitted'));
         // console.log(localStorage.getItem('drugScreeningResultsSubmitted'));
         
         login(); 

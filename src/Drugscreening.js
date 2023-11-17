@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 const DrugScreeningResult = () => {
   const { authenticated } = useAuth();
+  const userId = localStorage.getItem('userId');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [results, setResults] = useState([
     {
@@ -25,33 +26,50 @@ const DrugScreeningResult = () => {
 
   const handleFinalSubmit = async () => {
     // Prepare the data to be sent to the backend
-    setFormSubmitted(true);
     const formData = {
-      results: results,
-      // Add any other data you want to send
+      userId: userId, // Include the userId if needed by the backend
+      drugScreeningResults: results.map(result => ({
+        dateCollected: result.dateCollected,
+        orderedBy: result.orderedBy,
+        result: result.result,
+        providerReviewed: result.providerReviewed === 'Yes',
+        specifyResult: result.result === 'Positive' ? result.specifyResult : null,
+      })),
     };
-
+  
     try {
       // Send a POST request to the backend
-      const response = await fetch('/api/plan-of-safe-care/drug-screening-result', {
+      const response = await fetch('/api/plan-of-self-care/drug-screening-results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
-
+  
       // Check if the request was successful
       if (response.ok) {
         console.log('Data sent successfully!');
         setFormSubmitted(true); // Mark the form as submitted
+        // Additional logic here if needed, e.g., redirecting the user or updating the state
       } else {
         console.error('Failed to send data to the backend:', await response.text());
+        // Handle the error case, e.g., showing an error message to the user
       }
     } catch (error) {
       console.error('An error occurred while sending data to the backend:', error);
+      // Handle the network error case, e.g., showing an error message to the user
     }
   };
+
+  if(formSubmitted){
+    return (
+      <div className="maternal-demographics-card">
+        <p>Thank you for submitting the form!</p>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="maternal-demographics-card">

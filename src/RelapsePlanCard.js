@@ -5,6 +5,8 @@ class RelapsePlanCard extends Component {
     super(props);
 
     this.state = {
+      userId: localStorage.getItem('userId'),
+      formSubmitted: localStorage.getItem('relapse_plan_submitted') === 'true',
       currentQuestionIndex: 0,
       questions: [
         'List 3 things that you know trigger your desire to use:',
@@ -18,7 +20,7 @@ class RelapsePlanCard extends Component {
         'list', // List of people to talk to
         'group', // Safe caregivers
       ],
-      listAnswers: ['', '', ''], // Initialize list answers with empty strings
+      listAnswers: [['', '', ''], ['', '', ''], ['', '', '']], // Initialize list answers with empty strings
       safeCaregivers: [
         {
           firstName: '',
@@ -62,14 +64,17 @@ class RelapsePlanCard extends Component {
     }));
   };
 
-  handleInputChange = (event) => {
+  handleInputChange = (event, index) => {
     const { currentQuestionIndex, listAnswers } = this.state;
     const newAnswers = [...listAnswers];
-    newAnswers[currentQuestionIndex] = event.target.value;
-
-    // Update the listAnswers array when the user types
+  
+    // Update the specific item in the listAnswers array
+    newAnswers[currentQuestionIndex][index] = event.target.value;
+  
+    // Update the state with the new listAnswers array
     this.setState({ listAnswers: newAnswers });
   };
+  
 
   handleGroupInputChange = (event, index, field) => {
     const { safeCaregivers } = this.state;
@@ -84,14 +89,75 @@ class RelapsePlanCard extends Component {
     this.setState({ safeCaregivers: updatedSafeCaregivers });
   };
 
+  handleFinalSubmit = async () => {
+    const { listAnswers, safeCaregivers, userId } = this.state; // Assuming you have userId in your state
+  
+    // Prepare the data in the format expected by the backend
+    const formData = {
+      userId: userId,
+      triggers: listAnswers[0], // Assuming the first list answer contains triggers
+      skills: listAnswers[1], // Assuming the second list answer contains skills
+      peopleToTalk: listAnswers[2], // Assuming the third list answer contains people to talk to
+      safeCaregivers: safeCaregivers.map(caregiver => ({
+        firstName: caregiver.firstName,
+        lastName: caregiver.lastName,
+        contactNumber: caregiver.contactNumber,
+        relationship: caregiver.relationship
+      }))
+    };
+  
+    try {
+      // Send a POST request to the backend
+      const response = await fetch('/api/plan-of-safe-care/relapse-plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      // Check if the request was successful
+      if (response.ok) {
+        console.log('Data sent successfully!');
+        localStorage.setItem('relapse_plan_submitted', 'true');
+        this.setState({ formSubmitted: true }); // Mark the form as submitted
+        // Additional logic here if needed, e.g., redirecting the user or updating the state
+      } else {
+        console.error('Failed to send data to the backend:', await response.text());
+        // Handle the error case, e.g., showing an error message to the user
+      }
+    } catch (error) {
+      console.error('An error occurred while sending data to the backend:', error);
+      // Handle the network error case, e.g., showing an error message to the user
+    }
+  };
+  
+
   render() {
     const { currentQuestionIndex, questions, answerTypes, listAnswers, safeCaregivers } = this.state;
-
+  
     const placeholders = {
       list: this.listPlaceholders,
       group: this.groupPlaceholders,
     };
-
+  
+    if (this.state.formSubmitted) {
+      return (
+        <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+          <h2 className="headerstyle">Relapse Plan</h2>
+          <p>Relapse Plan submitted!</p>
+        </div>
+      );
+    }
+    if (localStorage.getItem('relapse_plan_submitted') === 'true') {
+      return (
+        <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+          <h2 className="headerstyle">Relapse Plan</h2>
+          <p>Relapse Plan submitted!</p>
+        </div>
+      );
+    }
+  
     return (
       <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
         <h2 className="headerstyle">Relapse Plan</h2>
@@ -101,13 +167,13 @@ class RelapsePlanCard extends Component {
               <p>{questions[currentQuestionIndex]}</p>
               {answerTypes[currentQuestionIndex] === 'list' ? (
                 <>
-                  {[0, 1, 2].map((index) => (
-                    <div key={index}>
+                  {[0, 1, 2].map((itemIndex) => (
+                    <div key={itemIndex}>
                       <input
                         type="text"
-                        placeholder={placeholders.list[currentQuestionIndex * 3 + index]}
-                        value={listAnswers[index]}
-                        onChange={this.handleInputChange}
+                        placeholder={placeholders.list[currentQuestionIndex * 3 + itemIndex]}
+                        value={listAnswers[currentQuestionIndex][itemIndex]}
+                        onChange={(e) => this.handleInputChange(e, itemIndex)}
                       />
                     </div>
                   ))}
@@ -156,7 +222,7 @@ class RelapsePlanCard extends Component {
                     {currentQuestionIndex < questions.length - 1 ? (
                       <button onClick={this.handleNextClick}>Next</button>
                     ) : (
-                      <button onClick={this.handleNextClick}>Enter</button>
+                      <button onClick={this.handleFinalSubmit}>Enter</button>
                     )}
                   </div>
                 </>
@@ -166,7 +232,7 @@ class RelapsePlanCard extends Component {
         </div>
       </div>
     );
-  }
+  }  
 }
 
 export default RelapsePlanCard;
