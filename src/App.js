@@ -6,6 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar2 from "./Navbar2";
 import Home from "./Home";
@@ -24,12 +25,14 @@ import RelapsePlanCard from './RelapsePlanCard';
 import SubstanceUseServices from'./Substanceuse';
 import DrugScreeningResult from './Drugscreening'
 import Profile  from './profile';
+import { useAuth } from './AuthContext';
 function App() {
+  const { authenticated } = useAuth(); 
   return (
     <Router>
       <Navbar2 />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={authenticated ? <Navigate to="/home2" /> : <Home />} />
         <Route path="/home2" element={<Home2 />} />
         <Route path="/plan-of-safe-care" element={<PlanOfSafeCare />} />
         <Route path="/your-documentation" element={<YourDocumentation />} />
