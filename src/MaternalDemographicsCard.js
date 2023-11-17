@@ -6,12 +6,11 @@ const MaternalDemographicsCard = () => {
   //get userId from localStoage
   const userId = localStorage.getItem('userId');
   const { authenticated } = useAuth();
-  // const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
-  // const maternalDemographicsSubmitted = formsSubmitted.maternal_demographics_submitted;
+
   const maternalDemographicsSubmitted = localStorage.getItem('maternalDemographicsSubmitted');
-  // console.log(maternalDemographicsSubmitted);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  // const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(maternalDemographicsSubmitted);
+
   const [formSubmitted, setFormSubmitted] = useState(maternalDemographicsSubmitted === 'true');
 
   const [answers, setAnswers] = useState(Array(8).fill(''));

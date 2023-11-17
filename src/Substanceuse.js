@@ -3,7 +3,9 @@ import { useAuth } from './AuthContext';
 
 const SubstanceUseServices = () => {
   const { authenticated } = useAuth();
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const substanceUseServicesSubmitted = localStorage.getItem('substanceUseServicesSubmitted');
+  const [formSubmitted, setFormSubmitted] = useState(substanceUseServicesSubmitted === 'true');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(4).fill(''));
   const [additionalDetails, setAdditionalDetails] = useState(['', '', '']);
@@ -28,14 +30,20 @@ const SubstanceUseServices = () => {
 
   const handleFinalSubmit = async () => {
     // Log the answers
-    console.log(answers);
-    setFormSubmitted(true);
+    console.log(answers, additionalDetails);
+  
     // Prepare the data to be sent to the backend
     const formData = {
-      answers: answers,
-      // Add any other data you want to send
+      user_id: userId, // Assuming you have the user's ID stored in the state or context
+      mat_engaged: answers[0],
+      addiction_services: answers[1],
+      mat_clinic_info: answers[2],
+      addiction_clinic_info: answers[3],
+      last_use_date: additionalDetails[0],
+      medication_and_dose: additionalDetails[1],
+      last_appointment_date: additionalDetails[2],
     };
-
+  
     try {
       // Send a POST request to the backend
       const response = await fetch('/api/plan-of-safe-care/services-for-substance-use', {
@@ -45,10 +53,11 @@ const SubstanceUseServices = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       // Check if the request was successful
       if (response.ok) {
-        console.log('Data sent successfully!');
+        console.log('Data sent successfully!')
+        localStorage.setItem('substanceUseServicesSubmitted', 'true');
         setFormSubmitted(true); // Mark the form as submitted
       } else {
         console.error('Failed to send data to the backend:', await response.text());
@@ -57,6 +66,7 @@ const SubstanceUseServices = () => {
       console.error('An error occurred while sending data to the backend:', error);
     }
   };
+  
 
   const handleInputChange = (event, index) => {
     const newAnswers = [...answers];
@@ -69,6 +79,21 @@ const SubstanceUseServices = () => {
     newDetails[index] = event.target.value;
     setAdditionalDetails(newDetails);
   };
+  if (substanceUseServicesSubmitted === 'true') {
+    return <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <h2 className = "headerstyle"> Services for Substance Use </h2>
+        <p>Thank you for submitting the form!</p>
+    </div>;
+  }
+
+  if (formSubmitted) {
+    return (
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className="headerstyle">Services for Substance Use</h2>
+        <p>Thank you for submitting the form!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">

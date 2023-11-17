@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
 const SocialSupportsCard = () => {
+  const userId = localStorage.getItem('userId');
+  const socialSupportSubmitted = localStorage.getItem('socialSupportSubmitted');
+  const [formSubmitted, setFormSubmitted] = useState(socialSupportSubmitted === 'true');
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({
     peopleInHome: [{ firstName: '', lastName: '', dob: '', relationship: '' }],
@@ -46,6 +49,61 @@ const SocialSupportsCard = () => {
   const prevStep = () => {
     setCurrentStep((prevCurrentStep) => Math.max(prevCurrentStep - 1, 0));
   };
+
+  const handleFinalSubmit = async () => {
+    // Prepare the data to be sent to the backend
+    const formData = {
+      user_id: userId, // Assuming you have the user's ID stored in the state or context
+      goals: answers.goals,
+      support: answers.support,
+      feelings: answers.feelings,
+      people_in_home: answers.peopleInHome.map(person => ({
+        first_name: person.firstName,
+        last_name: person.lastName,
+        date_of_birth: person.dob,
+        relationship: person.relationship
+      }))
+    };
+  
+    try {
+      // Send a POST request to the backend
+      const response = await fetch('/api/plan-of-safe-care/social-supports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      // Check if the request was successful
+      if (response.ok) {
+        console.log('Data sent successfully!');
+        localStorage.setItem('socialSupportSubmitted', 'true');
+        setFormSubmitted(true); // Mark the form as submitted
+      } else {
+        console.error('Failed to send data to the backend:', await response.text());
+      }
+    } catch (error) {
+      console.error('An error occurred while sending data to the backend:', error);
+    }
+  };
+
+  if (socialSupportSubmitted === 'true') {
+    return <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <h2 className = "headerstyle"> Social Supports </h2>
+        <p>Thank you for submitting the form!</p>
+    </div>;
+  }
+
+  if (formSubmitted) {
+    return (
+      <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <h2 className="headerstyle">Social Supports</h2>
+        <p>Thank you for submitting the form!</p>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
@@ -124,6 +182,7 @@ const SocialSupportsCard = () => {
       <div className="question-container">
         {currentStep > 0 && <button onClick={prevStep}>Previous</button>}
         {currentStep < 3 && <button onClick={nextStep}>Next</button>}
+        {currentStep === 3 && <button onClick={handleFinalSubmit}>Submit</button>}
       </div>
     </div>
   );

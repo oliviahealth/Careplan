@@ -66,7 +66,22 @@ export default function SignUp() {
         alert("User created successfully!"); // You can replace this with a more user-friendly feedback mechanism
         localStorage.setItem('userId', result.userID);
         localStorage.setItem('formsStatus', JSON.stringify(result.formsStatus));
+        const formsSubmitted = JSON.parse(localStorage.getItem('formsStatus')) || {};
+        localStorage.setItem('maternalDemographicsSubmitted', formsSubmitted.maternal_demographics_submitted);
+        localStorage.setItem('medicalHistorySubmitted', formsSubmitted.medical_history_submitted);
+        localStorage.setItem('socialSupportSubmitted', formsSubmitted.social_supports_submitted);
+        localStorage.setItem('substanceUseServicesSubmitted', formsSubmitted.substance_use_services_submitted);
+        localStorage.setItem('serviceNeedsSubmitted', formsSubmitted.service_needs_submitted);
+        // localStorage.setItem('drugScreeningResultsSubmitted', formsSubmitted.drug_screening_results_submitted);
         console.log(result.formsStatus);
+        console.log(result.userID);
+        console.log(result.formsStatus);
+        console.log(localStorage.getItem('maternalDemographicsSubmitted'));
+        console.log(localStorage.getItem('medicalHistorySubmitted'));
+        console.log(localStorage.getItem('socialSupportSubmitted'));
+        console.log(localStorage.getItem('substanceUseServicesSubmitted'));
+        console.log(localStorage.getItem('serviceNeedsSubmitted'));
+        // console.log(localStorage.getItem('drugScreeningResultsSubmitted'));
         login(); // Set the user as authenticated
         navigate('/home2');
       } else {

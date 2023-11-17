@@ -7,6 +7,11 @@ class ServicesCard extends Component {
 
         this.state = {
             currentQuestionIndex: 0,
+            userId: localStorage.getItem('userId'), // Get the user ID from local storage
+            serviceNeedsSubmitted: localStorage.getItem('serviceNeedsSubmitted'),
+            formSubmitted: localStorage.getItem('serviceNeedsSubmitted') === 'true',
+            orgNames: Array(35).fill(''),
+            orgContacts: Array(35).fill(''),
             answers: Array(35).fill(null),
             questions: [
                  // SUPPORT SERVICES
@@ -86,6 +91,7 @@ class ServicesCard extends Component {
             this.setState({ currentQuestionIndex: nextIndex });
         } else {
             console.log('All questions completed!');
+            console.log(this.state.answers)
         }
     };
 
@@ -106,12 +112,74 @@ class ServicesCard extends Component {
         this.setState({ currentQuestionIndex: index });
     };
 
+    handleOrgNameChange = (event, index) => {
+        const updatedOrgNames = [...this.state.orgNames];
+        updatedOrgNames[index] = event.target.value;
+        this.setState({ orgNames: updatedOrgNames });
+    };
+    
+    handleContactInfoChange = (event, index) => {
+        const updatedContactInfos = [...this.state.orgContacts];
+        updatedContactInfos[index] = event.target.value;
+        this.setState({ orgContacts: updatedContactInfos });
+    };
+
+    handleFinalSubmit = async () => {
+        const { answers, orgNames, orgContacts } = this.state;
+        const formData = {
+            user_id: this.state.userId, // Assuming you have the user's ID stored in the state or context
+            answers,
+            orgNames,
+            orgContacts,
+            // Include any other relevant data
+        };
+    
+        try {
+            const response = await fetch('/api/plan-of-self-care/service-needs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+    
+            if (response.ok) {
+                console.log('Data sent successfully!');
+                localStorage.setItem('serviceNeedsSubmitted', 'true');
+                this.setState({ formSubmitted: true });
+                // Handle successful submission (e.g., show a success message)
+            } else {
+                console.error('Failed to send data:', await response.text());
+            }
+        } catch (error) {
+            console.error('Error sending data:', error);
+        }
+    };
+    
+
     render() {
         const { currentQuestionIndex, questions, answers } = this.state;
         const currentQuestion = questions[currentQuestionIndex];
         const categoryLabel = this.getCategoryLabel(currentQuestionIndex);
         const options = ['Needed', 'Referred', 'Participating', 'Completed'];
         const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+        if (this.state.formSubmitted) {
+            return (
+                <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md lg:max-w-screen-lg text-center">
+                    <h2 className = "headerstyle" >Service Needs</h2>
+                    <p>Thank you for submitting your responses!</p>
+                </div>
+            );
+        }
+        if(this.state.serviceNeedsSubmitted === 'true') {
+            return (
+                <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md lg:max-w-screen-lg text-center">
+                    <h2 className = "headerstyle" >Service Needs</h2>
+                    <p>Thank you for submitting your responses!</p>
+                </div>
+            );
+        }
 
         return (
             <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md lg:max-w-screen-lg text-center">
@@ -147,18 +215,31 @@ class ServicesCard extends Component {
                     <div className="info-inputs" style={{ marginTop: '10px' }}>
                         <div style={{ marginBottom: '10px' }}>
                             <label>Organization Name: </label>
-                            <input type="text" placeholder="Enter Organization Name" />
+                            <input 
+                                type="text" 
+                                placeholder="Enter Organization Name" 
+                                value={this.state.orgNames[currentQuestionIndex]}
+                                onChange={(e) => this.handleOrgNameChange(e, currentQuestionIndex)} 
+                            />
                         </div>
                         <div>
                             <label>Organization Contact Information: </label>
-                            <input type="text" placeholder="Enter Contact Information" />
+                            <input 
+                                type="text" 
+                                placeholder="Enter Contact Information" 
+                                value={this.state.orgContacts[currentQuestionIndex]}
+                                onChange={(e) => this.handleContactInfoChange(e, currentQuestionIndex)}
+                            />
                         </div>
                     </div>
                 </div>
                 <div className='question-container'>
                     <button onClick={this.handlePrevClick}>Previous</button>
-                    <button onClick={this.handleNextClick}>Next</button>
-                    
+                    {isLastQuestion ? (
+                        <button onClick={this.handleFinalSubmit}>Submit</button>
+                    ) : (
+                        <button onClick={this.handleNextClick}>Next</button>
+                    )}
                 </div>
                 <div className="question-number-indicator">
                      Question {currentQuestionIndex + 1}
