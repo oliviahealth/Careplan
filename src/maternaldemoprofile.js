@@ -48,7 +48,7 @@ const MaternalDemographicsprofile = () => {
   }
 
   return (
-    <div className="maternal-demographics-card">
+    <div className="service-profile-container">
       <h2>Maternal Demographics</h2>
       {demographicsData ? (
         <div>
@@ -83,8 +83,14 @@ const MaternalDemographicsprofile = () => {
             <p>Do you have insurance: <span className="answer">{demographicsData["Has Insurance"] ? 'Yes' : 'No'}</span></p>
           </div>
         </div>
-      ) : (
-        <p>Loading...</p>
+      ) :(
+        <div>
+          {questions.map((question, index) => (
+            <div key={index} className="question-container">
+              <p>{question}</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

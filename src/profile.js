@@ -5,6 +5,10 @@ import MaternalDemographicsprofile from './maternaldemoprofile';
 import MedicalHistoryprofile from './medicalhistoryprofile';
 import Substanceuseprofile from './substanceuseprofile';
 import DrugScreeningProfile from './Drugscreeningprofile';
+import SocialSupportProfile from './socialsupportprofile';
+import ChildInformationProfile from './childinformationprofile';
+import ServicesProfile from './referralandservicesprofile';
+import Relapseplanprofile from './relapesplanprofile';
 const Profile = () => {
   const [selectedSection, setSelectedSection] = useState(null);
   const { authenticated } = useAuth();
@@ -48,6 +52,10 @@ const Profile = () => {
             {selectedSection === 'Medical History' && <MedicalHistoryprofile />}
             {selectedSection === 'Services for Substance Use' && <Substanceuseprofile />}
             {selectedSection === 'Drug Screening Results' && <DrugScreeningProfile />}
+            {selectedSection === 'Social Supports' && <SocialSupportProfile />}
+            {selectedSection === 'Infant Information' && <ChildInformationProfile />}
+            {selectedSection === 'Referrals and Services' && <ServicesProfile />}
+            {selectedSection === 'Relapse Prevention Plan' && <Relapseplanprofile />}
           </div>
         )}
       </div>

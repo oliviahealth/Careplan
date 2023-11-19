@@ -23,6 +23,12 @@ const DrugScreeningResult = () => {
     updatedResults[index][field] = value;
     setResults(updatedResults);
   };
+  const handleRemoveResult = () => {
+    if (results.length > 1) {
+      const updatedResults = results.slice(0, -1);
+      setResults(updatedResults);
+    }
+  };
 
   const handleFinalSubmit = async () => {
     // Prepare the data to be sent to the backend
@@ -124,6 +130,7 @@ const DrugScreeningResult = () => {
                 </div>
               ))}
               <button onClick={handleAddResult}>Add</button>
+              <button onClick={handleRemoveResult}>Remove</button>
               <button onClick={handleFinalSubmit}>Enter</button>
             </div>
           )}

@@ -25,7 +25,7 @@ const MedicalHistoryprofile = () => {
   }
 
   return (
-    <div className="maternal-demographics-card">
+    <div className="service-profile-container">
       <h2>Medical History</h2>
       {questions.map((question, index) => (
         <div key={index} className="question-container">

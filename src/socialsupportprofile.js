@@ -1,17 +1,17 @@
 import React from 'react';
 import { useAuth } from './AuthContext';
 
-const Substanceuseprofile = () => {
+const SocialSupportProfile = () => {
   const { authenticated } = useAuth();
   
   const questions = [
-    'Medication Assisted Treatment (MAT) Engaged:',
-    'Date of Last use:',
-    'Medication(s) and Dose:',
-    'Addiction Medicine Services:',
-    'Date of Last Appointment:',
-    'Name and Contact Information for MAT Clinic:',
-    'Name and Contact Information for Addiction Medicine Clinic:',
+    'First Name:',
+    'Last Name:', 
+    'Date of Birth:',
+    'Relationship',
+    'Goals:',
+    'Support:',
+    'Feelings about Relationships:',
   ];
 
   if (!authenticated) {
@@ -20,7 +20,7 @@ const Substanceuseprofile = () => {
 
   return (
     <div className="service-profile-container">
-      <h2>Substance use</h2>
+      <h2>Social Support Profile</h2>
       {questions.map((question, index) => (
         <div key={index} className="question-container">
           <p>{question}</p>
@@ -30,4 +30,4 @@ const Substanceuseprofile = () => {
   );
 };
 
-export default Substanceuseprofile;
+export default SocialSupportProfile;

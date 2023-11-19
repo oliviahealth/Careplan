@@ -403,9 +403,9 @@ body {
 }
 
 .section-button {
-  margin-bottom: -15px;
+  margin-bottom: -30px;
   padding: 5px 20px;
-  font-size: 22px;
+  font-size: 20px;
   border: none;
   background-color: transparent;
   cursor: pointer;
@@ -443,4 +443,25 @@ body {
 
 .answer {
   font-weight: normal;
+}
+.service-profile-container {
+  background-color: #ffffff;
+  border: 2px solid #4d0000;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  max-width: 800px; /* Optional: Limit the width on very large screens */
+  width: 90%; /* Take up 90% of the screen width, but no more than 800px */
+  margin-left: auto;
+  margin-right: auto; /* Center the card horizontally */
+    max-height: 500px; /* Set the maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+.service-profile-container h2 {
+  color: #4d0000;
+  font-size: 2.5rem;
+  margin-bottom: 15px;
 }
