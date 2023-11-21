@@ -193,9 +193,9 @@ export default function SignInSide() {
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2" color="text.primary">
+                  {/* <Link href="#" variant="body2" color="text.primary">
                     Forgot password?
-                  </Link>
+                  </Link> */}
                 </Grid>
                 <Grid item>
                   <RouterLink to="/signup" style={{ textDecoration: 'none' }}>

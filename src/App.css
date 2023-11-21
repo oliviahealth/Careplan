@@ -465,3 +465,49 @@ body {
   font-size: 2.5rem;
   margin-bottom: 15px;
 }
+
+.subsectionProfile{
+  color: #4d0000;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
+.profile-rectangular-button{
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center; /* Centers content vertically */
+  align-items: center;     /* Centers content horizontally */
+  width: 100px; /* Adjust width as needed */
+  height: 50px; /* Adjust height as needed */
+  background-color: #4d0000;
+  color: white;
+  border-radius: 10px; /* Adjust for slight rounded corners */
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px; /* Adjust font size as needed */
+  font-weight: bold;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for depth */
+  position: relative; /* Optional: Makes the shadow appear above other elements */
+  overflow: hidden; /* Optional: Hide any overflowed content */
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.infantProfileButton{
+  /* make text size small */
+  font-size: 15px;
+}
+
+.profile-navigation-buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  
+}
