@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ProgressNavBar from './ProgressNavBar';
 
 class RelapsePlanCard extends Component {
   constructor(props) {
@@ -160,6 +161,11 @@ class RelapsePlanCard extends Component {
   
     return (
       <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <ProgressNavBar 
+          totalQuestions={questions.length}
+          currentQuestionIndex={currentQuestionIndex}
+          onNavigate={(index) => this.setState({ currentQuestionIndex: index })}
+        />
         <h2 className="headerstyle">Relapse Plan</h2>
         <div className="question-container">
           {currentQuestionIndex < questions.length ? (
@@ -224,12 +230,16 @@ class RelapsePlanCard extends Component {
                     ) : (
                       <button onClick={this.handleFinalSubmit}>Enter</button>
                     )}
+                    
                   </div>
                 </>
               ) : null}
             </>
           ) : null}
         </div>
+        <div className="question-number-indicator">
+                     Question {currentQuestionIndex + 1}
+                 </div>
       </div>
     );
   }  

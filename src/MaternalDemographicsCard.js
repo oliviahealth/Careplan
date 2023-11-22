@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
+import ProgressNavBar from './ProgressNavBar';
 
 
 const MaternalDemographicsCard = () => {
@@ -12,7 +13,10 @@ const MaternalDemographicsCard = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   const [formSubmitted, setFormSubmitted] = useState(maternalDemographicsSubmitted === 'true');
-
+  
+  const onNavigate = (index) => {
+    setCurrentQuestionIndex(index);
+  };
   const [answers, setAnswers] = useState(Array(8).fill(''));
   const [emergencyContact, setEmergencyContact] = useState({
     firstName: '',
@@ -254,6 +258,11 @@ const MaternalDemographicsCard = () => {
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <ProgressNavBar 
+        totalQuestions={questions.length}
+        currentQuestionIndex={currentQuestionIndex}
+        onNavigate={onNavigate} // using the onNavigate function
+      />
         {authenticated ? (
             <>
                 <h2 className = "headerstyle"> Maternal Demographics </h2>
@@ -443,6 +452,9 @@ const MaternalDemographicsCard = () => {
                                 <button onClick={handleFinalSubmit}>Enter</button>
                             )}
                         </div>
+                        <div className="question-number-indicator">
+                     Question {currentQuestionIndex + 1}
+                 </div>
                     </div>
                 )}
             </>

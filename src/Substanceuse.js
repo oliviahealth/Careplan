@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
+import ProgressNavBar from './ProgressNavBar';
+
 
 const SubstanceUseServices = () => {
   const { authenticated } = useAuth();
@@ -24,6 +26,9 @@ const SubstanceUseServices = () => {
     setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
   };
 
+  const navigateToQuestion = (index) => {
+    setCurrentQuestionIndex(index);
+  };
   const handlePreviousClick = () => {
     setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
   };
@@ -97,6 +102,12 @@ const SubstanceUseServices = () => {
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+      <ProgressNavBar 
+            totalQuestions={questions.length}
+            currentQuestionIndex={currentQuestionIndex}
+            onNavigate={navigateToQuestion} // Add this line to handle navigation
+          />
+
       {authenticated ? (
         <>
           <h2 className="headerstyle">Services for Substance Use</h2>

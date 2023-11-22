@@ -245,13 +245,10 @@ class ServicesCard extends Component {
                      Question {currentQuestionIndex + 1}
                  </div>
                  <div className="flex-none">
-        <ProgressNavBar 
-            totalQuestions={questions.length}
-            currentQuestionIndex={currentQuestionIndex}
-            onNavigate={this.navigateToQuestion}
-        />
+       
     </div>
             </div>
+            
             </div>
         );
     }

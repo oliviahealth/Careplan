@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
+import ProgressNavBar from './ProgressNavBar';
 
 const MedicalHistory = () => {
   const userId = localStorage.getItem('userId');
@@ -11,6 +12,11 @@ const MedicalHistory = () => {
   const [additionalQuestionsVisible, setAdditionalQuestionsVisible] = useState(false);
   const [locationAnswer, setLocationAnswer] = useState('');
   const [dateCompletedAnswer, setDateCompletedAnswer] = useState('');
+
+  const onNavigate = (index) => {
+    setCurrentQuestionIndex(index);
+  };
+  
   const questions = [
     'Prenatal Care (for current or most recent pregnancy)',
     'Age at Entry of Care (When you join POSC):',
@@ -50,8 +56,10 @@ const MedicalHistory = () => {
     setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
   };
 
+  
   const handleFinalSubmit = async () => {
     console.log(answers);
+
 
     // Prepare the data to be sent to the backend
     const formData = {
@@ -98,6 +106,8 @@ const MedicalHistory = () => {
     } catch (error) {
       console.error('An error occurred while sending data to the backend:', error);
     }
+
+    
 };
 
   
@@ -145,6 +155,11 @@ const MedicalHistory = () => {
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+     <ProgressNavBar 
+        totalQuestions={questions.length}
+        currentQuestionIndex={currentQuestionIndex}
+        onNavigate={onNavigate} // using the onNavigate function
+      />
       {authenticated ? (
         <>
           <h2 className = "headerstyle">Medical History</h2>
@@ -229,6 +244,9 @@ const MedicalHistory = () => {
                   <button onClick={handleFinalSubmit}>Enter</button>
                 )}
               </div>
+              <div className="question-number-indicator">
+                     Question {currentQuestionIndex + 1}
+                 </div>
             </div>
           )}
         </>

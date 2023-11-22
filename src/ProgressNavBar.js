@@ -26,7 +26,7 @@ const ProgressNavBar = ({ totalQuestions, currentQuestionIndex, onNavigate }) =>
                 className={`question-button ${currentQuestionIndex === index ? 'active' : ''}`}
                 onClick={() => onNavigate(index)}
               >
-                {index + 1}
+                Question {index + 1}
               </button>
             ))}
           </div>

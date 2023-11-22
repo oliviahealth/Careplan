@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ProgressNavBar from './ProgressNavBar';
 
 const SocialSupportsCard = () => {
   const userId = localStorage.getItem('userId');
@@ -11,6 +12,14 @@ const SocialSupportsCard = () => {
     support: '',
     feelings: '',
   });
+
+    // Total number of steps in the form
+    const totalSteps = 4;
+
+    // Function to navigate between steps (optional)
+    const onNavigate = (index) => {
+      setCurrentStep(index);
+    };
 
   const handleChange = (index, key, value) => {
     const updatedPeopleInHome = answers.peopleInHome.map((person, i) => {
@@ -107,6 +116,11 @@ const SocialSupportsCard = () => {
 
   return (
     <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+        <ProgressNavBar 
+          totalQuestions={totalSteps}
+          currentQuestionIndex={currentStep}
+          onNavigate={onNavigate} 
+        />
       <h2 className = "headerstyle">Social Supports</h2>
       <div className="question-container">
         {currentStep === 0 && (

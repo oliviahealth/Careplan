@@ -29,6 +29,7 @@ import { useAuth } from './AuthContext';
 function App() {
   const { authenticated } = useAuth(); 
   return (
+ 
     <Router>
       <Navbar2 />
       <Routes>
@@ -52,6 +53,7 @@ function App() {
       </Routes>
       <SubBar />
     </Router>
+   
   );
 }
 

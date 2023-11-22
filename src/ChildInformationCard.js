@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ProgressNavBar from './ProgressNavBar';
 
 class ChildInformationCard extends Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class ChildInformationCard extends Component {
       nicuStayDays: '', // State to store the number of NICU days
       NICUanswerr: 'No', // State for NICU answer (default to 'No')
     };
-
+    
     this.state = {
       currentQuestionIndex: 0,
       questions: [
@@ -104,6 +105,10 @@ class ChildInformationCard extends Component {
     });
   };
   
+  navigateToQuestion = (index) => {
+    this.setState({ currentQuestionIndex: index });
+};
+
 
 
 
@@ -282,6 +287,7 @@ class ChildInformationCard extends Component {
     if (this.state.formSubmitted) {
       return (
         <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+     
           <h2 className="headerstyle">Infant Information</h2>
           <p>Thank you for submitting the form!</p>
         </div>
@@ -290,6 +296,12 @@ class ChildInformationCard extends Component {
 
     return (
       <div className="bg-white border-4d0000 border-8 rounded-lg p-4 mx-auto max-w-screen-md text-center">
+            <ProgressNavBar 
+          totalQuestions={questions.length}
+          currentQuestionIndex={currentQuestionIndex}
+          onNavigate={this.navigateToQuestion}
+        />
+
         <h2 className = "headerstyle">Child Information</h2>
         <div className="question-container">
           {currentQuestionIndex < questions.length ? (
@@ -503,6 +515,9 @@ class ChildInformationCard extends Component {
                       <button onClick={this.handleFinalSubmit}>Enter</button>
                     )}
                   </div>
+                  <div className="question-number-indicator">
+                     Question {currentQuestionIndex + 1}
+                 </div>
         </div>
         </div>
             
