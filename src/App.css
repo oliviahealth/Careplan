@@ -126,6 +126,15 @@
   /* Other button styles go here */
 }
 
+.header-home {
+  font-family: 'Open Sans', sans-serif; /* Apply the Open Sans font */
+  color: white; /* Set the text color to white */
+  padding: 10px;
+  text-align: center; /* Center the text */
+  font-size: 70px;
+}
+
+
 body {
   font-family: 'Open Sans', sans-serif; /* Change the font to Open Sans */
   /* Other CSS styles for the body element */

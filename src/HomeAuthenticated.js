@@ -17,15 +17,15 @@ const Home2 = () => {
   return (
     <div className="background-container">
       <div className="text-container">
-        <div className="text">Welcome to PageOne!</div>
+        <div className="header-home"> PageOne </div>
         <Link to="/plan-of-safe-care">
-          <button id="button1">Plan of safe care</button>
+          <button id="button1">Plan of Safe Care </button>
         </Link>
         <Link to="/your-documentation">
-          <button id="button2">Your Documentation</button>
+          <button id="button2">Your Documentation </button>
         </Link>
         <Link to="/about">
-          <button id="button3">About</button>
+          <button id="button3">About </button>
         </Link>
       </div>
     </div>

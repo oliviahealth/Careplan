@@ -10,7 +10,7 @@ const Home = () => {
   return (
     React.createElement("div", { className: "background-container" },
       React.createElement("div", { className: "text-container" },
-        React.createElement("div", { className: "text" }, "Welcome to PageOne!"),
+        React.createElement("div", { className: "header-home" }, "PageOne"),
         <Link to="/signin">
         <button id="button1">Get started</button>
       </Link>
