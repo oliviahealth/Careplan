@@ -26,6 +26,8 @@ import SubstanceUseServices from'./Substanceuse';
 import DrugScreeningResult from './Drugscreening'
 import Profile  from './profile';
 import { useAuth } from './AuthContext';
+import Faq from './faq';
+import Contact from './contact';
 function App() {
   const { authenticated } = useAuth(); 
   return (
@@ -36,7 +38,7 @@ function App() {
         <Route path="/" element={authenticated ? <Navigate to="/home2" /> : <Home />} />
         <Route path="/home2" element={<Home2 />} />
         <Route path="/plan-of-safe-care" element={<PlanOfSafeCare />} />
-        <Route path="/your-documentation" element={<YourDocumentation />} />
+        <Route path="/documentation" element={<YourDocumentation />} />
         <Route path="/about" element={<About />} />
         <Route path="/signin" element={<SignInSide />} />
         <Route path="/signup" element={<SignUp />} />
@@ -49,6 +51,8 @@ function App() {
         <Route path="/plan-of-safe-care/services-for-substance-use" element={<SubstanceUseServices/>} />
         <Route path="/plan-of-safe-care/drug-screening-results" element={<DrugScreeningResult/>} />
         <Route path="/profile" element={<Profile/>} />
+        <Route path="/faq" element={<Faq/>} />
+        <Route path="/contact" element={<Contact/>} />
 
       </Routes>
       <SubBar />

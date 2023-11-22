@@ -32,7 +32,7 @@ const Navbar2 = () => {
               Plan of Safe Care
             </Link>
             <Link to="/your-documentation" className="nav-button open-sans-button">
-              Your Documentation
+              Documentation
             </Link>
             <Dropdown
               show={showAboutDropdown}

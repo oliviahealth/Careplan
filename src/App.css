@@ -520,3 +520,82 @@ body {
   margin-bottom: 10px;
   
 }
+/* Add your custom styles for the FAQ page */
+.faq-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.faq-list {
+  margin-top: 30px;
+}
+
+.faq-item {
+  border-bottom: 1px solid #ccc;
+  padding: 20px 0;
+}
+
+.faq-item h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.faq-item p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.faq-title {
+  font-size: 2.5rem; /* Adjust the font size */
+  font-weight: bold;
+  color: #4d0000; /* Your chosen color */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.contact-page {
+  text-align: center;
+  margin: 20px;
+}
+
+.contact-title {
+  font-size: 3em;
+  color: #4d0000;
+  margin-bottom: 20px;
+}
+
+.contact-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.contact-cell {
+  padding: 20px;
+}
+
+.contact-details {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.contact-details h2 {
+  font-size: 1.5em;
+  margin-bottom: 5px;
+}
+
+.contact-details p {
+  font-size: 1.2em;
+  margin: 5px 0;
+}
+.sponsor {
+  text-align:left;
+  font-size: 24px; /* Adjust the font size as needed */
+  color: #4d0000;
+}
+
+.developer h1 {
+  font-size: 24px;
+  text-align: left;
+  color: #4d0000;
+}

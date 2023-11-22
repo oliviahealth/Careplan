@@ -22,9 +22,9 @@ const Home2 = () => {
           <button id="button1">Plan of Safe Care </button>
         </Link>
         <Link to="/your-documentation">
-          <button id="button2">Your Documentation </button>
+          <button id="button2">Documentation </button>
         </Link>
-        <Link to="/about">
+        <Link to="/faq">
           <button id="button3">About </button>
         </Link>
       </div>

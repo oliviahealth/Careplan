@@ -10,6 +10,8 @@ const PlanOfSafeCare = () => {
     // Redirect to the login page if not authenticated
     return <Navigate to="/" />;
   }
+  
+
 
   return (
     <div>
