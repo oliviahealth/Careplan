@@ -46,6 +46,12 @@ const MaternalDemographicsprofile = () => {
   if (!authenticated) {
     return <p>You are not authorized to access this page.</p>;
   }
+  if (!demographicsData) {
+    return <div className="service-profile-container">
+    <h2>Relapse Plan</h2>
+    <p>Loading Maternal Demographics data...</p>
+    </div>;
+  }
 
   return (
     <div className="service-profile-container">

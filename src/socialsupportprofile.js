@@ -57,6 +57,12 @@ const SocialSupportProfile = () => {
   if (!authenticated) {
     return <p>You are not authorized to access this page.</p>;
   }
+  if (!socialSupportData) {
+    return <div className="service-profile-container">
+      <h2>Social Support Profile</h2>
+      <p>Loading Social Support Data...</p>
+    </div>;
+  }
 
   return (
     <div className="service-profile-container">

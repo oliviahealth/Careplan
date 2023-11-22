@@ -52,12 +52,12 @@ class ServicesProfile extends Component {
             } else {
                 // Handle HTTP errors
                 console.error('HTTP error:', response.status);
-                this.setState({ isLoading: false });
+                this.setState({ isLoading: true });
             }
         } catch (error) {
             // Handle network errors or other exceptions
             console.error('There was a problem with the fetch operation:', error);
-            this.setState({ isLoading: false });
+            this.setState({ isLoading: true });
         }
     }
     
@@ -148,7 +148,10 @@ class ServicesProfile extends Component {
 
         const { organizations, isLoading } = this.state;
         if (isLoading) {
-            return <p>Loading referral service data...</p>;
+            return <div className="service-profile-container">
+                <h2>Service Needs Profile</h2>
+                <p>Loading referral service data...</p>
+                </div>;
         }
 
         return (

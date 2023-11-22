@@ -61,7 +61,10 @@ const Relapseplanprofile = () => {
     return <p>You are not authorized to access this page.</p>;
   }
   if (!relapsePlanData) {
-    return <p>Loading relapse plan data...</p>;
+    return <div className="service-profile-container">
+      <h2>Relapse Plan</h2>
+      <p>Loading relapse plan data...</p>
+      </div>;
   }
 
   return (
