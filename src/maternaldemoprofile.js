@@ -48,7 +48,7 @@ const MaternalDemographicsprofile = () => {
   }
   if (!demographicsData) {
     return <div className="service-profile-container">
-    <h2>Relapse Plan</h2>
+    <h2>Maternal Demographics</h2>
     <p>Loading Maternal Demographics data...</p>
     </div>;
   }
