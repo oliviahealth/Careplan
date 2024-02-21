@@ -5,8 +5,22 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        OpenSans: [
+          "OpenSans"
+        ],
+        Oswald: [
+          "Oswald"
+        ],
+    },
+    },
   },
-  plugins: [],
+  corePlugins: {
+    fontWeight: false
+  },
+  plugins: [
+    require("./fontVariationSettingsPlugin"),
+  ],
 }
 

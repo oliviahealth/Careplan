@@ -1,12 +1,7 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
 function App() {
   return (
     <>
-      <div className='text-2xl font-bold underline'>Hello World!</div>
+      <div className='text-base font-OpenSans font-bold not-italic font-condensed'>There are four primary typefaces used in the Texas A&M University brand: Tungsten, Moriston, Minion Pro and Open Sans.</div>
     </>
   )
 }
