@@ -1,7 +1,7 @@
 function App() {
   return (
     <>
-      <div className='text-base font-OpenSans font-bold not-italic font-condensed'>There are four primary typefaces used in the Texas A&M University brand: Tungsten, Moriston, Minion Pro and Open Sans.</div>
+      <div className='text-base font-OpenSans not-italic font-ultraexpanded'>There are four primary typefaces used in the Texas A&M University brand: Tungsten, Moriston, Minion Pro and Open Sans.</div>
     </>
   )
 }
