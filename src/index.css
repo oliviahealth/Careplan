@@ -11,4 +11,13 @@
         font-family: "Oswald";
         src: url("/fonts/Oswald-VariableFont_wght.ttf") format("truetype");
     }
+    body {
+        @apply font-OpenSans;
+    }
+}
+
+@layer components {
+    .button {
+        @apply bg-[#500000] text-white px-6 py-2 rounded-full transition-colors ease-in-out duration-300 hover:bg-[#633333];
+    }
 }
