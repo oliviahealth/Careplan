@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
   return (
-    <div className="flex min-h-[6.25rem] w-full items-center text-black shadow-md">
+    <div className="flex min-h-[6.25rem] w-full items-center text-black border-b shadow-xl">
       <div className="flex min-w-[60rem] px-4 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
