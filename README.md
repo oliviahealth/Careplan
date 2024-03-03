@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# PlanOfSafeCare Frontend Repository
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+The frontend is built using React, Vite, Tailwind, and Typescript
 
-In the project directory, you can run:
+## Install and Run
 
-### `npm start`
+To install and run locally:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Install all packages with `npm install`
+- Run the local server with `npm run dev`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Documentation
 
-### `npm test`
+## Custom Tailwind Utilities
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Font Variation Settings
 
-### `npm run build`
+Located in [./fontVariationSettingsPlugin.ts](./fontVariationSettingsPlugin.ts)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Allows variable fonts to be adjusted via Tailwind classes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The classes included are:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+| Width Axis Tailwind Class  | CSS Property |
+| ------------- | ------------- |
+| ultracondensed  | font-variation-settings: 'wdth' 50;  |
+| extracondensed  | font-variation-settings: 'wdth' 62.5;  |
+| condensed  | font-variation-settings: 'wdth' 75;  |
+| semicondensed  | font-variation-settings: 'wdth' 87.5;  |
+| base  | font-variation-settings: 'wdth' 100;  |
+| semiexpanded  | font-variation-settings: 'wdth' 112.5;  |
+| expanded  | font-variation-settings: 'wdth' 125;  |
+| extraexpanded  | font-variation-settings: 'wdth' 150;  |
+| ultraexpanded  | font-variation-settings: 'wdth' 200;  |
 
-### `npm run eject`
+| Weight Axis Tailwind Class  | CSS Property |
+| ------------- | ------------- |
+| thin  | font-variation-settings: 'wght' 100;  |
+| extraLight  | font-variation-settings: 'wght' 200;  |
+| light  | font-variation-settings: 'wght' 300;  |
+| normal  | font-variation-settings: 'wght' 400;  |
+| medium  | font-variation-settings: 'wght' 500;  |
+| semibold  | font-variation-settings: 'wght' 600;  |
+| bold  | font-variation-settings: 'wght' 700;  |
+| extrabold  | font-variation-settings: 'wght' 800;  |
+| black  | font-variation-settings: 'wght' 900;  |
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+| Slant Axis Tailwind Class  | CSS Property |
+| ------------- | ------------- |
+| italic  | font-variation-settings: 'slnt' 1;  |
+| not-italic  |  font-style: normal; |
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

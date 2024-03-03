@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: "OpenSans";
+        src: url("/fonts/OpenSans-VariableFont_wdth,wght.ttf") format("truetype");
+    }
+    @font-face {
+        font-family: "Oswald";
+        src: url("/fonts/Oswald-VariableFont_wght.ttf") format("truetype");
+    }
+}
+
+@layer components {
+    .input_field {
+        @apply border border-gray-300 px-4 py-2 rounded-md w-full;
+    }
+}
+
+@layer components {
+    .required_field {
+        @apply text-red-500
+    }
+}
+
+@layer components {
+    .input_label {
+        @apply font-medium
+    }
+}
