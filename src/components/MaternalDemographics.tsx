@@ -2,28 +2,34 @@
 This component is meant to display the Maternal Demographic Form that is found on the top half of Page 7 of the Plan of Self Care Document
 */
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { months, states, countries, livingArrangements, phoneType, maritalStatus } from "../utils";
 
-// tsx interface for all of the input fields
+/**
+ * TypeScript Interface that defines what data types are meant for each field in the form
+ */
 type Inputs = {
   firstName: string;
   lastName: string;
-  //dob: string;
   dobMonth: string;
   dobDay: string;
   dobYear: string;
-  homeStatus: "Rent/Own a Home" | "Living with Relatives or Friends" | "Residential Treatment Center" | "Correctional Facility" | "Emergency Shelter" | "Homeless" | "Other";
+  homeStatus: string;
   street_address: string;
   city: string;
   state: string;
   zip_code: number;
   country: string;
-  primary_phone_number: string; 
-  phone_type: "Mobile" | "Home" | "Other";
+  primary_phone_number: string;
+  phone_type: string;
   emergency_contact: string;
   emergency_phone_number: string;
   emergency_relationship: string;
-  maritalStatus: "Single" | "Married" | "Divorced" | "Widowed" | "Separated";
+  maritalStatus: string;
   insurance_plan: string;
   effective_date: string;
   subscriber_id: number;
@@ -31,332 +37,182 @@ type Inputs = {
   obgyn: string;
 };
 
+/**
+ *
+ * @returns a form for the Maternal Demographics found on the top half of Page 7 of the Plan of Self Care Document
+ */
 export default function MaternalDemographics() {
-  const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({length: currentYear - 1899}, (_, i) => String(i + 1900)).reverse();
-  const states = [
-    "Alabama",
-    "Alaska",
-    "Arizona",
-    "Arkansas",
-    "California",
-    "Colorado",
-    "Connecticut",
-    "Delaware",
-    "Florida",
-    "Georgia",
-    "Hawaii",
-    "Idaho",
-    "Illinois",
-    "Indiana",
-    "Iowa",
-    "Kansas",
-    "Kentucky",
-    "Louisiana",
-    "Maine",
-    "Maryland",
-    "Massachusetts",
-    "Michigan",
-    "Minnesota",
-    "Mississippi",
-    "Missouri",
-    "Montana",
-    "Nebraska",
-    "Nevada",
-    "New Hampshire",
-    "New Jersey",
-    "New Mexico",
-    "New York",
-    "North Carolina",
-    "North Dakota",
-    "Ohio",
-    "Oklahoma",
-    "Oregon",
-    "Pennsylvania",
-    "Rhode Island",
-    "South Carolina",
-    "South Dakota",
-    "Tennessee",
-    "Texas",
-    "Utah",
-    "Vermont",
-    "Virginia",
-    "Washington",
-    "West Virginia",
-    "Wisconsin",
-    "Wyoming",
-    "Washington D.C."
-  ];
-
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ]
+  const { register, handleSubmit, control, formState: { errors, isSubmitted }} = useForm<Inputs>({
+    defaultValues: {
+      homeStatus: "", // Set the default value to an empty string
+      maritalStatus: "",
+      phone_type: ""
+    }
+  });
   
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const currentYear = new Date().getFullYear(); // function to get the current year to display in the form
+  const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse(); // creates an array with every year from 1900 - pres
+
   return (
     <div className="w-[30rem] mx-auto mt-[10rem] p-2 rounded-xl font-OpenSans">
-      <legend className="text-white text-xl mb-2">
-        Maternal Demographics Form
-      </legend>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <p className="input_label">First Name *</p>
-        <input
-          {...register("firstName", { required: true })}
-          className="input_field"
-        />
-        {errors.firstName && (
-          <span className="required_field">First Name is required</span>
-        )}
+        <p className="font-medium">First Name *</p>
+        <input {...register("firstName", { required: true })} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="input_label">Last Name *</p>
-        <input
-          {...register("lastName", { required: true })}
-          className="input_field"
-        />
-        {errors.lastName && (
-          <span className="required_field">Last Name is required</span>
-        )}
+        {errors.firstName && isSubmitted && (<span className="text-red-500">First Name is required</span>)}
 
-        <p className="input_label">Date of Birth</p>
+        <p className="font-medium">Last Name *</p>
+        <input {...register("lastName", { required: true })} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+
+        {errors.lastName && isSubmitted && (<span className="text-red-500">Last Name is required</span>)}
+
+        <p className="font-medium">Date of Birth</p>
         <div className="flex space-x-2 mb-4">
-          <select
-            {...register("dobMonth")}
-            className="input_field"
-          >
-            <option value="" disabled selected>
-              Month
-            </option>
-            {months.map((month, index) => (
-              <option key={month} value={index + 1}>
-                {month}
-              </option>
-            ))}
-          </select>
-          <select
-            {...register("dobDay")}
-            className="input_field"
-          >
-            <option value="" disabled selected>
-              00
-            </option>
-            {Array.from({ length: 31 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
-          <select
-            {...register("dobYear")}
-            className="input_field"
-          >
-            <option value="" disabled selected>
-              0000
-            </option>
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+          {/* Material UI component for the selector for DOB */}
+          <FormControl fullWidth>
+            <InputLabel id="dob-month-label">Month</InputLabel>
+            <Controller name="dobMonth" control={control} defaultValue="" render={({ field }) => (
+                <Select labelId="dob-month-label" {...field} label="Month">
+                  <MenuItem value="" disabled>Month</MenuItem>
+                  {months.map((month, index) => (<MenuItem key={month} value={index + 1}>{month}</MenuItem>))}
+                </Select>
+              )}
+            />
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="dob-day-label">Day</InputLabel>
+            <Controller name="dobDay" control={control} defaultValue="" render={({ field }) => (
+                <Select labelId="dob-day-label" {...field} label="Day">
+                  <MenuItem value="" disabled>Day</MenuItem>
+                  {Array.from({ length: 31 }, (_, i) => (<MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>))}
+                </Select>
+              )}
+            />
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="dob-year-label">Year</InputLabel>
+            <Controller name="dobYear" control={control} defaultValue=""
+              render={({ field }) => (
+                <Select labelId="dob-year-label" {...field} label="Year">
+                  <MenuItem value="" disabled>Year</MenuItem>
+                  {years.map((year) => (<MenuItem key={year} value={year}>{year}</MenuItem>))}
+                </Select>
+              )}
+            />
+          </FormControl>
         </div>
 
         <fieldset className="flex flex-col gap-2">
-          <p className="input_label">Current Housing Status</p>
-          <legend className="text-white mb-2">Housing Status:</legend>
-          {[
-            "Rent/Own a Home",
-            "Living with Relatives or Friends",
-            "Residential Treatment Center",
-            "Correctional Facility",
-            "Emergency Shelter",
-            "Homeless",
-            "Other",
-          ].map((status) => (
+          <p className="font-medium mt-6">Current Living Arrangements</p>
+          {livingArrangements.map((status) => (
             <label key={status} className="inline-flex items-center">
-              <input
-                {...register("homeStatus")}
-                type="radio"
-                value={status}
-                className="form-radio"
-              />
+              <input {...register("homeStatus")} type="radio" value={status} className="form-radio"/>
               <span className="ml-2">{status}</span>
             </label>
           ))}
         </fieldset>
 
-        <p className="input_label">Street Address</p>
-        <input
-          {...register("street_address", {
-            pattern: {
-              value: /^\d+\s[A-Za-z\s]+$/,
-              message: "ex: 123 Main Street",
-            },
-          })}
-          className="input_field"
-        />
-        {errors.street_address?.message && (
-          <span className="required_field">
-            Must be in this form: 123 Main Street
-          </span>
-        )}
+        <p className="font-medium">Street Address</p>
+        <input {...register("street_address", { pattern: { value: /^\d+\s[A-Za-z\s]+$/, message: "Must be a valid address" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        {errors.street_address?.message && isSubmitted && (<span className="text-red-500">{errors.street_address.message}</span>)}
 
-        <p className="input_label">City</p>
-        <input
-          {...register("city")}
-          className="input_field"
-        />
+        <p className="font-medium">City</p>
+        <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
-        <p className="input_label">State</p>
-        <select
-          {...register("state")}
-          className="input_field"
-        >
-          <option value="">Select a state</option>
-          {states.map((state) => (
-            <option key={state} value={state}>
-              {state}
-            </option>
-          ))}
-        </select>
+        <p className="font-medium">State</p>
+        {/* Material UI component for displaying states */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="state-select-label">State</InputLabel>
+          <Controller name="state" control={control} defaultValue="" render={({ field }) => (
+              <Select labelId="state-select-label" {...field} label="State">
+                {states.map((state) => (<MenuItem key={state} value={state}>{state}</MenuItem>))}
+              </Select>
+            )}
+          />
+        </FormControl>
 
-        <p className="input_label">Zip Code</p>
-        <input
-          {...register("zip_code", {
-            pattern: { value: /^\d{5}$/, message: "must be a 5 digit number" },
-          })}
-          className="input_field"
-        />
-        {errors.zip_code?.message && (
-          <span className="required_field">Must be a 5 digit number</span>
-        )}
+        <p className="font-medium">Zip Code</p>
+        {/* used a regex that will only accept 5 digit numbers and nothing else */}
+        <input {...register("zip_code", { pattern: { value: /^\d{5}$/, message: "must be a 5 digit number" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        {errors.zip_code?.message && isSubmitted && (<span className="text-red-500">Must be a 5 digit number</span>)}
 
-        <p className="input_label">Country</p>
-        <input
-          {...register("country")}
-          className="input_field"
-        />
+        <p className="font-medium">Country</p>
+        {/* Material UI component for displaying country */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="country-select-label">Country</InputLabel>
+          <Controller name="country" control={control} defaultValue="" render={({ field }) => (
+              <Select labelId="country-select-label" {...field} label="Country">
+                {countries.map((country) => (<MenuItem key={country} value={country}>{country}</MenuItem>))}
+              </Select>
+            )}
+          />
+        </FormControl>
 
-        <p className="input_label">Primary Phone Number</p>
-        <input
-          {...register("primary_phone_number", {
-            pattern: {
-              value: /^(\(\d{3}\)|\d{3})[ -]?\d{3}[ -]?\d{4}$/,
-              message: "Must be a valid phone number",
-            },
-          })}
-          className="input_field"
-        />
-        {errors.primary_phone_number && errors.primary_phone_number.message && (
-          <span className="required_field">Must be a valid Phone number</span>
-        )}
+        <p className="font-medium">Primary Phone Number</p>
+        {/* used a regex that takes phones numbers with () optional around the area code and optional dashes inbetween the digits */}
+        <input {...register("primary_phone_number", { pattern: { value: /^(\(\d{3}\)|\d{3})[ -]?\d{3}[ -]?\d{4}$/, message: "Must be a valid phone number" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+        {errors.primary_phone_number && errors.primary_phone_number.message && isSubmitted &&  (<span className="text-red-500">Must be a valid Phone number</span>)}
 
         <fieldset className="flex flex-col gap-2">
-          <legend className="input_label mb-2">Phone Type:</legend>
-          {["Mobile", "Home", "Other"].map((type) => (
+          <legend className="font-medium mb-2">Phone Type:</legend>
+          {phoneType.map((type) => (
             <label key={type} className="inline-flex items-center">
-              <input
-                {...register("phone_type")}
-                type="radio"
-                value={type}
-                className="form-radio"
-              />
+              <input {...register("phone_type")} type="radio" value={type} className="form-radio"/>
               <span className="ml-2">{type}</span>
             </label>
           ))}
         </fieldset>
 
-        <p className="input_label">Emergency Contact</p>
-        <input
-          {...register("emergency_contact")}
-          className="input_field"
-        />
+        <p className="font-medium">Emergency Contact</p>
+        <input {...register("emergency_contact")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="input_label">Phone Number</p>
-        <input
-          {...register("emergency_phone_number", {
-            pattern: {
-              value: /^(\(\d{3}\)|\d{3})[ -]?\d{3}[ -]?\d{4}$/,
-              message: "Must be a valid phone number",
-            },
-          })}
-          className="input_field"
-        />
-        {errors.emergency_phone_number?.message && (
-          <span className="required_field">Must be a valid Phone Number</span>
-        )}
+        <p className="font-medium">Phone Number</p>
+        {/* used a regex that takes phones numbers with () optional around the area code and optional dashes inbetween the digits */}
+        <input {...register("emergency_phone_number", { pattern: { value: /^(\(\d{3}\)|\d{3})[ -]?\d{3}[ -]?\d{4}$/, message: "Must be a valid phone number" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        {errors.emergency_phone_number?.message && isSubmitted && (<span className="text-red-500">Must be a valid Phone Number</span>)}
 
-        <p className="input_label">Relationship</p>
-        <input
-          {...register("emergency_relationship")}
-          className="input_field"
-        />
+        <p className="font-medium">Relationship</p>
+        <input {...register("emergency_relationship")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
         <fieldset className="flex flex-col gap-2">
-          <legend className="input_label mb-2">Marital Status:</legend>
-          {["Single", "Married", "Divorced", "Widowed", "Separated"].map(
-            (status) => (
+          {/* radio buttons for marital status */}
+          <legend className="font-medium mb-2">Marital Status:</legend>
+          {maritalStatus.map((status) => (
               <label key={status} className="inline-flex items-center">
-                <input
-                  {...register("maritalStatus")}
-                  type="radio"
-                  value={status}
-                  className="form-radio"
-                />
+                <input {...register("maritalStatus")} type="radio" value={status} className="form-radio"/>
                 <span className="ml-2">{status}</span>
               </label>
             )
           )}
         </fieldset>
 
-        <p className="input_label">Insurance Plan</p>
-        <input
-          {...register("insurance_plan")}
-          className="input_field"
-        />
+        <p className="font-medium">Insurance Plan</p>
+        <input {...register("insurance_plan")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="input_label">Effective Date</p>
-        <input
-          {...register("effective_date")}
-          className="input_field"
-          type="date"
-        />
+        <p className="font-medium">Effective Date</p>
+        <input {...register("effective_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date"/>
+        
+        <p className="font-medium">Subscriber ID</p>
+        {/* regex that only accepts numbers of any length of digits */}
+        <input {...register("subscriber_id", { pattern: { value: /^\d+$/, message: "Subscriber ID must be a number" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        {errors.subscriber_id && isSubmitted &&(<span className="text-red-500">{errors.subscriber_id.message}</span>)}
 
-        <p className="input_label">Subscriber ID</p>
-        <input
-          {...register("subscriber_id")}
-          className="input_field"
-        />
+       <p className="font-medium">Group ID</p>
+       {/* regex that only accepts numbers of any length of digits */}
+        <input {...register("group_id", { pattern: { value: /^\d+$/, message: "Group ID must be a number" }})} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        {errors.group_id && isSubmitted &&(<span className="text-red-500">{errors.group_id.message}</span>)}
 
-        <p className="input_label">Group ID</p>
-        <input
-          {...register("group_id")}
-          className="input_field"
-        />
+        <p className="font-medium">OB/GYN or Primary Provider Name</p>
+        <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="input_label">OB/GYN or Primary Provider Name</p>
-        <input
-          {...register("obgyn")}
-          className="input_field"
-        />
-
-        <button
-          type="submit"
-          className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md"
-        >
-          Save
-        </button>
+        <div className="flex justify-center">
+          {/* div to center button */}
+          <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
+        </div>
+        
       </form>
     </div>
   );
