@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
             <span className="block h-1 w-8 bg-black"></span>
           </div>
         </div>
-        <div className={`${isOpen ? "block bg-white border" : "hidden"} absolute md:relative right-0 md:mt-0 p-5 md:p-0 md:flex space-y-6 md:space-y-0 md:space-x-4`}>
+        <div className={`${isOpen ? "block bg-white border" : "hidden"} absolute md:bg-none md:border-0 md:relative right-0 md:mt-0 p-5 md:p-0 md:flex space-y-6 md:space-y-0 md:space-x-4`}>
           <Link to={"/"} className="block md:flex button">
             Client Dashboard
           </Link>

@@ -21,7 +21,6 @@ export default {
   },
   plugins: [
     require("./fontVariationSettingsPlugin"),
-    require('flowbite/plugin'),
   ],
 }
 
