@@ -13,16 +13,16 @@ const Navbar: React.FC = () => {
       <div className="flex w-[60rem] px-4 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
-            <img className="h-auto selectable" src="/images/pageone.svg"></img>
+            <img className="h-auto" src="/images/pageone.svg"></img>
           </Link>
         </div>
 
         <div>
-        <div className="md:hidden selectable" onClick={menuToggle}>
+        <div className="md:hidden selectable group" onClick={menuToggle}>
           <div className="space-y-2">
             <span className="block h-1 w-8 bg-black rounded-full"></span>
             <span className="block h-1 w-8 bg-black rounded-full"></span>
-            <span className="block h-1 w-4 bg-black rounded-full"></span>
+            <span className={`block h-1 w-4 bg-black rounded-full transition-all duration-200 ease-out group-hover:w-8 ${isOpen ? "w-8" : ""}`}></span>
           </div>
         </div>
         <div className={`${isOpen ? "block bg-white border shadow mt-8 mr-1" : "hidden"} absolute rounded-xl md:shadow-none md:bg-none md:border-0 md:relative right-0 md:mt-0 p-5 md:p-0 md:flex space-y-6 md:space-y-0 md:space-x-4`}> 
