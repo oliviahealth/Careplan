@@ -23,4 +23,7 @@
     .button-filled {
         @apply bg-[#500000] text-white md:px-6 md:py-2 rounded-full transition-colors ease-in-out duration-300 hover:bg-[#732F2F];
     }
+    .selectable {
+        @apply cursor-pointer p-2 rounded-xl hover:shadow hover:bg-black/5 transition-all ease-in-out duration-300;
+    }
 }
