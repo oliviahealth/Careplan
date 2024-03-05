@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
       <div className="flex w-[60rem] px-4 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
-            <img className="h-auto" src="/images/pageone.svg"></img>
+            <img className="h-auto" alt="Texas A&M Olivia Health Plan of Safecare logo" src="/images/pageone.svg"></img>
           </Link>
         </div>
 
