@@ -266,19 +266,7 @@ export const countries = [
     "Zimbabwe"
   ];
 
-export const livingArrangements = [
-  "Rent/Own a Home",
-  "Living with Relatives or Friends",
-  "Residential Treatment Center",
-  "Correctional Facility",
-  "Emergency Shelter",
-  "Homeless",
-  "Other",
-]
 
-export const phoneType = ["Mobile", "Home", "Other"];
-
-export const maritalStatus = ["Single", "Married", "Divorced", "Widowed", "Separated"]
   
 
   
