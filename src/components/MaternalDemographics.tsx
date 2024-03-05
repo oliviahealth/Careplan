@@ -36,6 +36,7 @@ type Inputs = {
 /**
  *
  * @returns a form for the Maternal Demographics found on the top half of Page 7 of the Plan of Self Care Document
+ * @param takes no props
  */
 export default function MaternalDemographics() {
   const {
