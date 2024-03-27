@@ -18,12 +18,11 @@ const Navbar: React.FC = () => {
         </div>
 
         <div>
-        <div className="md:hidden selectable group"onClick={menuToggle}>
+        <div className="md:hidden selectable group" onClick={menuToggle}>
           <div className="space-y-2">
-            <span className="block h-1 w-8 bg-black rounded-full"></span>
-            <span className="block h-1 w-8 bg-black rounded-full"></span>
-            <span className={`block h-1 w-4 bg-black rounded-full transition-all duration-200 ease-out group-hover:w-8 ${isOpen ? "w-8" : ""}`}></span>
-          </div>
+            <span className={`block h-1 w-8 bg-black rounded-full transition-transform duration-100 ease-in ${isOpen ? "transform translate-y-3 rotate-45" : ""}`}></span>
+            <span className={`block h-1 w-8 bg-black rounded-full transition-opacity duration-100 ease-in  ${isOpen ? "opacity-0" : "opacity-100"}`}></span>
+            <span className={`block h-1 w-8 bg-black rounded-full transition-transform duration-100 ease-in ${isOpen ? "transform -translate-y-3 -rotate-45" : ""}`}></span>          </div>
         </div>
         <div className={`${isOpen ? "block bg-white border shadow mt-4 mr-1" : "hidden"} absolute rounded-xl md:shadow-none md:bg-none md:border-0 md:relative right-0 md:mt-0 p-4 md:p-0 md:flex space-y-6 md:space-y-0 md:space-x-4 text-sm md:text-base`}> 
           <Link to={"/"} className="block md:flex button">
