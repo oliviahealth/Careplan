@@ -10,10 +10,10 @@ const Navbar: React.FC = () => {
 
   return (
     <div className="flex min-h-[4.5rem] w-full items-center text-black border-b shadow-xl">
-      <div className="flex w-[60rem] px-4 mx-auto items-center justify-between">
+      <div className="flex w-full md:w-3/4 px-4 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
-            <img className="h-[3rem]" alt="Texas A&M Olivia Health Plan of Safecare logo" src="/images/pageone.svg"></img>
+            <img className="h-[3rem]" alt="Olivia Health Plan of Safecare logo" src="/images/pageone.svg"></img>
           </Link>
         </div>
 
