@@ -70,6 +70,7 @@ export const months = [
 
 export const countries = [
     "United States of America",
+    "Canada",
     "Afghanistan",
     "Albania",
     "Algeria",
@@ -101,7 +102,6 @@ export const countries = [
     "Cabo Verde",
     "Cambodia",
     "Cameroon",
-    "Canada",
     "Central African Republic",
     "Chad",
     "Chile",

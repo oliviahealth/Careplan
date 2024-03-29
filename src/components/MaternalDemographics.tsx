@@ -15,6 +15,7 @@ type MaternalDemographicsInputs = {
   country: string;
   primaryPhoneNumber: string;
   phoneType: string;
+  phoneType: string;
   emergencyContact: string;
   emergencyPhoneNumber: string;
   emergencyRelationship: string;
@@ -80,32 +81,34 @@ export default function MaternalDemographics() {
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form onSubmit={handleSubmit(onSubmit)} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
-
+        <p className="font-medium text-xl">Personal Information</p>
         <p className="font-medium">First Name</p>
         <input {...register("firstName")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+    
         <p className="font-medium">Last Name</p>
         <input {...register("lastName")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="font-medium">Date of Birth <span className="text-red-500">*</span></p>
+        <p className="font-medium">Date of Birth</p>
         <div className="flex space-x-4">
-          <select {...register('dobMonth')} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-            <option  disabled selected>Month</option>
+          <select {...register("dobMonth")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+            <option disabled selected>Month</option>
             {months.map((month, index) => (<option key={index}>{month}</option>))}
           </select>
 
-          <select {...register('dobDay')} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+          <select {...register("dobDay")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
             <option disabled selected>Day</option>
             {Array.from({ length: 31 }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
           </select>
 
-          <select {...register('dobYear')} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+          <select {...register("dobYear")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
             <option disabled selected>Year</option>
             {years.map((year) => (<option key={year}>{year}</option>))}
           </select>
         </div>
 
-          <p className="font-medium mt-6">Current Living Arrangements</p>
+        <p className="font-medium text-xl">Address and Contact Information</p>
+
+          <p className="font-medium my-6">Current Living Arrangements</p>
           <div className="flex flex-col space-y-2">
           {livingArrangements.map((status) => (
             <label key={status} className="inline-flex items-center">
@@ -122,7 +125,7 @@ export default function MaternalDemographics() {
           <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
           <p className="font-medium">State</p>
-          <select {...register('state')} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
+          <select  {...register("state")} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
             <option disabled selected>State</option>
             {states.map((state) => (<option key={state}>{state}</option>))}
           </select>
@@ -131,14 +134,12 @@ export default function MaternalDemographics() {
           <input {...register("zipCode")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
           <p className="font-medium">Country</p>
-          {/* Material UI component for displaying country */}
-          <select {...register('country')} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
+          <select {...register("country")} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
             <option disabled selected>Country</option>
             {countries.map((country) => (<option key={country}>{country}</option>))}
           </select>
         
           <p className="font-medium">Primary Phone Number</p>
-          {/* used a regex that takes phones numbers with () optional around the area code and optional dashes inbetween the digits */}
           <input {...register("primaryPhoneNumber")}className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
             <p className="font-medium mb-2">Phone Type:</p>
@@ -146,13 +147,16 @@ export default function MaternalDemographics() {
             {phoneType.map((type) => (
               <label key={type} className="inline-flex items-center">
                 <input {...register("phoneType")} type="radio" value={type} className="form-radio"/>
+                <input {...register("phoneType")} type="radio" value={type} className="form-radio"/>
                 <span className="ml-2">{type}</span>
               </label>
             ))}
             </div>
     
 
-        <p className="font-medium">Emergency Contact</p>
+        <p className="font-medium text-xl">Emergency Contact</p>
+
+        <p className="font-medium">Name</p>
         <input {...register("emergencyContact")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
         <p className="font-medium">Emergency Contact Phone Number</p>
@@ -162,6 +166,9 @@ export default function MaternalDemographics() {
         <input {...register("emergencyRelationship")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
         {/* radio buttons for marital status */}
+
+        <p className="font-medium text-xl">Insurance Status</p>
+        
         <p className="font-medium mb-2">Marital Status:</p>
         <div className="flex flex-col gap-2">
           {maritalStatus.map((status) => (
@@ -184,7 +191,7 @@ export default function MaternalDemographics() {
         <p className="font-medium">Insurance Group ID</p>
         <input {...register("groupID")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="font-medium">OB/GYN or Primary Provider Name</p>
+        <p className="font-medium mt-100">OB/GYN or Primary Provider Name</p>
         <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
         <div className="flex justify-center">

@@ -1,13 +1,15 @@
+
 import MaternalDemographics from "./components/MaternalDemographics"
+import MaternalMedicalHistory from "./components/MaternalMedicalHistory"
+import MaternalPsychiatricHistory from "./components/MaternalPsychiatricHistory"
 
 
-function App() {
-  return (
+export default function App() {
+  return ( 
     <>
-      {/* <div className='text-base font-OpenSans not-italic font-ultraexpanded'>There are four primary typefaces used in the Texas A&M University brand: Tungsten, Moriston, Minion Pro and Open Sans.</div> */}
-      <MaternalDemographics />
+      {/* <MaternalDemographics /> */}
+      <MaternalMedicalHistory />
+      {/* <MaternalPsychiatricHistory /> */}
     </>
   )
 }
-
-export default App
