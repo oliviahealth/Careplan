@@ -1,13 +1,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from './components/LandingPage.tsx'
-import Dashboard from './components/Dashboard.tsx'
 import './index.css'
 
 import Layout from './components/Layout.tsx';
+
+import LandingPage from './components/LandingPage.tsx'
+import Dashboard from './components/ClientDashboard/Dashboard.tsx'
+
+import MaternalDemographics from './components/MaternalDemographics.tsx';
+import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
+import MaternalPsychiatricHistory from './components/MaternalPsychiatricHistory.tsx';
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -16,6 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route element={<Layout />}>
           <Route path='/' element={<LandingPage />} />
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/maternal-demographics' element={<MaternalDemographics />} />
+          <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
+          <Route path='/maternal-psychiatric-history' element={<MaternalPsychiatricHistory />} />
         </Route>
       </Routes>
     </BrowserRouter>
