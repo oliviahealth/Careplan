@@ -13,8 +13,9 @@ function LeftSidebar() {
                 Search for patients {/* TODO: needs to be a functional search component */}
             </div>
         </div>
-        <div className="flex flex-col gap-2 overflow-x-auto min-h-[calc(100vh-230px)] border-r-2 border-gray-200 p-5"> 
+        <div className="flex flex-col gap-4 overflow-x-auto min-h-[calc(100vh-230px)] border-r-2 border-gray-200 p-5"> 
           <ChildSelector isSelected={true} actionsRequired={true}></ChildSelector>
+          <ChildSelector isSelected={false} actionsRequired={false}></ChildSelector>
         </div>
     </div>
   );
