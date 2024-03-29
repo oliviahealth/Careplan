@@ -9,8 +9,8 @@ const Navbar: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-[4.5rem] w-full items-center text-black border-b z-10 shadow-md">
-      <div className="flex w-full md:w-3/4 px-4 mx-auto items-center justify-between">
+    <div className="flex min-h-[4.5rem] w-full items-center text-black border-b z-10 shadow-sm">
+      <div className="xl:container xl:px-2 flex w-full px-5 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
             <img className="h-[3rem]" alt="Olivia Health Plan of Safecare logo" src="/images/pageone.svg"></img>
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
           <Link to={"/dashboard"} className="block md:flex button">
             Client Dashboard
           </Link>
-          <Link to={"/"} className="block md:flex button md:button-filled">
+          <Link to={"/"} className="block md:flex button ">
             Sign In
           </Link>
         </div>
