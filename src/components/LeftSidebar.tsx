@@ -9,7 +9,7 @@ function LeftSidebar() {
             <div className="text-gray-400">(2)</div> {/* TODO: needs to update dynamically */}
         </div>
             <div className="rounded-xl bg-gray-200 text-gray-400 flex flex-row items-center">
-            <img className="w-5 mx-2" src="./vite.svg"/>
+            <img className="w-3 mx-2" src="./images/search.svg"/>
                 Search for patients {/* TODO: needs to be a functional search component */}
             </div>
         </div>

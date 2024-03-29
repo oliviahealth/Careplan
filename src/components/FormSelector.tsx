@@ -17,7 +17,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div className="w-full h-fit py-3 px-6 rounded-2xl bg-gray-200 flex justify-between text-lg">
         <div>{name}</div>
         <div className="flex gap-10 items-center">
-          <div className="text-red-500">{completed ? "" : "Not completed"}</div>
+          <div className="flex flex-row text-red-500">
+            {completed ? (
+              <>
+                <img className="w-4 mr-2" src={`./images/action.svg`} />
+                Actions Required
+              </>
+            ) : (
+              ""
+            )}
+          </div>{" "}
           <div>
             {isSelected ? (
               <Chevron className="h-5 stroke-black" direction="up" />
@@ -27,7 +36,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           </div>
         </div>
       </div>
-      <div className="px-6 text-sm">{isSelected ? ("Selected form content") : ("")}</div>
+      <div className="px-6 text-sm">
+        {isSelected ? "Selected form content" : ""}
+      </div>
     </>
   );
 };
