@@ -21,8 +21,7 @@ export default {
     fontWeight: false
   },
   plugins: [
-    require("./fontVariationSettingsPlugin"),
-    [require("daisyui")]
+    require("./fontVariationSettingsPlugin", "daisyui")
   ],
 }
 
