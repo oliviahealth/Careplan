@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-[4.5rem] w-full items-center text-black border-b shadow-xl">
+    <div className="flex min-h-[4.5rem] w-full items-center text-black border-b z-10 shadow-md">
       <div className="flex w-full md:w-3/4 px-4 mx-auto items-center justify-between">
         <div>
           <Link to={"/"}>
@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
           </div>
         </div>
         <div className={`${isOpen ? "block bg-white border shadow mt-4 mr-1" : "hidden"} absolute rounded-xl md:shadow-none md:bg-none md:border-0 md:relative right-0 md:mt-0 p-4 md:p-0 md:flex space-y-6 md:space-y-0 md:space-x-4 text-sm md:text-base`}> 
-          <Link to={"/"} className="block md:flex button">
+          <Link to={"/dashboard"} className="block md:flex button">
             Client Dashboard
           </Link>
           <Link to={"/"} className="block md:flex button md:button-filled">
