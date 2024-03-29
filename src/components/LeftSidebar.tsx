@@ -2,7 +2,7 @@ import ChildSelector from "./ChildSelector";
 
 function LeftSidebar() {
   return(
-    <div className="w-1/5 bg-white">
+    <div className="w-1/4 bg-white">
         <div className="flex flex-col gap-2 border-b-2 border-r-2 border-gray-200  min-h-fit p-5">
         <div className="text-lg flex flex-row gap-2">
             <div>Children</div>

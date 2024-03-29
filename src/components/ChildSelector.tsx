@@ -1,11 +1,12 @@
-import { FunctionComponent } from "react";
+import React from 'react';
+import Chevron from './Chevron';
 
 interface ChildSelectorProps {
   isSelected?: boolean;
   actionsRequired?: boolean;
 }
 
-const ChildSelector: FunctionComponent<ChildSelectorProps> = ({
+const ChildSelector: React.FC<ChildSelectorProps> = ({
   isSelected,
   actionsRequired,
 }) => {
@@ -20,7 +21,7 @@ const ChildSelector: FunctionComponent<ChildSelectorProps> = ({
           </div>
         </div>
       </div>
-      <img className="w-8" src="./vite.svg" />
+      <Chevron className='h-5 stroke-gray-200' direction='right'></Chevron>
     </div>
   );
 };
