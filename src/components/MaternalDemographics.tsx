@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { months, states, countries } from "../utils";
+import { months, states } from "../utils";
 
 type MaternalDemographicsInputs = {
   firstName: string;
@@ -12,9 +12,8 @@ type MaternalDemographicsInputs = {
   city: string;
   state: string;
   zipCode: number;
-  country: string;
+  county: string;
   primaryPhoneNumber: string;
-  phoneType: string;
   phoneType: string;
   emergencyContact: string;
   emergencyPhoneNumber: string;
@@ -72,7 +71,11 @@ export default function MaternalDemographics() {
       if(!userConfirmed) return;
     }
 
-    console.log(data);
+    data.zipCode = Number(data.zipCode);
+
+    console.log("Zip Code:", typeof data.zipCode);
+    console.log("Subscriber ID:", typeof data.subscriberID);
+    console.log("Group ID:", typeof data.groupID);
   };
 
   const currentYear = new Date().getFullYear();
@@ -117,27 +120,34 @@ export default function MaternalDemographics() {
             </label>))}
           </div>
   
+          <div className="flex flex-nowrap space-x-4 py-6">
+            <div className="flex flex-col flex-grow lg:w-full md:w-full sm:w-auto">
+              <p className="font-medium whitespace-nowrap">Street Address</p>
+              <input {...register("streetAddress")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+            </div>
+            <div className="flex flex-col flex-grow lg:w-3/4 md:w-3/4 sm:w-3/4">
+              <p className="font-medium">City</p>
+              <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+            </div>
+            <div className="flex flex-col flex-grow lg:w-1/3 md:w-full sm:w-3/4">
+            <p className="font-medium">State</p>
+            <select {...register("state")} className="dropdown border border-gray-300 px-4 py-2 rounded-md w-full">
+              <option selected disabled>--</option>
+              {states.map((state) => (<option key={state}>{state}</option>))}
+              </select>
+            </div>
+          </div>
 
-          <p className="font-medium">Street Address</p>
-          <input {...register("streetAddress")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
-
-          <p className="font-medium">City</p>
-          <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
-
-          <p className="font-medium">State</p>
-          <select  {...register("state")} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
-            <option disabled selected>State</option>
-            {states.map((state) => (<option key={state}>{state}</option>))}
-          </select>
-
-          <p className="font-medium">Zip Code</p>
-          <input {...register("zipCode")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
-
-          <p className="font-medium">Country</p>
-          <select {...register("country")} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
-            <option disabled selected>Country</option>
-            {countries.map((country) => (<option key={country}>{country}</option>))}
-          </select>
+          <div className="flex flex-nowrap space-x-4">
+            <div className="flex flex-col flex-grow">
+              <p className="font-medium">Zip Code</p>
+              <input {...register("zipCode")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+            </div>
+            <div className="flex flex-col flex-grow">
+              <p className="font-medium">County</p>
+              <input {...register("county")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            </div>
+          </div>
         
           <p className="font-medium">Primary Phone Number</p>
           <input {...register("primaryPhoneNumber")}className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
@@ -146,7 +156,6 @@ export default function MaternalDemographics() {
             <div className="flex flex-col gap-2">
             {phoneType.map((type) => (
               <label key={type} className="inline-flex items-center">
-                <input {...register("phoneType")} type="radio" value={type} className="form-radio"/>
                 <input {...register("phoneType")} type="radio" value={type} className="form-radio"/>
                 <span className="ml-2">{type}</span>
               </label>
@@ -182,14 +191,25 @@ export default function MaternalDemographics() {
         <p className="font-medium">Insurance Plan</p>
         <input {...register("insurancePlan")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="font-medium">Insurance Effective Date</p>
-        <input {...register("effectiveDate")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date"/>
+        <div className="flex flex-nowrap space-x-4 py-6">
+            <div className="flex flex-col flex-grow">
+            <p className="font-medium">Effective Date</p>
+            <input {...register("effectiveDate")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date"/>
+            </div>
+            <div className="flex flex-col flex-grow">
+              <p className="font-medium">Subscriber ID</p>
+              <input {...register("subscriberID")} className="border border-gray-300 px-4 py-2.5 rounded-md w-full"/>
+            </div>
+            <div className="flex flex-col flex-grow">
+              <p className="font-medium">Group ID</p>
+              <input {...register("groupID")} className="border border-gray-300 px-4 py-2.5 rounded-md w-full"/>
+            </div>
+        </div>
 
-        <p className="font-medium">Insurance Subscriber ID</p>
-        <input {...register("subscriberID")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="font-medium">Insurance Group ID</p>
-        <input {...register("groupID")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+
+
+
 
         <p className="font-medium mt-100">OB/GYN or Primary Provider Name</p>
         <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
