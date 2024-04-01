@@ -9,8 +9,8 @@ type MedicineInputs = {
 };
 
 type Inputs = {
-    gestationAge: string,
-    anticipatedDeliveryData: string,
+    gestationAge: number,
+    anticipatedDeliveryDate: string,
     plannedModeDelivery: string,
     actualModeDelivery: string,
     attendedPostpartum: string,
@@ -58,14 +58,7 @@ export default function MaternalMedicalHistory() {
         })
     };
 
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        const dateSubmitted = `${data.dateCompletedMonth} ${data.dateCompletedDay}, ${data.dateCompletedYear}`;
-
-        const { dateCompletedDay, dateCompletedMonth, dateCompletedYear, ...restOfData } = data;
-        const fullData = { ...restOfData, dateSubmitted };
-
-        console.log(fullData);
-    }
+    const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
     const currentYear = new Date().getFullYear(); // function to get the current year to display in the form
     const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse(); // creates an array with every year from 1900 - pres
 
@@ -81,12 +74,20 @@ export default function MaternalMedicalHistory() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit(onSubmit)} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
                 <p className="font-medium text-xl whitespace-nowrap">Prenatal Care (for current or most recent pregnancy)</p>
-                
-                <p className="font-medium">Gestation Age at Entry of Care</p>
-                <input {...register("gestationAge")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <div className="flex flex-nowrap space-x-4">
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Gestation Age at Entry of Care</p>
+                        <select {...register("gestationAge")} className="border border-gray-300 px-4 py-2 rounded-md w-full">
+                            {[...Array(100).keys()].map(age => (<option key={age} value={age}>{age}</option>))}
+                        </select>
 
-                <p className="font-medium">Anticipated Delivery Date</p>
-                <input {...register("anticipatedDeliveryData")} className="border border-gray-300 px-4 py-2 rounded-md w-full"   />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Anticipated Delivery Date</p>
+                        <input {...register("anticipatedDeliveryDate")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                    </div>
+                </div>
+
 
                 <p className="font-medium">Planned Mode of Delivery</p>
                 <div className="flex flex-col space-y-2">
@@ -151,36 +152,45 @@ export default function MaternalMedicalHistory() {
                 </select>
 
                 <p className="font-medium">Please Explain Complications During Prior Pregnancies</p>
-                <input {...register("preganacyComplications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("preganacyComplications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <p className="font-medium text-xl pt-6">Medical Problems Requiring Ongoing Care</p>
 
                 <p className="font-medium">Diagnoses</p>
-                <input {...register("diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <p className="font-medium text-xl">Current Medication List</p>
+                <div className="flex justify-center">
+                    <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
+                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
+                </div>
                 {fields.map((field, index) => (
                     <div key={field.id} className="py-6">
                         <p className="font-medium pt-6">Medication {index + 1}</p>
                         <input {...register(`medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
-                        <p className="font-medium pt-6">Dose</p>
-                        <input {...register(`medications.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        <div className="flex flex-nowrap space-x-4">
+                            <div className="flex flex-col flex-grow">
+                                <p className="font-medium pt-6">Dose</p>
+                                <input {...register(`medications.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                            </div>
+                            <div className="flex flex-col flex-grow">
+                                <p className="font-medium pt-6">Prescriber</p>
+                                <input {...register(`medications.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                            </div>
+                        </div>
 
-                        <p className="font-medium pt-6">Prescriber</p>
-                        <input {...register(`medications.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+
+
 
                         <p className="font-medium pt-6">Medication Notes</p>
-                        <input {...register(`medications.${index}.medicationNotes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        <textarea {...register(`medications.${index}.medicationNotes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                     </div>))}
 
-                <div className="flex justify-center">
-                    <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
-                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
-                </div>
+
 
                 <p className="font-medium">Other Notes</p>
-                <input {...register("otherNotes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("otherNotes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <p className="font-medium">OB/GYN or Primary Provider Name</p>
                 <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />

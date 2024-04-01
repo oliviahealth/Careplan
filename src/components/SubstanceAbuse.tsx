@@ -1,5 +1,5 @@
-import { useForm, SubmitHandler, useFieldArray } from "react-hook-form"
-import { months } from "../utils"
+import { useForm, SubmitHandler } from "react-hook-form"
+//import { months } from "../utils"
 
 type Inputs = {
     alcohol: string,
@@ -82,7 +82,7 @@ type additionalDrugs = {
 
 
 export default function SubstanceAbuse() {
-    const { register, control, handleSubmit } = useForm<Inputs>({
+    const { register, handleSubmit } = useForm<Inputs>({
         defaultValues: {
             substances: [],
             alcohol: '',
@@ -105,36 +105,16 @@ export default function SubstanceAbuse() {
             tobaccoPregnancy: '',
         },
     });
-}
 
-const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'substances'
-})
 
-const removeSubstance = () => {
-    if (fields.length > 0) {
-        remove(fields.length - 1);
-    }
-};
 
-const addSubstance = () => {
-    append({
-        drug: '',
-        drugPregnancy: '',
-        drugMonth: '',
-        drugDay: '',
-        drugYear: '',
-        drugNotes: '',
-    })
-};
 
 const onSubmit: SubmitHandler<Inputs> = (data) => {
     console.log(data);
 }
 
-const currentYear = new Date().getFullYear;
-const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse();
+//const currentYear = new Date().getFullYear;
+//const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse();
 
 return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
@@ -150,3 +130,4 @@ return (
         </form>  
     </div>
 )
+}

@@ -49,7 +49,7 @@ const maritalStatus = [
 
 
 export default function MaternalDemographics() {
-  const { register, handleSubmit, formState: { }} = useForm<MaternalDemographicsInputs>({
+  const { register, handleSubmit } = useForm<MaternalDemographicsInputs>({
     defaultValues: { currentLivingArrangements: "", maritalStatus: "", phoneType: "" },
   });
 
@@ -70,12 +70,6 @@ export default function MaternalDemographics() {
 
       if(!userConfirmed) return;
     }
-
-    data.zipCode = Number(data.zipCode);
-
-    console.log("Zip Code:", typeof data.zipCode);
-    console.log("Subscriber ID:", typeof data.subscriberID);
-    console.log("Group ID:", typeof data.groupID);
   };
 
   const currentYear = new Date().getFullYear();
@@ -165,11 +159,20 @@ export default function MaternalDemographics() {
 
         <p className="font-medium text-xl">Emergency Contact</p>
 
-        <p className="font-medium">Name</p>
-        <input {...register("emergencyContact")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <p className="font-medium">Emergency Contact Phone Number</p>
-        <input {...register("emergencyPhoneNumber")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+        <div className="flex flex-nowrap space-x-4">
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Name</p>
+            <input {...register("emergencyContact")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+          </div>
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Phone Number</p>
+            <input {...register("emergencyPhoneNumber")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+          </div>
+        </div>
+
+        
+
 
         <p className="font-medium">Emergency Contact Relationship</p>
         <input {...register("emergencyRelationship")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
@@ -191,7 +194,7 @@ export default function MaternalDemographics() {
         <p className="font-medium">Insurance Plan</p>
         <input {...register("insurancePlan")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
-        <div className="flex flex-nowrap space-x-4 py-6">
+        <div className="flex flex-nowrap space-x-4 pt-6">
             <div className="flex flex-col flex-grow">
             <p className="font-medium">Effective Date</p>
             <input {...register("effectiveDate")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date"/>
@@ -205,11 +208,6 @@ export default function MaternalDemographics() {
               <input {...register("groupID")} className="border border-gray-300 px-4 py-2.5 rounded-md w-full"/>
             </div>
         </div>
-
-
-
-
-
 
         <p className="font-medium mt-100">OB/GYN or Primary Provider Name</p>
         <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
