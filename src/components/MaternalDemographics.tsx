@@ -3,6 +3,7 @@ import { states } from "../utils";
 import { useMutation } from 'react-query'
 import { MaternalDemographicsInputsSchema, MaternalDemographicsInputsType } from "../utils/interfaces";
 import axios from 'axios'
+import { z } from 'zod'
 
 const livingArrangements = [
   "Rent/Own a Home",
@@ -41,10 +42,6 @@ export default function MaternalDemographics() {
 
   const onSubmit: SubmitHandler<MaternalDemographicsInputsType> = async (formData) => {
 
-    formData.zip_code = Number(formData.zip_code);
-    formData.group_id = Number(formData.group_id);
-    formData.subscriber_id = Number(formData.subscriber_id);
-
     let missingInputsString = ''
 
     Object.entries(formData).forEach((elm) => {
@@ -56,13 +53,28 @@ export default function MaternalDemographics() {
     })
 
     if (missingInputsString) {
-      const userConfirmed = window.confirm(`The following data fields are missing or invalid.\n\n${missingInputsString}`);
+      const userConfirmed = window.confirm(`The following data fields are missing.\n\n${missingInputsString}`);
       if (!userConfirmed) return;
     } else {
+
+      formData.zip_code = Number(formData.zip_code);
+      formData.group_id = Number(formData.group_id);
+      formData.subscriber_id = Number(formData.subscriber_id);
+
       try {
         mutate(MaternalDemographicsInputsSchema.parse(formData));
         console.log("Data submitted successfully!");
       } catch (error) {
+
+        let validationErrors = '';
+        if (error instanceof z.ZodError) {
+          error.errors.forEach(err => {
+            validationErrors += `${err.path.join('.')} - ${err.message}\n`;
+          });
+        }
+        
+        const userConfirmed = window.confirm(`The following data fields are invalid.\n\n${validationErrors}`);
+        if (!userConfirmed) return;
         console.error("Error submitting data:", error);
       }
     }
@@ -103,7 +115,7 @@ export default function MaternalDemographics() {
         </select>
 
         <p className="font-medium">Zip Code</p>
-        <input  {...register("zip_code", { valueAsNumber: true })} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+        <input  {...register("zip_code")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
         <p className="font-medium">County</p>
         <input {...register("county")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />

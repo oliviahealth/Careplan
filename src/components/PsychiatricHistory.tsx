@@ -2,6 +2,7 @@ import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { PsychiatricHistorySchema, PsychiatricHistorySchemaType } from '../utils/interfaces.tsx';
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { z } from 'zod'
 
 const addPsychiatricHistory = async (data: PsychiatricHistorySchemaType) => {
 
@@ -46,10 +47,6 @@ export default function PsychiatricHistory() {
     const { mutate } = useMutation(addPsychiatricHistory);
     const onSubmit: SubmitHandler<PsychiatricHistorySchemaType> = async (data) => {
 
-        data.diagnoses.forEach(diagnosis => {
-            diagnosis.taking_medication = Boolean(diagnosis.taking_medication);
-        });
-
         let missingInputsString = ''
 
         Object.entries(data).forEach((elm) => {
@@ -61,13 +58,28 @@ export default function PsychiatricHistory() {
         })
 
         if (missingInputsString) {
-            const userConfirmed = window.confirm(`The following data fields are missing or invalid.\n\n${missingInputsString}`);
+            const userConfirmed = window.confirm(`The following data fields are missing.\n\n${missingInputsString}`);
             if (!userConfirmed) return;
         } else {
+
+            data.diagnoses.forEach(diagnosis => {
+                diagnosis.taking_medication = Boolean(diagnosis.taking_medication);
+            });
+
             try {
+
                 mutate(PsychiatricHistorySchema.parse(data));
                 console.log("Data submitted successfully!");
             } catch (error) {
+                let validationErrors = '';
+                if (error instanceof z.ZodError) {
+                  error.errors.forEach(err => {
+                    validationErrors += `${err.path.join('.')} - ${err.message}\n`;
+                  });
+                }
+        
+                const userConfirmed = window.confirm(`The following data fields are invalid.\n\n${validationErrors}`);
+                if (!userConfirmed) return;
                 console.error("Error submitting data:", error);
             }
         }

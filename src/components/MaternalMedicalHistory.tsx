@@ -2,6 +2,7 @@ import { useForm, SubmitHandler, useFieldArray } from "react-hook-form"
 import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../utils/interfaces.tsx';
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { z } from 'zod'
 
 const updateMaternalDemographicsData = async (data: MaternalMedicalHistorySchemaType) => {
 
@@ -48,12 +49,6 @@ export default function MaternalMedicalHistory() {
     const { mutate } = useMutation(updateMaternalDemographicsData);
     const onSubmit: SubmitHandler<MaternalMedicalHistorySchemaType> = async (data) => {
 
-        data.gestational_age = Number(data.gestational_age)
-        data.total_num_pregnancies = Number(data.total_num_pregnancies)
-        data.total_num_live_births = Number(data.total_num_live_births)
-        data.total_num_children_with_mother = Number(data.total_num_children_with_mother)
-        data.attended_postpartum_visit = Boolean(data.attended_postpartum_visit)
-
         let missingInputsString = ''
 
         Object.entries(data).forEach((elm) => {
@@ -69,13 +64,30 @@ export default function MaternalMedicalHistory() {
         })
 
         if (missingInputsString) {
-            const userConfirmed = window.confirm(`The following data fields are missing or invalid.\n\n${missingInputsString}`);
+            const userConfirmed = window.confirm(`The following data fields are missing.\n\n${missingInputsString}`);
             if (!userConfirmed) return;
         } else {
+
+            data.gestational_age = Number(data.gestational_age)
+            data.total_num_pregnancies = Number(data.total_num_pregnancies)
+            data.total_num_live_births = Number(data.total_num_live_births)
+            data.total_num_children_with_mother = Number(data.total_num_children_with_mother)
+            data.attended_postpartum_visit = Boolean(data.attended_postpartum_visit)
+
             try {
                 mutate(MaternalMedicalHistorySchema.parse(data));
                 console.log("Data submitted successfully!");
             } catch (error) {
+
+                let validationErrors = '';
+                if (error instanceof z.ZodError) {
+                  error.errors.forEach(err => {
+                    validationErrors += `${err.path.join('.')} - ${err.message}\n`;
+                  });
+                }
+        
+                const userConfirmed = window.confirm(`The following data fields are invalid.\n\n${validationErrors}`);
+                if (!userConfirmed) return;
                 console.error("Error submitting data:", error);
             }
         }
