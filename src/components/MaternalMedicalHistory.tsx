@@ -15,7 +15,6 @@ const updateMaternalDemographicsData = async (data: MaternalMedicalHistorySchema
     }
 };
 
-
 export default function MaternalMedicalHistory() {
     const { register, control, handleSubmit } = useForm<MaternalMedicalHistorySchemaType>({
         defaultValues: {
@@ -48,10 +47,7 @@ export default function MaternalMedicalHistory() {
 
     const { mutate } = useMutation(updateMaternalDemographicsData);
     const onSubmit: SubmitHandler<MaternalMedicalHistorySchemaType> = async (data) => {
-        // const dateSubmitted = `${data.dateCompletedMonth} ${data.dateCompletedDay}, ${data.dateCompletedYear}`;
 
-        // const { dateCompletedDay, dateCompletedMonth, dateCompletedYear, ...restOfData } = data;
-        // const fullData = { ...restOfData };
         data.gestational_age = Number(data.gestational_age)
         data.total_num_pregnancies = Number(data.total_num_pregnancies)
         data.total_num_live_births = Number(data.total_num_live_births)
@@ -73,36 +69,19 @@ export default function MaternalMedicalHistory() {
         })
 
         if (missingInputsString) {
-            const userConfirmed = window.confirm(`The following data is missing, please fill them out.\n\n${missingInputsString}`);
-
+            const userConfirmed = window.confirm(`The following data fields are missing or invalid.\n\n${missingInputsString}`);
             if (!userConfirmed) return;
-        }
-
-        try {
-            const validatedData = MaternalMedicalHistorySchema.parse(data);
-            const updatedData = await mutate(validatedData);
-
-        } catch (error) {
-            if (error instanceof Error && error.message) {
-                console.error("Error:", error.message);
-                const userConfirmed = window.confirm(`Please fix errors from the following fields.\n\n${missingInputsString}`);
-                if (!userConfirmed) return;
-            } else {
-                console.error("An error occurred:", error);
+        } else {
+            try {
+                mutate(MaternalMedicalHistorySchema.parse(data));
+                console.log("Data submitted successfully!");
+            } catch (error) {
+                console.error("Error submitting data:", error);
             }
         }
     };
 
-    // console.log(data);
-    // const currentYear = new Date().getFullYear(); // function to get the current year to display in the form
-    // const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse(); // creates an array with every year from 1900 - pres
-
     const deliveryModes = ["Vaginal", "Cesarean"];
-
-    // const numberOptions =  [];
-    // for (let i = 0; i <= 10; i++) {
-    //     numberOptions.push(<option key={i} value={i}>{i}</option>);
-    // }
 
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
@@ -150,22 +129,6 @@ export default function MaternalMedicalHistory() {
 
                 <p className="font-medium">Date Completed</p>
                 <input {...register("postpartum_visit_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-                {/* <div className="flex space-x-4">
-                    <select {...register("dateCompletedMonth")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Month</option>
-                        {months.map((month, index) => (<option key={index}>{month}</option>))}
-                    </select>
-
-                    <select {...register("dateCompletedDay")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Day</option>
-                        {Array.from({ length: 31 }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
-                    </select>
-
-                    <select {...register("dateCompletedYear")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Year</option>
-                        {years.map((year) => (<option key={year}>{year}</option>))}
-                    </select>
-                </div> */}
 
                 <p className="font-medium text-xl">Obstetric History</p>
 
@@ -216,8 +179,8 @@ export default function MaternalMedicalHistory() {
                 <p className="font-medium">Other Notes</p>
                 <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
-                {/* <p className="font-medium">OB/GYN or Primary Provider Name</p>
-                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" /> */}
+                <p className="font-medium">OB/GYN or Primary Provider Name</p>
+                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>

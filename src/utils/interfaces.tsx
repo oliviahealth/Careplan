@@ -21,6 +21,7 @@ export const MaternalMedicalHistorySchema = z.object({
     current_medication_list: z.array(CurrentMedicationListSchema),
     med_problems_diagnoses: z.string(),
     notes: z.string(),
+    obgyn: z.string()
 });
 export type MaternalMedicalHistorySchemaType = z.infer<typeof MaternalMedicalHistorySchema>;
 
@@ -61,6 +62,21 @@ export const MaternalDemographicsInputsSchema = z.object({
     effective_date: z.string(),
     subscriber_id: z.number(),
     group_id: z.number(),
-    // obgyn: z.string(),
 });
 export type MaternalDemographicsInputsType = z.infer<typeof MaternalDemographicsInputsSchema>
+
+const diagnosesSchema = z.object({
+    diagnosis: z.string(),
+    provider: z.string(),
+    phone_number: z.string(),
+    date_of_diagnosis: z.string(),
+    taking_medication: z.boolean(),
+});
+export const PsychiatricHistorySchema = z.object({
+    diagnoses: z.array(diagnosesSchema),
+    notes: z.string(),
+    obgyn: z.string(),
+});
+export type PsychiatricHistorySchemaType = z.infer<typeof PsychiatricHistorySchema>
+
+

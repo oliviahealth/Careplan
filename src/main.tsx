@@ -12,7 +12,7 @@ import Dashboard from './components/ClientDashboard/Dashboard.tsx'
 
 import MaternalDemographics from './components/MaternalDemographics.tsx';
 import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
-import MaternalPsychiatricHistory from './components/MaternalPsychiatricHistory.tsx';
+import PsychiatricHistory from './components/PsychiatricHistory.tsx';
 
 const queryClient = new QueryClient();
 
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/maternal-demographics' element={<MaternalDemographics />} />
             <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
-            <Route path='/maternal-psychiatric-history' element={<MaternalPsychiatricHistory />} />
+            <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
           </Route>
         </Routes>
       </BrowserRouter>

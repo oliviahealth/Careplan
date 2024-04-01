@@ -35,11 +35,15 @@ const updateMaternalDemographicsData = async (data: MaternalDemographicsInputsTy
 };
 
 export default function MaternalDemographics() {
-  
+
   const { register, handleSubmit } = useForm<MaternalDemographicsInputsType>();
   const { mutate } = useMutation(updateMaternalDemographicsData);
 
   const onSubmit: SubmitHandler<MaternalDemographicsInputsType> = async (formData) => {
+
+    formData.zip_code = Number(formData.zip_code);
+    formData.group_id = Number(formData.group_id);
+    formData.subscriber_id = Number(formData.subscriber_id);
 
     let missingInputsString = ''
 
@@ -52,26 +56,14 @@ export default function MaternalDemographics() {
     })
 
     if (missingInputsString) {
-      const userConfirmed = window.confirm(`The following data is missing, please fill them out.\n\n${missingInputsString}`);
-
+      const userConfirmed = window.confirm(`The following data fields are missing or invalid.\n\n${missingInputsString}`);
       if (!userConfirmed) return;
-    }
-
-    formData.zip_code = Number(formData.zip_code);
-    formData.group_id = Number(formData.group_id);
-    formData.subscriber_id = Number(formData.subscriber_id);
-
-    try {
-      const validatedData = MaternalDemographicsInputsSchema.parse(formData);
-      const updatedData = await mutate(validatedData);
-
-    } catch (error) {
-      if (error instanceof Error && error.message) {
-        console.error("Error:", error.message);
-        const userConfirmed = window.confirm(`Please fix errors from the following fields.\n\n${missingInputsString}`);
-        if (!userConfirmed) return;
-      } else {
-        console.error("An error occurred:", error);
+    } else {
+      try {
+        mutate(MaternalDemographicsInputsSchema.parse(formData));
+        console.log("Data submitted successfully!");
+      } catch (error) {
+        console.error("Error submitting data:", error);
       }
     }
   };
@@ -82,9 +74,6 @@ export default function MaternalDemographics() {
         <p className="font-medium text-xl">Personal Information</p>
         <p className="font-medium">Name</p>
         <input {...register("name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
-        {/* <p className="font-medium">Last Name</p>
-        <input {...register("lastName")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/> */}
 
         <p className="font-medium">Date of Birth</p>
         <input {...register("date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
@@ -170,9 +159,6 @@ export default function MaternalDemographics() {
 
         <p className="font-medium">Insurance Group ID</p>
         <input {...register("group_id")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
-        {/* <p className="font-medium mt-100">OB/GYN or Primary Provider Name</p>
-        <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/> */}
 
         <div className="flex justify-center">
           <button type="submit" className="bg-[#AFAFAFAF] w-full text-black px-20 py-2 mt-6 rounded-md">Save</button>
