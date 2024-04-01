@@ -1,23 +1,32 @@
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { PsychiatricHistorySchema, PsychiatricHistorySchemaType } from '../utils/interfaces.tsx';
+import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
-import { z } from 'zod'
 
-const addPsychiatricHistory = async (data: PsychiatricHistorySchemaType) => {
+const diagnosesSchema = z.object({
+    diagnosis: z.string().min(1, "Diagnosis is required"),
+    provider: z.string().min(1, "Provider is required"),
+    phone_number: z.string().min(1, "Phone number is required"),
+    date_of_diagnosis: z.string().min(1, "Date of diagnosis is required"),
+    taking_medication: z.string().min(1, "This field is required"),
+});
 
-    const newData = { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }
-    try {
-        const response = await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', newData);
-        console.log("Data successfully updated:", data);
-        return response.data;
-    } catch (error) {
-        throw new Error('Network response was not ok');
-    }
-};
+export const PsychiatricHistoryInputsSchema = z.object({
+    diagnoses: z.array(diagnosesSchema),
+    notes: z.string().min(1, "Notes is required"),
+    obgyn: z.string().min(1, "OB/GYN or Primary Care Provider is required"),
+});
+export type PsychiatricHistoryInputsType = z.infer<typeof PsychiatricHistoryInputsSchema>
+
+const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
+    id: z.string(),
+    user_id: z.string()
+});
 
 export default function PsychiatricHistory() {
-    const { register, control, handleSubmit } = useForm<PsychiatricHistorySchemaType>({
+    const { register, handleSubmit, control, formState: { errors } } = useForm<PsychiatricHistoryInputsType>({
+        resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
             diagnoses: []
         },
@@ -40,54 +49,28 @@ export default function PsychiatricHistory() {
             provider: '',
             phone_number: '',
             date_of_diagnosis: '',
-            taking_medication: false,
+            taking_medication: '',
         })
     };
 
-    const { mutate } = useMutation(addPsychiatricHistory);
-    const onSubmit: SubmitHandler<PsychiatricHistorySchemaType> = async (data) => {
+    const { mutate } = useMutation(async (data: PsychiatricHistoryInputsType) => {
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
-        let missingInputsString = ''
+        PsychiatricHistoryResponseSchema.parse(responseData);
 
-        Object.entries(data).forEach((elm) => {
-            const [key, value] = elm;
-
-            if (!value) {
-                missingInputsString += `${key} \n\n`
-            }
-        })
-
-        if (missingInputsString) {
-            const userConfirmed = window.confirm(`The following data fields are missing.\n\n${missingInputsString}`);
-            if (!userConfirmed) return;
-        } else {
-
-            data.diagnoses.forEach(diagnosis => {
-                diagnosis.taking_medication = Boolean(diagnosis.taking_medication);
-            });
-
-            try {
-
-                mutate(PsychiatricHistorySchema.parse(data));
-                console.log("Data submitted successfully!");
-            } catch (error) {
-                let validationErrors = '';
-                if (error instanceof z.ZodError) {
-                  error.errors.forEach(err => {
-                    validationErrors += `${err.path.join('.')} - ${err.message}\n`;
-                  });
-                }
-        
-                const userConfirmed = window.confirm(`The following data fields are invalid.\n\n${validationErrors}`);
-                if (!userConfirmed) return;
-                console.error("Error submitting data:", error);
-            }
+        return responseData;
+    }, {
+        onSuccess: (responseData) => {
+            console.log("PsychiatricHistory data added successfully", responseData);
+        },
+        onError: () => {
+            alert("Error while adding PsychiatricHistory data.");
         }
-    }
+    });
 
     return (
         <div className="flex  justify-center w-full p-2 mt-2 text-base font-OpenSans">
-            <form onSubmit={handleSubmit(onSubmit)} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+            <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
                 {fields.map((field, index) => (
                     <div key={field.id} className="py-6">
                         <p className="font-medium pt-6">Diagnosis</p>
@@ -105,14 +88,11 @@ export default function PsychiatricHistory() {
 
                         <p className="font-medium pt-6">Are You Currently Taking Medicine for this Diagnosis?</p>
                         <div className="flex flex-col space-y-2">
-                            <label className="inline-flex items-center">
-                                <input {...register(`diagnoses.${index}.taking_medication`, { required: true })} type="radio" value="true" className="form-radio" />
-                                <span className="ml-2">Yes</span>
-                            </label>
-                            <label className="inline-flex items-center">
-                                <input {...register(`diagnoses.${index}.taking_medication`)} type="radio" value='' className="form-radio" />
-                                <span className="ml-2">No</span>
-                            </label>
+                            {["Yes", "No"].map((status, idx) => (
+                                <label key={idx} className="inline-flex items-center">
+                                    <input {...register(`diagnoses.${index}.taking_medication`)} type="radio" value={status} className="form-radio" />
+                                    <span className="ml-2">{status}</span>
+                                </label>))}
                         </div>
                     </div>))}
 
@@ -123,9 +103,12 @@ export default function PsychiatricHistory() {
 
                 <p className="font-medium">Notes</p>
                 <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
 
                 <p className="font-medium whitespace-nowrap">OB/GYN, Primary Care Provider, or Mental Health Provider Name</p>
                 <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
+
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
