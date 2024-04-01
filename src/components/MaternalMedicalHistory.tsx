@@ -37,8 +37,9 @@ const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
 
 export default function MaternalMedicalHistory() {
 
-    
-    const { register, control, handleSubmit, formState: { errors } } = useForm<MaternalMedicalHistoryInputsType>({ resolver: zodResolver(MaternalMedicalHistoryInputs),
+
+    const { register, control, handleSubmit, formState: { errors } } = useForm<MaternalMedicalHistoryInputsType>({
+        resolver: zodResolver(MaternalMedicalHistoryInputs),
         defaultValues: {
             current_medication_list: [],
             planned_mode_delivery: "",
@@ -69,19 +70,19 @@ export default function MaternalMedicalHistory() {
 
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputsType) => {
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
-    
+
         MaternalMedicalHistoryResponse.parse(responseData);
-    
+
         return responseData;
-      }, {
+    }, {
         onSuccess: (responseData) => {
-          console.log("MaternalMedicalHistory data added successfully.", responseData);
+            console.log("MaternalMedicalHistory data added successfully.", responseData);
         },
         onError: () => {
-          alert("Error while adding MaternalMedicalHistory data.");
+            alert("Error while adding MaternalMedicalHistory data.");
         }
-      });
-    
+    });
+
 
     const deliveryModes = ["Vaginal", "Cesarean"];
 
@@ -105,7 +106,7 @@ export default function MaternalMedicalHistory() {
                             <input {...register("planned_mode_delivery")} type="radio" value={status} className="form-radio" />
                             <span className="ml-2">{status}</span>
                         </label>))}
-                        {errors.planned_mode_delivery && <span className="label-text-alt text-red-500">{errors.planned_mode_delivery.message}</span>}
+                    {errors.planned_mode_delivery && <span className="label-text-alt text-red-500">{errors.planned_mode_delivery.message}</span>}
                 </div>
 
                 <p className="font-medium">Actual Mode of Delivery</p>
@@ -115,7 +116,7 @@ export default function MaternalMedicalHistory() {
                             <input {...register("actual_mode_delivery")} type="radio" value={status} className="form-radio" />
                             <span className="ml-2">{status}</span>
                         </label>))}
-                        {errors.actual_mode_delivery && <span className="label-text-alt text-red-500">{errors.actual_mode_delivery.message}</span>}
+                    {errors.actual_mode_delivery && <span className="label-text-alt text-red-500">{errors.actual_mode_delivery.message}</span>}
                 </div>
 
                 <p className="font-medium">Attended Postpartum Visit</p>
@@ -174,17 +175,26 @@ export default function MaternalMedicalHistory() {
                     <div key={field.id} className="py-6">
                         <p className="font-medium pt-6">Medication {index + 1}</p>
                         <input {...register(`current_medication_list.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.med_problems_diagnoses && <span className="label-text-alt text-red-500">{errors.med_problems_diagnoses.message}</span>}
+                        {errors.current_medication_list && errors.current_medication_list[index]?.name && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.name?.message}</span>
+                        )}
 
                         <p className="font-medium pt-6">Dose</p>
                         <input {...register(`current_medication_list.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                        {errors.current_medication_list && errors.current_medication_list[index]?.dose && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.dose?.message}</span>
+                        )}
                         <p className="font-medium pt-6">Prescriber</p>
                         <input {...register(`current_medication_list.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.current_medication_list && errors.current_medication_list[index]?.prescriber && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.prescriber?.message}</span>
+                        )}
 
                         <p className="font-medium pt-6">Medication Notes</p>
                         <input {...register(`current_medication_list.${index}.notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                    </div>))}
+                        {errors.current_medication_list && errors.current_medication_list[index]?.notes && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.notes?.message}</span>
+                        )}                    </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>

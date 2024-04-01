@@ -75,16 +75,27 @@ export default function PsychiatricHistory() {
                     <div key={field.id} className="py-6">
                         <p className="font-medium pt-6">Diagnosis</p>
                         <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
+                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.diagnosis?.message}</span>
+                        )}
 
                         <p className="font-medium pt-6">Provider</p>
                         <input {...register(`diagnoses.${index}.provider`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnoses && errors.diagnoses[index]?.provider && (
+                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.provider?.message}</span>
+                        )}
 
                         <p className="font-medium pt-6">Phone Number</p>
                         <input {...register(`diagnoses.${index}.phone_number`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnoses && errors.diagnoses[index]?.phone_number && (
+                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
+                        )}
 
                         <p className="font-medium">Date of Diagnosis</p>
                         <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-
+                        {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
+                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>
+                        )}
 
                         <p className="font-medium pt-6">Are You Currently Taking Medicine for this Diagnosis?</p>
                         <div className="flex flex-col space-y-2">
@@ -94,6 +105,10 @@ export default function PsychiatricHistory() {
                                     <span className="ml-2">{status}</span>
                                 </label>))}
                         </div>
+                        {errors.diagnoses && errors.diagnoses[index]?.taking_medication && (
+                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
+                        )}
+
                     </div>))}
 
                 <div className="flex justify-center">
