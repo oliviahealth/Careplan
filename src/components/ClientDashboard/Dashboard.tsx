@@ -9,7 +9,7 @@ function Dashboard() {
         <div className="text-3xl font-semibold">First Name Last Name</div>
 
         <div className="mt-8 flex flex-col gap-2">
-          <FormSelector name="General Information"></FormSelector>
+          <FormSelector name="General Information" completed={false}></FormSelector>
           <FormSelector name="Consent Form"></FormSelector>
           <FormSelector name="Demographics"></FormSelector>
         </div>

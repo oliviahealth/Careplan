@@ -27,7 +27,7 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{ transform: `rotate(0deg)` }}
-        className={'h-5 stroke-gray-200'}
+        className={`h-5 ${isSelected ? "stroke-[#D0BABA]" : "stroke-gray-200"}`}
       >
         <path
           d="M2 24L13 13L2 2"
