@@ -90,14 +90,18 @@ export default function MaternalMedicalHistory() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
                 <p className="font-medium text-xl whitespace-nowrap">Prenatal Care (for current or most recent pregnancy)</p>
-
-                <p className="font-medium">Gestational Age at Entry of Care</p>
-                <input {...register("gestational_age")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.gestational_age && <span className="label-text-alt text-red-500">{errors.gestational_age.message}</span>}
-
-                <p className="font-medium">Anticipated Delivery Date</p>
-                <input {...register("anticipated_delivery_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-                {errors.anticipated_delivery_date && <span className="label-text-alt text-red-500">{errors.anticipated_delivery_date.message}</span>}
+                <div className="space-y-7">
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Gestation Age at Entry of Care</p>
+                        <select {...register("gestational_age")} className="border border-gray-300 px-4 py-2 rounded-md w-full">
+                            {[...Array(100).keys()].map(age => (<option key={age} value={age}>{age}</option>))}
+                        </select>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Anticipated Delivery Date</p>
+                        <input {...register("anticipated_delivery_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                    </div>
+                </div>
 
                 <p className="font-medium">Planned Mode of Delivery</p>
                 <div className="flex flex-col space-y-2">
@@ -161,18 +165,18 @@ export default function MaternalMedicalHistory() {
                 {errors.total_num_children_with_mother && <span className="label-text-alt text-red-500">{errors.total_num_children_with_mother.message}</span>}
 
                 <p className="font-medium">Please Explain Complications During Prior Pregnancies</p>
-                <input {...register("prior_complications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("prior_complications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.prior_complications && <span className="label-text-alt text-red-500">{errors.prior_complications.message}</span>}
 
                 <p className="font-medium text-xl pt-6">Medical Problems Requiring Ongoing Care</p>
 
                 <p className="font-medium">Diagnoses</p>
-                <input {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.med_problems_diagnoses && <span className="label-text-alt text-red-500">{errors.med_problems_diagnoses.message}</span>}
 
                 <p className="font-medium text-xl">Current Medication List</p>
                 {fields.map((field, index) => (
-                    <div key={field.id} className="py-6">
+                    <div key={field.id} className="py-4">
                         <p className="font-medium pt-6">Medication {index + 1}</p>
                         <input {...register(`current_medication_list.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.current_medication_list && errors.current_medication_list[index]?.name && (
@@ -202,7 +206,7 @@ export default function MaternalMedicalHistory() {
                 </div>
 
                 <p className="font-medium">Other Notes</p>
-                <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
 
                 <p className="font-medium">OB/GYN or Primary Provider Name</p>
