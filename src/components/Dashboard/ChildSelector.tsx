@@ -21,8 +21,6 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
         </div>
       </div>
       <svg
-        width="15"
-        height="26"
         viewBox="0 0 15 26"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
