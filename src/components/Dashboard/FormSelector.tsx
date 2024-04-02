@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
 interface FormSelectorProps {
   name: string;
+  path: string;
   completed?: boolean;
 }
 
-const FormSelector: React.FC<FormSelectorProps> = ({ name, completed = true }) => {
+const FormSelector: React.FC<FormSelectorProps> = ({ name, path, completed = true }) => {
   return (
     <div className="collapse collapse-arrow">
       <input type="checkbox" className="peer" />
@@ -30,7 +30,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, completed = true }) =
           <div>1</div>
         </div>
         <div className="flex justify-end">
-          <Link to={"/"} className="button-filled font-semibold">
+          <Link to={path} className="button-filled font-semibold">
             Edit
           </Link>
         </div>

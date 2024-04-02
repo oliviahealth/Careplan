@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form"
-import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../utils/interfaces.tsx';
+import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../../utils/interfaces.tsx';
 import { useMutation } from 'react-query'
 import axios from 'axios'
 

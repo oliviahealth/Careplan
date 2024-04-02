@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { states } from "../utils";
+import { states } from "../../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 
