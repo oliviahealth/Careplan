@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios, { AxiosResponse } from 'axios';
-import { useMutation } from 'react-query';
+import axios from 'axios';
+// import { useMutation } from 'react-query';
+// import useForm from 'react-hook-form';
+// import { z } from 'zod'
 
 interface FormSelectorProps {
   name: string;
@@ -10,35 +12,51 @@ interface FormSelectorProps {
   completed?: boolean;
 }
 
-interface UserData {
-  userId: string;
-}
-
 const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl, completed = true }) => {
 
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [data, setData] = useState('')
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const params = { "user_id": "d2bd4688-5527-4bbb-b1a8-af1399d00b12" };
-        const response = await axios.get<UserData>(apiUrl, {
-          params,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        setUserData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  const options = {
+    method: 'GET',
+    url: `${apiUrl}/d2bd4688-5527-4bbb-b1a8-af1399d00b12`,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
 
-    fetchData();
-  }, [apiUrl]); 
+  const getData = async () => {
+
+    const response = await axios.get(options.url, options)
+    console.log(response.data)
+    setData(response.data)
+  }
+
+  const maternalDemographicsFieldNames: { [key: string]: string } = {
+    name: "Name",
+    date_of_birth: "Date of Birth",
+    current_living_arrangement: "Current Living Arrangement",
+    street_address: "Street Address",
+    city: "City",
+    state: "State",
+    zip_code: "Zip Code",
+    county: "County",
+    primary_phone_number: "Primary Phone Number",
+    phone_type: "Phone Type",
+    emergency_contact: "Emergency Contact",
+    emergency_contact_phone: "Emergency Contact Phone Number",
+    relationship: "Relationship",
+    marital_status: "Marital Status",
+    insurance_plan: "Insurance Plan",
+    effective_date: "Effective Date",
+    subscriber_id: "Subscriber ID",
+    group_id: "Group ID",
+  };
+
+  const excludedKeys: string[] = ["user_id", "id"];
+
 
   return (
-    <div className="collapse collapse-arrow">
+    <div className="collapse collapse-arrow" onClick={async () => { await getData() }}>
       <input type="checkbox" className="peer" />
       <div className="collapse-title rounded-2xl items-center flex bg-gray-200 justify-between">{name}
         <div className="flex flex-row text-red-500">
@@ -53,11 +71,18 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl, complet
         </div>
       </div>
       <div className="collapse-content mt-2 flex flex-col bg-white">
-        <div className="grid grid-cols-3 py-2 text-sm">
-          <div>1</div>
-          <div>1</div>
-          <div>1</div>
-        </div>
+        {data && (
+          <div className="grid grid-cols-2 py-2 text-sm">
+            {Object.entries<string>(maternalDemographicsFieldNames)
+              .filter(([key]) => !excludedKeys.includes(key))
+              .map(([key, fieldName]) => (
+                <React.Fragment key={key}>
+                  <div className="font-semibold">{fieldName}</div>
+                  <div>{data?.[key]}</div>
+                </React.Fragment>
+              ))}
+          </div>
+        )}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
