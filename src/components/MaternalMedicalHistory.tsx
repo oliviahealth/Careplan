@@ -4,7 +4,7 @@ import { useMutation } from 'react-query'
 import axios from 'axios'
 
 const updateMaternalDemographicsData = async (data: MaternalMedicalHistorySchemaType) => {
-    const newData = { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }
+    const newData = { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }
     try {
         const response = await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', newData);
         console.log("Data successfully updated:", data);

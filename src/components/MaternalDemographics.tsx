@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { states } from "../utils";
 import { useMutation } from 'react-query'
@@ -55,25 +56,27 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
   id: z.string(),
   user_id: z.string()
 });
-type MaternalDemographicsResponseSchema = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
+  const navigate = useNavigate();
+
   const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "f707ebd9-4b2c-4fe9-a569-caf9dda6dc93" }));
+    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
 
     MaternalDemographicsResponseSchema.parse(responseData);
 
     return responseData;
   }, {
     onSuccess: (responseData) => {
-      console.log("Maternal demographics data added successfully", responseData);
-    },
-    onError: (err) => {
-      alert("Error while adding maternal demographics data");
+      alert("Maternal demographics data added successfully!");
+      console.log("MaternalDemographics data added successfully", responseData);
 
-      console.error(err);
+      navigate("/dashboard");
+    },
+    onError: () => {
+      alert("Error while adding MaternalDemographics data.");
     }
   });
 
@@ -98,7 +101,7 @@ export default function MaternalDemographics() {
               <span className="ml-2">{status}</span>
             </label>))}
 
-            {errors.current_living_arrangement && <span className="label-text-alt text-red-500">{errors.current_living_arrangement.message}</span>}
+          {errors.current_living_arrangement && <span className="label-text-alt text-red-500">{errors.current_living_arrangement.message}</span>}
         </div>
 
         <div className="flex flex-nowrap space-x-4 py-6">
@@ -215,5 +218,5 @@ export default function MaternalDemographics() {
         </div>
       </form>
     </div>
-  );
+  )
 }
