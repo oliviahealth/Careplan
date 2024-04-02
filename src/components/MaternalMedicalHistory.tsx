@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form"
-// import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../utils/interfaces.tsx';
 import { useMutation } from 'react-query'
+import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,11 +11,18 @@ const CurrentMedicationList = z.object({
     prescriber: z.string().min(1, 'Prescriber is required'),
     notes: z.string().min(1, 'Notes is required')
 });
+
+const deliveryModesEnum = z.enum([
+    "Vaginal",
+    "Cesarean"
+]);
+const deliveryModes = Object.values(deliveryModesEnum.Values);
+
 const MaternalMedicalHistoryInputs = z.object({
     gestational_age: z.string().min(1, 'Gestational age is required'),
     anticipated_delivery_date: z.string().min(1, 'Anticipated delivery date is required'),
-    planned_mode_delivery: z.string().min(1, 'Planned mode of delivery is required'),
-    actual_mode_delivery: z.string().min(1, 'Actual mode of delivery is required'),
+    planned_mode_delivery: deliveryModesEnum,
+    actual_mode_delivery: deliveryModesEnum,
     attended_postpartum_visit: z.string(),
     postpartum_visit_location: z.string().min(1, 'Postpartum visit location is required'),
     postpartum_visit_date: z.string().min(1, 'Postpartum visit date is required'),
@@ -36,29 +43,18 @@ const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
 });
 
 export default function MaternalMedicalHistory() {
-
+    const navigate = useNavigate();
 
     const { register, control, handleSubmit, formState: { errors } } = useForm<MaternalMedicalHistoryInputsType>({
         resolver: zodResolver(MaternalMedicalHistoryInputs),
         defaultValues: {
             current_medication_list: [],
-            planned_mode_delivery: "",
-            actual_mode_delivery: "",
-            attended_postpartum_visit: "",
-        },
+        }
     });
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: 'current_medication_list'
-    })
+    const { fields, append, remove } = useFieldArray({ control, name: 'current_medication_list' })
 
-    const removeLastMedication = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
-    };
-
+    // Adds a new blank medication object to current_medication_list which also creates a new UI component
     const addNewMedication = () => {
         append({
             name: '',
@@ -68,23 +64,27 @@ export default function MaternalMedicalHistory() {
         })
     };
 
+    const removeLastMedication = () => {
+        remove(fields.length - 1);
+    };
+
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputsType) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
 
         MaternalMedicalHistoryResponse.parse(responseData);
 
         return responseData;
     }, {
         onSuccess: (responseData) => {
+            alert("Maternal medical history added successfully!");
             console.log("MaternalMedicalHistory data added successfully.", responseData);
+
+            navigate('/dashboard');
         },
         onError: () => {
             alert("Error while adding MaternalMedicalHistory data.");
         }
     });
-
-
-    const deliveryModes = ["Vaginal", "Cesarean"];
 
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">

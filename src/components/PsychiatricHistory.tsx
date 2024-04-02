@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
@@ -25,6 +26,8 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
+    const navigate = useNavigate();
+
     const { register, handleSubmit, control, formState: { errors } } = useForm<PsychiatricHistoryInputsType>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
@@ -32,15 +35,10 @@ export default function PsychiatricHistory() {
         },
     });
 
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: 'diagnoses'
-    })
+    const { fields, append, remove } = useFieldArray({ control, name: 'diagnoses' })
 
     const removeLastDiagnoses = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
+        remove(fields.length - 1);
     }
 
     const addNewDiagnoses = () => {
@@ -54,14 +52,17 @@ export default function PsychiatricHistory() {
     };
 
     const { mutate } = useMutation(async (data: PsychiatricHistoryInputsType) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
 
         PsychiatricHistoryResponseSchema.parse(responseData);
 
         return responseData;
     }, {
         onSuccess: (responseData) => {
+            alert("Psychiatric history added successfully");
             console.log("PsychiatricHistory data added successfully", responseData);
+
+            navigate('/dashboard');
         },
         onError: () => {
             alert("Error while adding PsychiatricHistory data.");
@@ -91,7 +92,7 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
                         )}
 
-                        <p className="font-medium">Date of Diagnosis</p>
+                        <p className="font-medium pt-6">Date of Diagnosis</p>
                         <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>
@@ -128,7 +129,6 @@ export default function PsychiatricHistory() {
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
                 </div>
-
             </form>
         </div>
     )
