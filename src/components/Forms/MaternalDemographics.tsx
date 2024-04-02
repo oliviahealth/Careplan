@@ -61,7 +61,7 @@ export default function MaternalDemographics() {
   const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) } );
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "f707ebd9-4b2c-4fe9-a569-caf9dda6dc93" }));
+    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
     MaternalDemographicsResponseSchema.parse(responseData);
 
