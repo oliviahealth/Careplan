@@ -55,28 +55,25 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
   id: z.string(),
   user_id: z.string()
 });
-type MaternalDemographicsResponseSchema = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
-  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) } );
+  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "f707ebd9-4b2c-4fe9-a569-caf9dda6dc93" }));
+    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
     MaternalDemographicsResponseSchema.parse(responseData);
 
     return responseData;
   }, {
     onSuccess: (responseData) => {
-      console.log("Maternal demographics data added successfully", responseData);
+      console.log("MaternalDemographics data added successfully", responseData);
     },
-    onError: (err) => {
-      alert("Error while adding maternal demographics data");
-
-      console.error(err);
+    onError: () => {
+      alert("Error while adding MaternalDemographics data.");
     }
   });
-  
+
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
