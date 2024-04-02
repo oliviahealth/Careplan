@@ -1,12 +1,10 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { months, states } from "../utils";
+import { states } from "../utils";
 
 type MaternalDemographicsInputs = {
   firstName: string;
   lastName: string;
-  dobMonth: string;
-  dobDay: string;
-  dobYear: string;
+  dob: string;
   currentLivingArrangements: string;
   streetAddress: string;
   city: string;
@@ -71,9 +69,7 @@ export default function MaternalDemographics() {
       if(!userConfirmed) return;
     }
   };
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse(); // Creates an array with every year from 1900 - pres to use in date of birth selector
+  
 
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
@@ -86,22 +82,7 @@ export default function MaternalDemographics() {
         <input {...register("lastName")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
 
         <p className="font-medium">Date of Birth</p>
-        <div className="flex space-x-4">
-          <select {...register("dobMonth")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-            <option disabled selected>Month</option>
-            {months.map((month, index) => (<option key={index}>{month}</option>))}
-          </select>
-
-          <select {...register("dobDay")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-            <option disabled selected>Day</option>
-            {Array.from({ length: 31 }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
-          </select>
-
-          <select {...register("dobYear")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-            <option disabled selected>Year</option>
-            {years.map((year) => (<option key={year}>{year}</option>))}
-          </select>
-        </div>
+        <input {...register("dob")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
 
         <p className="font-medium text-xl">Address and Contact Information</p>
 

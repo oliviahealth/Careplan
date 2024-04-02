@@ -18,7 +18,13 @@ type Inputs = {
 export default function MaternalPsychiatricHistory() {
     const { register, control, handleSubmit } = useForm<Inputs>({
         defaultValues: {
-            diagnoses: []
+            diagnoses: [{
+                diagnosis: '',
+                provider: '',
+                phoneNumber: '',
+                dateDiagnosis: '',
+                takingMeds: '',
+            }]
         },
     });
 

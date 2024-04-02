@@ -1,5 +1,4 @@
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form"
-import { months } from "../utils"
 
 type MedicineInputs = {
     medication: string,
@@ -14,9 +13,7 @@ type Inputs = {
     plannedModeDelivery: string,
     actualModeDelivery: string,
     attendedPostpartum: string,
-    dateCompletedDay: string,
-    dateCompletedMonth: string,
-    dateCompletedYear: string,
+    dateCompleted: string,
     numPregnancies: string,
     numLiveBirths: string,
     numChildrenLivingWithMother: string,
@@ -59,8 +56,6 @@ export default function MaternalMedicalHistory() {
     };
 
     const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
-    const currentYear = new Date().getFullYear(); // function to get the current year to display in the form
-    const years = Array.from({ length: currentYear - 1899 }, (_, i) => String(i + 1900)).reverse(); // creates an array with every year from 1900 - pres
 
     const deliveryModes = ["Vaginal", "Cesarean"];
 
@@ -117,22 +112,7 @@ export default function MaternalMedicalHistory() {
                 </div>
 
                 <p className="font-medium">Date Completed</p>
-                <div className="flex space-x-4">
-                    <select {...register("dateCompletedMonth")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Month</option>
-                        {months.map((month, index) => (<option key={index}>{month}</option>))}
-                    </select>
-
-                    <select {...register("dateCompletedDay")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Day</option>
-                        {Array.from({ length: 31 }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
-                    </select>
-
-                    <select {...register("dateCompletedYear")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
-                        <option disabled selected>Year</option>
-                        {years.map((year) => (<option key={year}>{year}</option>))}
-                    </select>
-                </div>
+                <input {...register("dateCompleted")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date"/>
 
                 <p className="font-medium text-xl">Obstretric History</p>
 

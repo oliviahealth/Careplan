@@ -11,6 +11,7 @@ import Dashboard from './components/ClientDashboard/Dashboard.tsx'
 import MaternalDemographics from './components/MaternalDemographics.tsx';
 import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
 import MaternalPsychiatricHistory from './components/MaternalPsychiatricHistory.tsx';
+import SubstanceUseHistory from './components/SubstanceUseHistory.tsx';
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path='/maternal-demographics' element={<MaternalDemographics />} />
           <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
           <Route path='/maternal-psychiatric-history' element={<MaternalPsychiatricHistory />} />
+          <Route path='/substance-use-history' element={<SubstanceUseHistory />}/>
         </Route>
       </Routes>
     </BrowserRouter>
