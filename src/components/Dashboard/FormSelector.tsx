@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 // import { useMutation } from 'react-query';
 // import useForm from 'react-hook-form';
 // import { z } from 'zod'
@@ -9,27 +9,41 @@ interface FormSelectorProps {
   name: string;
   path: string;
   apiUrl: string;
-  completed?: boolean;
+  formUrl: string;
 }
 
-const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl, completed = true }) => {
+const FormSelector: React.FC<FormSelectorProps> = ({
+  name,
+  path,
+  apiUrl,
+  formUrl,
+}) => {
+  const [data, setData] = useState<Record<string, string | null>>({});
+  const [completed, setIsCompleted] = useState<boolean>(true);
 
-  const [data, setData] = useState('')
+  useEffect(() => {
+    let allFieldsCompleted = true;
+    Object.entries(data).forEach(([key, value]) => {
+      if (!excludedKeys.includes(key) && (value === "" || value === null)) {
+        allFieldsCompleted = false;
+      }
+    });
+    setIsCompleted(allFieldsCompleted);
+  }, [data]);
 
   const options = {
-    method: 'GET',
-    url: `${apiUrl}/d2bd4688-5527-4bbb-b1a8-af1399d00b12`,
+    method: "GET",
+    url: `${apiUrl}/${formUrl}`,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   };
 
   const getData = async () => {
-
-    const response = await axios.get(options.url, options)
-    console.log(response.data)
-    setData(response.data)
-  }
+    const response = await axios.get(options.url, options);
+    console.log(response.data);
+    setData(response.data);
+  };
 
   const maternalDemographicsFieldNames: { [key: string]: string } = {
     name: "Name",
@@ -54,11 +68,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl, complet
 
   const excludedKeys: string[] = ["user_id", "id"];
 
-
   return (
-    <div className="collapse collapse-arrow" onClick={async () => { await getData() }}>
+    <div
+      className="collapse collapse-arrow"
+      onClick={async () => {
+        await getData();
+      }}
+    >
       <input type="checkbox" className="peer" />
-      <div className="collapse-title rounded-2xl items-center flex bg-gray-200 justify-between">{name}
+      <div className="collapse-title rounded-2xl items-center flex bg-gray-200 justify-between">
+        {name}
         <div className="flex flex-row text-red-500">
           {completed ? (
             ""
@@ -72,13 +91,15 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl, complet
       </div>
       <div className="collapse-content mt-2 flex flex-col bg-white">
         {data && (
-          <div className="grid grid-cols-2 py-2 text-sm">
+          <div className="grid grid-cols-3 py-2 text-sm">
             {Object.entries<string>(maternalDemographicsFieldNames)
               .filter(([key]) => !excludedKeys.includes(key))
               .map(([key, fieldName]) => (
                 <React.Fragment key={key}>
-                  <div className="font-semibold">{fieldName}</div>
-                  <div>{data?.[key]}</div>
+                  <div className="flex flex-row gap-1">
+                    <div className="font-semibold">{fieldName}:</div>
+                    <div>{data?.[key]}</div>
+                  </div>
                 </React.Fragment>
               ))}
           </div>
