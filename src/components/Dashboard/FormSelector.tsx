@@ -111,45 +111,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         </div>
       </div>
     </div>
-    // <>
-    //   <button
-    //     className="w-full h-fit py-3 px-6 rounded-2xl bg-gray-200 flex justify-between text-lg"
-    //     onClick={toggleSelected}
-    //   >
-    //     <div>{name}</div>
-    //     <div className="flex gap-10 items-center">
-    //       <div className="flex flex-row text-red-500">
-    //         {completed ? (
-    //           <>
-    //             <img className="w-4 mr-2" src={`./images/action.svg`} />
-    //             Actions Required
-    //           </>
-    //         ) : (
-    //           ""
-    //         )}
-    //       </div>
-    //         <svg
-    //           width="15"
-    //           height="26"
-    //           viewBox="0 0 15 26"
-    //           fill="none"
-    //           xmlns="http://www.w3.org/2000/svg"
-    //           style={{ transform: `rotate(90deg)` }}
-    //           className={`h-5 stroke-black`}
-    //         >
-    //           <path
-    //             d="M2 24L13 13L2 2"
-    //             strokeWidth="4"
-    //             strokeLinecap="round"
-    //             strokeLinejoin="round"
-    //           />
-    //         </svg>
-    //     </div>
-    //   </button>
-    //   <div className="px-6 text-sm">
-    //     {isSelected ? "Selected form content" : ""}
-    //   </div>
-    // </>
   );
 };
 
