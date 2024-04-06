@@ -9,14 +9,14 @@ interface FormSelectorProps {
   name: string;
   path: string;
   apiUrl: string;
-  formUrl: string;
+  userID: string;
 }
 
 const FormSelector: React.FC<FormSelectorProps> = ({
   name,
   path,
   apiUrl,
-  formUrl,
+  userID,
 }) => {
   const [data, setData] = useState<Record<string, string | null>>({});
   const [completed, setIsCompleted] = useState<boolean>(true);
@@ -33,7 +33,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const options = {
     method: "GET",
-    url: `${apiUrl}/${formUrl}`,
+    url: `${apiUrl}/${userID}`,
     headers: {
       "Content-Type": "application/json",
     },

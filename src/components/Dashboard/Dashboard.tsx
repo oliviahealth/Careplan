@@ -9,7 +9,7 @@ function Dashboard() {
         <div className="text-3xl font-semibold">First Name Last Name</div>
 
         <div className="mt-8 flex flex-col gap-2">
-          <FormSelector name="Maternal Demographics" path="/maternal-demographics" apiUrl="http://127.0.0.1:5000/api/get_maternal_demographics" formUrl="d2bd4688-5527-4bbb-b1a8-af1399d00b12"></FormSelector>
+          <FormSelector name="Maternal Demographics" path="/maternal-demographics" apiUrl="http://127.0.0.1:5000/api/get_maternal_demographics" userID="d2bd4688-5527-4bbb-b1a8-af1399d00b12"></FormSelector>
           {/* <FormSelector name="Medical History" path="/maternal-medical-history" apiUrl="http://127.0.0.1:5000/api/get_maternal_medical_history" completed={false}></FormSelector> */}
           {/* <FormSelector name="Psychiatric History" path="/maternal-psychiatric-history"></FormSelector> */}
         </div>
