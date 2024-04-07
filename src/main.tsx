@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/maternal-demographics' element={<MaternalDemographics />} />
             <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
             <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
-            <Route path='services-substance-use' element={<ServicesSubstanceUse />} />
+            <Route path='/services-substance-use' element={<ServicesSubstanceUse />} />
           </Route>
         </Routes>
       </BrowserRouter>
