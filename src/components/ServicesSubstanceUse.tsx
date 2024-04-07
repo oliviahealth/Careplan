@@ -12,16 +12,16 @@ const Medications = z.object({
 });
 
 const ServicesSubstanceUseInputs = z.object({
-    mat_engaged: z.string().min(1, 'required'),
+    mat_engaged: z.string().min(1, 'MAT engaged required'),
     date_used_mat: z.string(),
     medications: z.array(Medications),
-    mat_clinic_name: z.string().min(1, 'required'),
-    mat_clinic_phone: z.string().min(1, 'required'),
-    used_addiction_medicine_services: z.string().min(1, 'required'),
+    mat_clinic_name: z.string().min(1, 'MAT clinic name required'),
+    mat_clinic_phone: z.string().min(1, 'MAT clinic phone number required'),
+    used_addiction_medicine_services: z.string().min(1, 'This field is required'),
     date_used_medicine_service: z.string(),
-    addiction_medicine_clinic: z.string().min(1, 'required'),
-    addiction_medicine_clinic_phone: z.string().min(1, 'required'),
-    mat_provider: z.string().min(1, 'required'),
+    addiction_medicine_clinic: z.string().min(1, 'Addiction medicine clinic name required'),
+    addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required'),
+    mat_provider: z.string().min(1, 'MAT provider required'),
 });
 type ServicesSubstanceUseInputsType = z.infer<typeof ServicesSubstanceUseInputs>
 
@@ -94,18 +94,19 @@ export default function ServicesSubstanceUse() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
 
-                <p className="font-medium">Medication Assisted Treatment (MAT) enganged?</p>
+                <p className="font-medium">Medication Assisted Treatment (MAT) engaged?</p>
                 {["Never", "Currently", "Prior MAT use"].map((status) => (
                     <label key={status} className="flex pt-2">
                         <input {...register("mat_engaged")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowMatDate(e.target.value)} />
                         <span className="ml-2">{status}</span>
                     </label>))}
-
+                {errors.mat_engaged && <span className="label-text-alt text-red-500">{errors.mat_engaged.message}</span>}
 
                 {showMatDate &&
                     <>
                         <p className="font-medium">Date Last Used</p>
                         <input {...register("date_used_mat")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                        {errors.date_used_mat && <span className="label-text-alt text-red-500">{errors.date_used_mat.message}</span>}
                     </>
                 }
 
@@ -114,12 +115,18 @@ export default function ServicesSubstanceUse() {
 
                         <p className="font-medium">Medication</p>
                         <input {...register(`medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.medications && errors.medications[index]?.medication && (
+                            <span className="label-text-alt text-red-500">{errors.medications[index]?.medication?.message}</span>
+                        )}
 
                         <p className="font-medium">Dose</p>
                         <input {...register(`medications.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.medications && errors.medications[index]?.dose && (
+                            <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
+                        )}
                     </div>))}
-                    
-                    
+
+
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
                     <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
@@ -127,10 +134,11 @@ export default function ServicesSubstanceUse() {
 
                 <p className="font-medium">MAT Clinic</p>
                 <input {...register("mat_clinic_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.mat_clinic_name && <span className="label-text-alt text-red-500">{errors.mat_clinic_name.message}</span>}
 
                 <p className="font-medium">MAT Clinic Phone Number</p>
                 <input {...register("mat_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                {errors.mat_clinic_phone && <span className="label-text-alt text-red-500">{errors.mat_clinic_phone.message}</span>}
 
                 <p className="font-medium">Used Addiction Medicine Services?</p>
                 {["Never", "Currently", "Prior Use"].map((status) => (
@@ -138,23 +146,27 @@ export default function ServicesSubstanceUse() {
                         <input {...register("used_addiction_medicine_services")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowAddictionServiceDate(e.target.value)} />
                         <span className="ml-2">{status}</span>
                     </label>))}
+                {errors.used_addiction_medicine_services && <span className="label-text-alt text-red-500">{errors.used_addiction_medicine_services.message}</span>}
 
                 {showAddictionServiceDate &&
                     <>
                         <p className="font-medium">Date Last Used</p>
                         <input {...register("date_used_medicine_service")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                        {errors.date_used_medicine_service && <span className="label-text-alt text-red-500">{errors.date_used_medicine_service.message}</span>}
                     </>
                 }
 
                 <p className="font-medium">Addiction Medicine Clinic Name</p>
                 <input {...register("addiction_medicine_clinic")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.addiction_medicine_clinic && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic.message}</span>}
 
                 <p className="font-medium">Addiction Medicine Clinic Phone Number</p>
                 <input {...register("addiction_medicine_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                {errors.addiction_medicine_clinic_phone && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic_phone.message}</span>}
 
                 <p className="font-medium">MAT Provider</p>
                 <input {...register("mat_provider")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.mat_provider && <span className="label-text-alt text-red-500">{errors.mat_provider.message}</span>}
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
