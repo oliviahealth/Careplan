@@ -1,87 +1,143 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import { useMutation } from 'react-query';
-// import useForm from 'react-hook-form';
-// import { z } from 'zod'
 
 interface FormSelectorProps {
   name: string;
   path: string;
   apiUrl: string;
   userID: string;
+  fieldType: string;
 }
+
 
 const FormSelector: React.FC<FormSelectorProps> = ({
   name,
   path,
   apiUrl,
   userID,
+  fieldType,
 }) => {
-  const [data, setData] = useState<Record<string, string | null>>({});
-  const [completed, setIsCompleted] = useState<boolean>(true);
+  const [formData, setFormData] = useState<Record<string, string | null>>({});
+  const [completed, setCompleted] = useState<boolean>(true);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/${userID}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setFormData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, [apiUrl, userID]);
 
   useEffect(() => {
     let allFieldsCompleted = true;
-    Object.entries(data).forEach(([key, value]) => {
-      if (!excludedKeys.includes(key) && (value === "" || value === null)) {
+    Object.entries(formData).forEach(([_key, value]) => {
+      if (value === "" || value === null) {
         allFieldsCompleted = false;
       }
     });
-    setIsCompleted(allFieldsCompleted);
-  }, [data]);
+    setCompleted(allFieldsCompleted);
+  }, [formData]);
 
-  const options = {
-    method: "GET",
-    url: `${apiUrl}/${userID}`,
-    headers: {
-      "Content-Type": "application/json",
+  const fieldNames: {
+    maternalDemographics: { [key: string]: string };
+    maternalMedicalHistory: { [key: string]: string };
+  } = {
+    maternalDemographics: {
+      name: "Name",
+      date_of_birth: "Date of Birth",
+      current_living_arrangement: "Current Living Arrangement",
+      street_address: "Street Address",
+      city: "City",
+      state: "State",
+      zip_code: "Zip Code",
+      county: "County",
+      primary_phone_number: "Primary Phone Number",
+      phone_type: "Phone Type",
+      emergency_contact: "Emergency Contact",
+      emergency_contact_phone: "Emergency Contact Phone Number",
+      relationship: "Relationship",
+      marital_status: "Marital Status",
+      insurance_plan: "Insurance Plan",
+      effective_date: "Effective Date",
+      subscriber_id: "Subscriber ID",
+      group_id: "Group ID",
+    },
+    maternalMedicalHistory: {
+      gestational_age: "Gestational Age",
+      anticipated_delivery_date: "Anticipated Delivery Date",
+      planned_mode_delivery: "Planned Mode of Delivery",
+      actual_mode_delivery: "Actual Mode of Delivery",
+      attended_postpartum_visit: "Attended Postpartum Visit",
+      postpartum_visit_location: "Postpartum Visit Location",
+      postpartum_visit_date: "Postpartum Visit Date",
+      total_num_pregnancies: "Total Number of Pregnancies",
+      total_num_live_births: "Number of Live Births",
+      total_num_children_with_mother: "Number of Children Currently Living with Mother",
+      prior_complications: "Complications During Prior Pregnancies",
+      med_problems_diagnoses: "Medical Problems Requiring Ongoing Care",
+      current_medication_list: "Current Medication List",
+      notes: "Notes",
+      obgyn: "OB/GYN or Primary Care Provider"
     },
   };
 
-  const getData = async () => {
-    const response = await axios.get(options.url, options);
-    console.log(response.data);
-    setData(response.data);
-  };
+  const ShowMedicationList = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div>
+          <div>
+            Name: {x.name}
+          </div>
+          <div>
+            Dose: {x.dose}
+          </div>
+          <div>
+            Prescriber: {x.prescriber}
+          </div>
+          <div>
+            Notes: {x.notes}
+          </div>
+        </div>
+      )
+    })
+  }
 
-  const maternalDemographicsFieldNames: { [key: string]: string } = {
-    name: "Name",
-    date_of_birth: "Date of Birth",
-    current_living_arrangement: "Current Living Arrangement",
-    street_address: "Street Address",
-    city: "City",
-    state: "State",
-    zip_code: "Zip Code",
-    county: "County",
-    primary_phone_number: "Primary Phone Number",
-    phone_type: "Phone Type",
-    emergency_contact: "Emergency Contact",
-    emergency_contact_phone: "Emergency Contact Phone Number",
-    relationship: "Relationship",
-    marital_status: "Marital Status",
-    insurance_plan: "Insurance Plan",
-    effective_date: "Effective Date",
-    subscriber_id: "Subscriber ID",
-    group_id: "Group ID",
+  const renderFields = (fields: { [key: string]: string }) => {
+    return (
+      <div className="grid grid-cols-3 py-2 text-sm">
+        {Object.entries<string>(fields)
+          .map(([key, fieldName]) => (
+            <React.Fragment key={key}>
+              <div className="flex flex-row gap-1">
+                <div className="font-semibold">{fieldName}:</div>
+                {key === 'current_medication_list' ? (
+                  ShowMedicationList((formData as any)?.[key] || [])
+                ) : (
+                  <div>{(formData as any)?.[key]}</div>
+                )}
+              </div>
+            </React.Fragment>
+          ))}
+      </div>
+    );
   };
-
-  const excludedKeys: string[] = ["user_id", "id"];
 
   return (
-    <div
-      className="collapse collapse-arrow"
-      onClick={async () => {
-        await getData();
-      }}
-    >
+    <div className="collapse collapse-arrow" onClick={fetchData}>
       <input type="checkbox" className="peer" />
       <div className="collapse-title rounded-2xl items-center flex bg-gray-200 justify-between">
         {name}
         <div className="flex flex-row text-red-500">
-          {completed ? (
-            ""
-          ) : (
+          {!completed && (
             <>
               <img className="w-4 mr-2" src={`./images/action.svg`} />
               Actions Required
@@ -90,20 +146,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         </div>
       </div>
       <div className="collapse-content mt-2 flex flex-col bg-white">
-        {data && (
-          <div className="grid grid-cols-3 py-2 text-sm">
-            {Object.entries<string>(maternalDemographicsFieldNames)
-              .filter(([key]) => !excludedKeys.includes(key))
-              .map(([key, fieldName]) => (
-                <React.Fragment key={key}>
-                  <div className="flex flex-row gap-1">
-                    <div className="font-semibold">{fieldName}:</div>
-                    <div>{data?.[key]}</div>
-                  </div>
-                </React.Fragment>
-              ))}
-          </div>
-        )}
+        {fieldType === 'maternalDemographics' && formData && renderFields(fieldNames.maternalDemographics)}
+        {fieldType === 'maternalMedicalHistory' && formData && renderFields(fieldNames.maternalMedicalHistory)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
