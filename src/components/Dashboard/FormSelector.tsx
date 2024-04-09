@@ -50,6 +50,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const fieldNames: {
     maternalDemographics: { [key: string]: string };
     maternalMedicalHistory: { [key: string]: string };
+    psychiatricHistory: { [key: string]: string };
+    substanceUseHistory: { [key: string]: string };
   } = {
     maternalDemographics: {
       name: "Name",
@@ -88,7 +90,26 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       notes: "Notes",
       obgyn: "OB/GYN or Primary Care Provider"
     },
-  };
+    psychiatricHistory: {
+      diagnoses: "Diagnoses",
+      notes: "Notes",
+      obgyn: "OB/GYN"
+    },
+    substanceUseHistory: {
+      alcohol: "Alcohol",
+      benzodiazepines: "Benzodiazepines",
+      heroin: "Heroin",
+      kush: "Kush",
+      marijuana: "Marijuana",
+      methamphetamine: "Methamphetamine",
+      prescription_drugs: "Prescription Drugs",
+      tobacco: "Tobacco",
+      other1: "Other",
+      other2: "Other",
+      notes: "Notes",
+      treatment_case_manager: "Treatment Case Manager"
+    }
+  }
 
   const ShowMedicationList = (data: any) => {
     return data.map((x: any) => {
@@ -111,6 +132,42 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
+  const pscyhiatricHistoryDiagnoses = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div>
+          <div>
+            Provider: {x.provider}
+          </div>
+          <div>
+            Phone Number: {x.phone_number}
+          </div>
+          <div>
+            Diagnosis: {x.diagnosis}
+          </div>
+          <div>
+            Date of Diagnosis: {x.date_of_diagnosis}
+          </div>
+          <div>
+            Currently taking medication: {x.taking_medication}
+          </div>
+        </div>
+      )
+    })
+  }
+
+  const substanceUseHistoryDrugs = (formData: any) => {
+    return (
+      <div>
+        {Object.keys(formData).map((drug, index) => (
+          <div key={index}>
+            <div>{drug}: {formData[drug]}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-3 py-2 text-sm">
@@ -121,9 +178,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                 <div className="font-semibold">{fieldName}:</div>
                 {key === 'current_medication_list' ? (
                   ShowMedicationList((formData as any)?.[key] || [])
-                ) : (
-                  <div>{(formData as any)?.[key]}</div>
-                )}
+                ) : key === 'diagnoses' ? (
+                  pscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                ) : key === 'alcohol' || key === 'benzodiazepines' || key === 'heroin' || key === 'kush' || key === 'marijuana' || key === 'methamphetamine' || key === 'prescription_drugs' || key === 'tobacco' || key === 'other1' || key === 'other2' ? (
+                  substanceUseHistoryDrugs((formData as any)?.[key] || [])
+                ) :
+                  (
+                    <div>{(formData as any)?.[key]}</div>
+                  )}
               </div>
             </React.Fragment>
           ))}
@@ -148,6 +210,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div className="collapse-content mt-2 flex flex-col bg-white">
         {fieldType === 'maternalDemographics' && formData && renderFields(fieldNames.maternalDemographics)}
         {fieldType === 'maternalMedicalHistory' && formData && renderFields(fieldNames.maternalMedicalHistory)}
+        {fieldType === 'psychiatricHistory' && formData && renderFields(fieldNames.psychiatricHistory)}
+        {fieldType === 'substanceUseHistory' && formData && renderFields(fieldNames.substanceUseHistory)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
