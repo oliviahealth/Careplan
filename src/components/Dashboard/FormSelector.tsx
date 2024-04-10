@@ -53,6 +53,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     psychiatricHistory: { [key: string]: string };
     substanceUseHistory: { [key: string]: string };
     drugScreeningResults: { [key: string]: string };
+    familyAndSupports: { [key: string]: string };
   } = {
     maternalDemographics: {
       name: "Name",
@@ -113,6 +114,15 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     drugScreeningResults: {
       tests: "Tests",
       provider_ordering_UDS: "Provider Ordering UDS"
+    },
+    familyAndSupports: {
+      people_living_in_home: "List of People Living in the Home",
+      clients_children_not_living_in_home: "List of Clients Children NOT Living in the Home",
+      notes: "Notes",
+      current_support_system: "Current Support System",
+      strength_of_client_and_support_system: "Strengths of Client and Support System",
+      goals: "Goals",
+      recovery_coach: "Recovery Coach"
     }
   }
 
@@ -175,7 +185,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const drugScreeningResultsTests = (data: any) => {
     return data.map((x: any) => {
-      
+
       return (
         <div>
           <div>
@@ -207,6 +217,59 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
+  const familyAndSupportsPeopleInHome = (data: any) => {
+    return data.map((x: any) => {
+
+      return (
+        <div>
+          <div>
+            Person: {x.person}
+          </div>
+          <div>
+            Date of Birth: {x.date_of_birth}
+          </div>
+          <div>
+            Relation: {x.relation}
+          </div>
+        </div>
+      )
+    })
+  }
+
+  const familyAndSupportsChildrenNotHome = (data: any) => {
+    return data.map((x: any) => {
+
+      return (
+        <div>
+          <div>
+            Person: {x.person}
+          </div>
+          <div>
+            Date of Birth: {x.date_of_birth}
+          </div>
+          <div>
+            Caregiver: {x.caregiver}
+          </div>
+          <div>
+            Caregiver Contact Number: {x.caregiver_number}
+          </div>
+        </div>
+      )
+    })
+  }
+
+  const familyAndSupportsArrays = (data: any) => {
+    return (
+      <div>
+        {Object.keys(data).map((item, index) => (
+          <span key={index}>
+            {data[item]}{index === Object.keys(data).length - 1 ? "" : ", "}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 gap-y-4 py-4 text-sm">
@@ -223,6 +286,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   substanceUseHistoryDrugs((formData as any)?.[key] || [])
                 ) : key === 'tests' ? (
                   drugScreeningResultsTests((formData as any)?.[key] || [])
+                ) : key === 'people_living_in_home' ? (
+                  familyAndSupportsPeopleInHome((formData as any)?.[key] || [])
+                ) : key === 'clients_children_not_living_in_home' ? (
+                  familyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
+                ) : key === 'current_support_system' || key === 'strength_of_client_and_support_system' || key === 'goals' ? (
+                  familyAndSupportsArrays((formData as any)?.[key] || [])
                 ) :
                   (
                     <div>{(formData as any)?.[key]}</div>
@@ -254,6 +323,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {fieldType === 'psychiatricHistory' && formData && renderFields(fieldNames.psychiatricHistory)}
         {fieldType === 'substanceUseHistory' && formData && renderFields(fieldNames.substanceUseHistory)}
         {fieldType === 'drugScreeningResults' && formData && renderFields(fieldNames.drugScreeningResults)}
+        {fieldType === 'familyAndSupports' && formData && renderFields(fieldNames.familyAndSupports)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
