@@ -51,6 +51,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     maternalDemographics: { [key: string]: string };
     maternalMedicalHistory: { [key: string]: string };
     psychiatricHistory: { [key: string]: string };
+    medicalServicesForSubstanceUse: { [key: string]: string };
     substanceUseHistory: { [key: string]: string };
     drugScreeningResults: { [key: string]: string };
     familyAndSupports: { [key: string]: string };
@@ -99,6 +100,18 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       diagnoses: "Diagnoses",
       notes: "Notes",
       obgyn: "OB/GYN"
+    },
+    medicalServicesForSubstanceUse: {
+      mat_engaged: "Medication Assisted Treatment (MAT) Engaged",
+      date_used_mat: "Date of Last MAT Use",
+      medications: "Medications",
+      mat_clinic_name: "MAT Clinic Name",
+      mat_clinic_phone: "MAT Clinic Contact Information",
+      used_addiction_medicine_services: "Addiction Medicine Services",
+      date_used_medicine_service: "Date of Last Medicine Service",
+      addiction_medicine_clinic: "Addiction Medicine Clinic",
+      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information",
+      mat_provider: "MAT Provider"
     },
     substanceUseHistory: {
       alcohol: "Alcohol",
@@ -239,6 +252,17 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Diagnosis: {x.diagnosis} </div>
           <div> Date of Diagnosis: {x.date_of_diagnosis} </div>
           <div> Currently taking medication: {x.taking_medication} </div>
+        </div>
+      )
+    })
+  }
+
+  const MedicalServicesForSubstanceUseMedications = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div>
+          <div> Medication: {x.medication} </div>
+          <div> Dose: {x.dose} </div>
         </div>
       )
     })
@@ -411,6 +435,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   ShowMedicationList((formData as any)?.[key] || [])
                 ) : key === 'diagnoses' ? (
                   pscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
+                  MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
                 ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
                   substanceUseHistoryDrugs((formData as any)?.[key] || [])
                 ) : key === 'tests' ? (
@@ -466,6 +492,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {fieldType === 'infantInformation' && formData && renderFields(fieldNames.infantInformation)}
         {fieldType === 'referralsAndServices' && formData && renderFields(fieldNames.referralsAndServices)}
         {fieldType === 'relapsePreventionPlan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
+        {fieldType === 'medicalServicesForSubstanceUse' && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
