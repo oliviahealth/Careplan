@@ -56,6 +56,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     familyAndSupports: { [key: string]: string };
     infantInformation: { [key: string]: string };
     referralsAndServices: { [key: string]: string };
+    relapsePreventionPlan: { [key: string]: string };
   } = {
     maternalDemographics: {
       name: "Name",
@@ -205,6 +206,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       legal_assistance_other1: "Legal Assistance Other 1",
       legal_assistance_other2: "Legal Assistance Other 2",
       additional_notes: "Additional Notes"
+    }, relapsePreventionPlan: {
+      three_things_that_trigger_desire_to_use: "Three things that trigger your desire to use",
+      three_skills_you_enjoy: "Three skills you enjoy",
+      three_people_to_talk_to: "Three people to talk to",
+      safe_caregivers: "Safe Caregivers",
+      have_naloxone: "Have Naloxone",
+      comments: "Comments",
+      recovery_coach: "Social Worker or Recovery Coach"
     }
   }
 
@@ -366,6 +375,30 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   }
 
+  const RelapsePreventionPlanArrays = (data: any) => {
+    return (
+      <div>
+        {Object.keys(data).map((item, index) => (
+          <span key={index}>
+            {data[item]}{index === Object.keys(data).length - 1 ? "" : ", "}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  const RelapsePreventionPlanSafeCaregivers = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div>
+          <div> Name: {x.name} </div>
+          <div> Contact Number: {x.contact_number} </div>
+          <div> Relationship: {x.relationship} </div>
+        </div>
+      )
+    })
+  }
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 py-4 text-sm">
@@ -394,6 +427,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   infantInformationMedications((formData as any)?.[key] || [])
                 ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
                   FamilyAndSupportsServices((formData as any)?.[key] || [])
+                ) : key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
+                  RelapsePreventionPlanArrays((formData as any)?.[key] || [])
+                ) : key === 'safe_caregivers' ? (
+                  RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
                 ) :
                   (
                     <div>{(formData as any)?.[key]}</div>
@@ -428,6 +465,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {fieldType === 'familyAndSupports' && formData && renderFields(fieldNames.familyAndSupports)}
         {fieldType === 'infantInformation' && formData && renderFields(fieldNames.infantInformation)}
         {fieldType === 'referralsAndServices' && formData && renderFields(fieldNames.referralsAndServices)}
+        {fieldType === 'relapsePreventionPlan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
