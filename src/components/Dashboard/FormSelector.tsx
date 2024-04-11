@@ -7,23 +7,20 @@ interface FormSelectorProps {
   path: string;
   apiUrl: string;
   userID: string;
-  fieldType: string;
 }
-
 
 const FormSelector: React.FC<FormSelectorProps> = ({
   name,
   path,
   apiUrl,
   userID,
-  fieldType,
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   const [completed, setCompleted] = useState<boolean>(true);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/${userID}`, {
+      const response = await axios.get(`http://127.0.0.1:5000/api/${apiUrl}/${userID}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -230,7 +227,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     }
   }
 
-  const ShowMedicationList = (data: any) => {
+  const MaternalMedicalHistoryMedicationList = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -243,7 +240,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const pscyhiatricHistoryDiagnoses = (data: any) => {
+  const PscyhiatricHistoryDiagnoses = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -268,7 +265,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const substanceUseHistoryDrugs = (data: any) => {
+  const SubstanceUseHistoryDrugs = (data: any) => {
 
     const namesMap: { [key: string]: string } = {
       ever_used: "Ever Used",
@@ -288,7 +285,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const drugScreeningResultsTests = (data: any) => {
+  const DrugScreeningResultsTests = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -305,7 +302,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const familyAndSupportsPeopleInHome = (data: any) => {
+  const FamilyAndSupportsPeopleInHome = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -317,7 +314,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const familyAndSupportsChildrenNotHome = (data: any) => {
+  const FamilyAndSupportsChildrenNotHome = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -330,7 +327,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const familyAndSupportsArrays = (data: any) => {
+  const FamilyAndSupportsArrays = (data: any) => {
     return (
       <div>
         {Object.keys(data).map((item, index) => (
@@ -342,7 +339,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const infantInformationInfantCareNeeds = (data: any) => {
+  const InfantInformationInfantCareNeeds = (data: any) => {
 
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
@@ -368,7 +365,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const infantInformationMedications = (data: any) => {
+  const InfantInformationMedications = (data: any) => {
     return data.map((x: any) => {
       return (
         <div>
@@ -431,31 +428,31 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             <React.Fragment key={key}>
               <div className="flex flex-row gap-1">
                 <div className="font-semibold">{fieldName}:</div>
-                {key === 'current_medication_list' ? (
-                  ShowMedicationList((formData as any)?.[key] || [])
-                ) : key === 'diagnoses' ? (
-                  pscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                {fieldNames.maternalMedicalHistory[key] && key === 'current_medication_list' ? (
+                  MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
+                ) : fieldNames.psychiatricHistory[key] && key === 'diagnoses' ? (
+                  PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
                 ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
                   MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
                 ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
-                  substanceUseHistoryDrugs((formData as any)?.[key] || [])
-                ) : key === 'tests' ? (
-                  drugScreeningResultsTests((formData as any)?.[key] || [])
-                ) : key === 'people_living_in_home' ? (
-                  familyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-                ) : key === 'clients_children_not_living_in_home' ? (
-                  familyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-                ) : key === 'current_support_system' || key === 'strength_of_client_and_support_system' || key === 'goals' ? (
-                  familyAndSupportsArrays((formData as any)?.[key] || [])
-                ) : key === 'infant_care_needs_items' ? (
-                  infantInformationInfantCareNeeds((formData as any)?.[key] || [])
-                ) : key === 'infant_medications' ? (
-                  infantInformationMedications((formData as any)?.[key] || [])
+                  SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
+                ) : fieldNames.drugScreeningResults[key] && key === 'tests' ? (
+                  DrugScreeningResultsTests((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'people_living_in_home' ? (
+                  FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'clients_children_not_living_in_home' ? (
+                  FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' || key === 'strength_of_client_and_support_system' || key === 'goals' ? (
+                  FamilyAndSupportsArrays((formData as any)?.[key] || [])
+                ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
+                  InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
+                ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
+                  InfantInformationMedications((formData as any)?.[key] || [])
                 ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
                   FamilyAndSupportsServices((formData as any)?.[key] || [])
-                ) : key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
+                ) : fieldNames.relapsePreventionPlan[key] && key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
                   RelapsePreventionPlanArrays((formData as any)?.[key] || [])
-                ) : key === 'safe_caregivers' ? (
+                ) : fieldNames.relapsePreventionPlan[key] && key === 'safe_caregivers' ? (
                   RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
                 ) :
                   (
@@ -483,16 +480,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         </div>
       </div>
       <div className="collapse-content mt-2 flex flex-col bg-white">
-        {fieldType === 'maternalDemographics' && formData && renderFields(fieldNames.maternalDemographics)}
-        {fieldType === 'maternalMedicalHistory' && formData && renderFields(fieldNames.maternalMedicalHistory)}
-        {fieldType === 'psychiatricHistory' && formData && renderFields(fieldNames.psychiatricHistory)}
-        {fieldType === 'substanceUseHistory' && formData && renderFields(fieldNames.substanceUseHistory)}
-        {fieldType === 'drugScreeningResults' && formData && renderFields(fieldNames.drugScreeningResults)}
-        {fieldType === 'familyAndSupports' && formData && renderFields(fieldNames.familyAndSupports)}
-        {fieldType === 'infantInformation' && formData && renderFields(fieldNames.infantInformation)}
-        {fieldType === 'referralsAndServices' && formData && renderFields(fieldNames.referralsAndServices)}
-        {fieldType === 'relapsePreventionPlan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
-        {fieldType === 'medicalServicesForSubstanceUse' && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
+        {name === 'Maternal Demographics' && formData && renderFields(fieldNames.maternalDemographics)}
+        {name === 'Maternal Medical History' && formData && renderFields(fieldNames.maternalMedicalHistory)}
+        {name === 'Psychiatric History' && formData && renderFields(fieldNames.psychiatricHistory)}
+        {name === 'Medical Services For Substance Use' && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
+        {name === 'Substance Use History' && formData && renderFields(fieldNames.substanceUseHistory)}
+        {name === 'Drug Screening Results' && formData && renderFields(fieldNames.drugScreeningResults)}
+        {name === 'Family & Supports' && formData && renderFields(fieldNames.familyAndSupports)}
+        {name === 'Infant Information' && formData && renderFields(fieldNames.infantInformation)}
+        {name === 'Referrals and Services' && formData && renderFields(fieldNames.referralsAndServices)}
+        {name === 'Relapse Prevention Plan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
