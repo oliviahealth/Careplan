@@ -150,7 +150,7 @@ export default function FamilyAndSupports() {
                     <button type="button" onClick={() => removeHouseholdMember(householdMemberFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Member</button>
                 </div>
 
-                <p className="font-medium">Client's Children NOT Living in the home</p>
+                <p className="font-medium text-xl">Client's Children NOT Living in the home</p>
                 {childrenFields.map((field, index) => (
                     <div key={field.id} className="space-y-6 py-6">
                         <p className="font-medium">Child</p>
@@ -180,7 +180,7 @@ export default function FamilyAndSupports() {
                     <button type="button" onClick={() => removeChild(childrenFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Child</button>
                 </div>
 
-                <p className="font-medium">Notes</p>
+                <p className="font-medium text-xl">Notes</p>
                 <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
 
@@ -203,7 +203,7 @@ export default function FamilyAndSupports() {
                     <button type="button" onClick={() => removeSupport(supportFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Support</button>
                 </div>
 
-                <p className="font-medium">Strengths of Client and Support System</p>
+                <p className="font-medium text-xl">Strengths of Client and Support System</p>
                 {strengthFields.map((field, index) => (
                     <div key={field.id} className="space-y-6 py-6">
                         <p className="font-medium">Strength</p>
@@ -231,7 +231,7 @@ export default function FamilyAndSupports() {
                     <button type="button" onClick={() => removeGoal(goalsFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Goal</button>
                 </div>
 
-                <p className="font-medium">Social Worker or Recovery Coach</p>
+                <p className="font-medium text-xl">Social Worker or Recovery Coach</p>
                 <input {...register("recovery_coach")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.recovery_coach && <span className="label-text-alt text-red-500">{errors.recovery_coach.message}</span>}
 
