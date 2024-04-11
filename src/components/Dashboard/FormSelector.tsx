@@ -54,6 +54,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     substanceUseHistory: { [key: string]: string };
     drugScreeningResults: { [key: string]: string };
     familyAndSupports: { [key: string]: string };
+    infantInformation: { [key: string]: string };
   } = {
     maternalDemographics: {
       name: "Name",
@@ -123,6 +124,39 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       strength_of_client_and_support_system: "Strengths of Client and Support System",
       goals: "Goals",
       recovery_coach: "Recovery Coach"
+    },
+    infantInformation: {
+      child_name: "Child's Name",
+      date_of_birth: "Date of Birth",
+      sex: "Sex",
+      birth_weight: "Birth Weight",
+      gestational_age_at_birth: "Gestational Age at Birth",
+      NICU_stay: "NICU",
+      NICU_length_of_stay: "NICU Length of Stay",
+      pediatrician_name: "Pediatrician Name",
+      pediatrician_contact_info: "Pediatrician Contact Number",
+      infant_urine_drug_screening_at_birth: "Infant Urine Drug Screening at Birth",
+      infant_urine_drug_screening_at_birth_specify: "Specify Infant Urine Drug Screening at Birth",
+      meconium_results: "Meconium Results",
+      meconium_results_specify: "Specify Meconium Results",
+      neonatal_opiod_withdraw: "Neonatal Opiod Withdraw",
+      neonatal_opiod_withdraw_treatment_method: "Neonatal Opiod Withdraw Treatment Method",
+      DX_problems_additional_information: "DX/Problems and Additional Information",
+      infant_care_needs_items: "Infant Care Needs",
+      where_will_baby_sleep: "Where Will Baby Sleep",
+      infant_care_needs_additional_notes: "Infant Care Needs Additional Notes",
+      infant_medications: "Infant Medications",
+      infant_medication_notes: "Infant Medications Notes",
+      father_name: "Father's Name",
+      father_date_of_birth: "Father's DOB",
+      father_street_address: "Father's Street Address",
+      father_city: "Father's City",
+      father_state: "Father's State",
+      father_zip_code: "Father's Zip Code",
+      father_primary_phone_numbers: "Father's Primary Phone Numbers",
+      father_involved_in_babys_life: "Father Involved in Baby's Life",
+      father_involved_in_babys_life_comments: "Father Involved in Baby's Life Comments",
+      father_notes: "Father Notes"
     }
   }
 
@@ -130,18 +164,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     return data.map((x: any) => {
       return (
         <div>
-          <div>
-            Name: {x.name}
-          </div>
-          <div>
-            Dose: {x.dose}
-          </div>
-          <div>
-            Prescriber: {x.prescriber}
-          </div>
-          <div>
-            Notes: {x.notes}
-          </div>
+          <div> Name: {x.name} </div>
+          <div> Dose: {x.dose} </div>
+          <div> Prescriber: {x.prescriber} </div>
+          <div> Notes: {x.notes} </div>
         </div>
       )
     })
@@ -151,21 +177,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     return data.map((x: any) => {
       return (
         <div>
-          <div>
-            Provider: {x.provider}
-          </div>
-          <div>
-            Phone Number: {x.phone_number}
-          </div>
-          <div>
-            Diagnosis: {x.diagnosis}
-          </div>
-          <div>
-            Date of Diagnosis: {x.date_of_diagnosis}
-          </div>
-          <div>
-            Currently taking medication: {x.taking_medication}
-          </div>
+          <div> Provider: {x.provider} </div>
+          <div> Phone Number: {x.phone_number} </div>
+          <div> Diagnosis: {x.diagnosis} </div>
+          <div> Date of Diagnosis: {x.date_of_diagnosis} </div>
+          <div> Currently taking medication: {x.taking_medication} </div>
         </div>
       )
     })
@@ -185,33 +201,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const drugScreeningResultsTests = (data: any) => {
     return data.map((x: any) => {
-
       return (
         <div>
-          <div>
-            Test: {x.test_ordered}
-          </div>
-          <div>
-            Date of Test: {x.date_collected}
-          </div>
-          <div>
-            Provider name: {x.provider}
-          </div>
-          <div>
-            Provider Location: {x.provider_location}
-          </div>
-          <div>
-            Test Results: {x.results}
-          </div>
-          <div>
-            Test Results Specification: {x.specify_results}
-          </div>
-          <div>
-            Reviewed with Provider: {x.provider_reviewed}
-          </div>
-          <div>
-            Date Reviewed: {x.date_reviewed}
-          </div>
+          <div> Test: {x.test_ordered} </div>
+          <div> Date of Test: {x.date_collected} </div>
+          <div> Provider name: {x.provider} </div>
+          <div> Provider Location: {x.provider_location} </div>
+          <div> Test Results: {x.results} </div>
+          <div> Test Results Specification: {x.specify_results} </div>
+          <div> Reviewed with Provider: {x.provider_reviewed} </div>
+          <div> Date Reviewed: {x.date_reviewed} </div>
         </div>
       )
     })
@@ -219,18 +218,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const familyAndSupportsPeopleInHome = (data: any) => {
     return data.map((x: any) => {
-
       return (
         <div>
-          <div>
-            Person: {x.person}
-          </div>
-          <div>
-            Date of Birth: {x.date_of_birth}
-          </div>
-          <div>
-            Relation: {x.relation}
-          </div>
+          <div> Person: {x.person} </div>
+          <div> Date of Birth: {x.date_of_birth} </div>
+          <div> Relation: {x.relation} </div>
         </div>
       )
     })
@@ -238,21 +230,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const familyAndSupportsChildrenNotHome = (data: any) => {
     return data.map((x: any) => {
-
       return (
         <div>
-          <div>
-            Person: {x.person}
-          </div>
-          <div>
-            Date of Birth: {x.date_of_birth}
-          </div>
-          <div>
-            Caregiver: {x.caregiver}
-          </div>
-          <div>
-            Caregiver Contact Number: {x.caregiver_number}
-          </div>
+          <div> Person: {x.person} </div>
+          <div> Date of Birth: {x.date_of_birth} </div>
+          <div> Caregiver: {x.caregiver} </div>
+          <div> Caregiver Contact Number: {x.caregiver_number} </div>
         </div>
       )
     })
@@ -270,9 +253,48 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
+  const infantInformationInfantCareNeeds = (formData: any) => {
+
+    const namesMap: { [key: string]: string } = {
+      breast_pump: "Breast Pump",
+      breastfeeding_support: "Breastfeeding Support",
+      car_seat: "Car Seat",
+      childcare: "Childcare",
+      clothing: "Clothing",
+      crib: "Crib",
+      diapers: "Diapers",
+      infant_formula: "Infant Formula",
+      infant_stroller: "Infant Stroller",
+      other: "Other"
+    };
+  
+    return (
+      <div>
+        {Object.keys(formData).map((item, index) => (
+          <div key={index}>
+            <div>{namesMap[item] || item}: {formData[item]}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const infantInformationMedications = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div>
+          <div> Medication: {x.medication} </div>
+          <div> Dose: {x.dose} </div>
+          <div> Prescriber: {x.prescriber} </div>
+          <div> Notes: {x.notes} </div>
+        </div>
+      )
+    })
+  }
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
-      <div className="grid grid-cols-1 gap-y-4 py-4 text-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 py-4 text-sm">
         {Object.entries<string>(fields)
           .map(([key, fieldName]) => (
             <React.Fragment key={key}>
@@ -292,6 +314,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   familyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
                 ) : key === 'current_support_system' || key === 'strength_of_client_and_support_system' || key === 'goals' ? (
                   familyAndSupportsArrays((formData as any)?.[key] || [])
+                ) : key === 'infant_care_needs_items' ? (
+                  infantInformationInfantCareNeeds((formData as any)?.[key] || [])
+                ) : key === 'infant_medications' ? (
+                  infantInformationMedications((formData as any)?.[key] || [])
                 ) :
                   (
                     <div>{(formData as any)?.[key]}</div>
@@ -324,6 +350,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {fieldType === 'substanceUseHistory' && formData && renderFields(fieldNames.substanceUseHistory)}
         {fieldType === 'drugScreeningResults' && formData && renderFields(fieldNames.drugScreeningResults)}
         {fieldType === 'familyAndSupports' && formData && renderFields(fieldNames.familyAndSupports)}
+        {fieldType === 'infantInformation' && formData && renderFields(fieldNames.infantInformation)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit

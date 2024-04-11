@@ -15,6 +15,7 @@ function Dashboard() {
           <FormSelector name="Substance Use History" path="/substance-use-history" apiUrl="http://127.0.0.1:5000/api/get_substance_use_history" userID="d2bd4688-5527-4bbb-b1a8-af1399d00b12" fieldType="substanceUseHistory"></FormSelector>
           <FormSelector name="Drug Screening Results" path="/drug-screening-results" apiUrl="http://127.0.0.1:5000/api/get_drug_screening_results" userID="d2bd4688-5527-4bbb-b1a8-af1399d00b12" fieldType="drugScreeningResults"></FormSelector>
           <FormSelector name="Family & Supports" path="/family-and-supports" apiUrl="http://127.0.0.1:5000/api/get_family_and_supports" userID="d2bd4688-5527-4bbb-b1a8-af1399d00b12" fieldType="familyAndSupports"></FormSelector>
+          <FormSelector name="Infant Information" path="/infant-information" apiUrl="http://127.0.0.1:5000/api/get_infant_information" userID="d2bd4688-5527-4bbb-b1a8-af1399d00b12" fieldType="infantInformation"></FormSelector>
         </div>
       </div>
     </div>
