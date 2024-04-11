@@ -55,6 +55,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     drugScreeningResults: { [key: string]: string };
     familyAndSupports: { [key: string]: string };
     infantInformation: { [key: string]: string };
+    referralsAndServices: { [key: string]: string };
   } = {
     maternalDemographics: {
       name: "Name",
@@ -157,6 +158,53 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       father_involved_in_babys_life: "Father Involved in Baby's Life",
       father_involved_in_babys_life_comments: "Father Involved in Baby's Life Comments",
       father_notes: "Father Notes"
+    },
+    referralsAndServices: {
+      parenting_classes: "Parenting Classes",
+      transportation_services: "Transportation Services",
+      ssi_disability: "SSI Disability",
+      temporary_assistance_for_needy_families: "Temporary Assistance for Needy Families",
+      personal_safety: "Personal Safety",
+      home_visitation_program: "Home Visitation Program",
+      housing_assistance: "Housing Assistance",
+      healthy_start_program: "Healthy Start Program",
+      support_services_other1: "Support Services Other 1",
+      support_services_other2: "Support Services Other 2",
+      breastfeeding_support: "Breastfeeding Support",
+      local_food_pantries: "Local Food Pantries",
+      snap: "SNAP",
+      women_infants_children: "Women, Infants, and Children",
+      food_nutrition_other1: "Food Nutrition Other 1",
+      food_nutrition_other2: "Food Nutrition Other 2",
+      health_insurance_enrollment: "Health Insurance Enrollment",
+      prenatal_healthcare: "Prenatal Healthcare",
+      family_planning: "Family Planning",
+      primary_care: "Primary Care",
+      mental_health_counseling: "Mental Health Counseling",
+      smoking_cessation: "Smoking Cessation",
+      healthcare_other1: "Healthcare Other 1",
+      healthcare_other2: "Healthcare Other 2",
+      residential: "Residential",
+      outpatient: "Outpatient",
+      caring_for_two_program: "Caring for Two Program",
+      the_cradles_program: "The Cradles Program",
+      recovery_support_services: "Recovery Support Services",
+      medication_assisted_treatment: "Medication Assisted Treatment",
+      substance_use_treatment_other1: "Substance Use Treatment Other 1",
+      substance_use_treatment_other2: "Substance Use Treatment Other 2",
+      early_childhood_intervention: "Early Childhood Intervention",
+      early_head_start: "Early Head Start",
+      NCI_childcare_subsidy: "NCI Childcare Subsidy",
+      pediatrician_primary_care: "Pediatrician Primary Care",
+      safe_sleep_education: "Safe Sleep Education",
+      child_related_other1: "Child Related Other 1",
+      child_related_other2: "Child Related Other 2",
+      child_protective_service: "Child Protective Service",
+      legal_aid: "Legal Aid",
+      specialty_court: "Specialty Court",
+      legal_assistance_other1: "Legal Assistance Other 1",
+      legal_assistance_other2: "Legal Assistance Other 2",
+      additional_notes: "Additional Notes"
     }
   }
 
@@ -187,12 +235,20 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const substanceUseHistoryDrugs = (formData: any) => {
+  const substanceUseHistoryDrugs = (data: any) => {
+
+    const namesMap: { [key: string]: string } = {
+      ever_used: "Ever Used",
+      date_last_used: "Date Last Used",
+      notes: "Notes",
+      used_during_pregnancy: "Used During Pregnancy"
+    };
+
     return (
       <div>
-        {Object.keys(formData).map((drug, index) => (
+        {Object.keys(data).map((item, index) => (
           <div key={index}>
-            <div>{drug}: {formData[drug]}</div>
+            <div>{namesMap[item] || item}: {data[item]}</div>
           </div>
         ))}
       </div>
@@ -253,7 +309,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const infantInformationInfantCareNeeds = (formData: any) => {
+  const infantInformationInfantCareNeeds = (data: any) => {
 
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
@@ -270,9 +326,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   
     return (
       <div>
-        {Object.keys(formData).map((item, index) => (
+        {Object.keys(data).map((item, index) => (
           <div key={index}>
-            <div>{namesMap[item] || item}: {formData[item]}</div>
+            <div>{namesMap[item] || item}: {data[item]}</div>
           </div>
         ))}
       </div>
@@ -292,6 +348,24 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
+  const FamilyAndSupportsServices = (data: any) => {
+    const namesMap: { [key: string]: string } = {
+      status: "Status",
+      organization: "Organization",
+      organization_contact_information: "Organization Contact Info"
+    };
+  
+    return (
+      <div>
+        {Object.keys(data).map((item, index) => (
+          <div key={index}>
+            <div>{namesMap[item] || item}: {data[item]}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 py-4 text-sm">
@@ -304,7 +378,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   ShowMedicationList((formData as any)?.[key] || [])
                 ) : key === 'diagnoses' ? (
                   pscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
-                ) : key === 'alcohol' || key === 'benzodiazepines' || key === 'heroin' || key === 'kush' || key === 'marijuana' || key === 'methamphetamine' || key === 'prescription_drugs' || key === 'tobacco' || key === 'other1' || key === 'other2' ? (
+                ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
                   substanceUseHistoryDrugs((formData as any)?.[key] || [])
                 ) : key === 'tests' ? (
                   drugScreeningResultsTests((formData as any)?.[key] || [])
@@ -318,6 +392,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   infantInformationInfantCareNeeds((formData as any)?.[key] || [])
                 ) : key === 'infant_medications' ? (
                   infantInformationMedications((formData as any)?.[key] || [])
+                ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
+                  FamilyAndSupportsServices((formData as any)?.[key] || [])
                 ) :
                   (
                     <div>{(formData as any)?.[key]}</div>
@@ -351,6 +427,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {fieldType === 'drugScreeningResults' && formData && renderFields(fieldNames.drugScreeningResults)}
         {fieldType === 'familyAndSupports' && formData && renderFields(fieldNames.familyAndSupports)}
         {fieldType === 'infantInformation' && formData && renderFields(fieldNames.infantInformation)}
+        {fieldType === 'referralsAndServices' && formData && renderFields(fieldNames.referralsAndServices)}
         <div className="flex justify-end">
           <Link to={path} className="button-filled font-semibold">
             Edit
