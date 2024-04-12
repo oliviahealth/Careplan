@@ -1,76 +1,89 @@
-import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
+import { useMutation } from 'react-query'
+import { useNavigate } from "react-router-dom"
+import axios from 'axios'
+import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type Inputs = {
-    child_name: string;
-    date_of_birth: string;
-    sex: string;
-    birth_weight: string;
-    gestational_age_at_birth: number;
-    NICU_stay: string;
-    NICU_length_of_stay: string;
-    pediatrician_name: string;
-    pediatrician_contact_information: string;
-    infant_urine_drug_screening_at_birth: string;
-    infant_urine_drug_screening_at_birth_specify: string;
-    meconium_results: string;
-    meconium_specify: string;
-    meconium_opiod_withdraw: string;
-    neonatal_opiod_withdraw: string;
-    neonatal_opiod_withdraw_treatment_method: string;
-    DX_problems_addional_information: string;
-    infant_care_needs_items: infantCareNeeds[];
-    where_will_baby_sleep: string;
-    where_will_baby_sleep_specify: string;
-    infant_care_needs_additional_notes: string;
-    infant_medication: infantMeds[];
-    infant_medication_notes: string;
-    father_name: string;
-    father_date_of_birth: string;
-    father_street_address: string;
-    father_city: string;
-    father_state: string;
-    father_zip_code: number;
-    father_primary_phone_number: string;
-    father_involved_in_babys_life: string;
-    father_involved_in_babys_life_comments: string;
-    father_notes: string;
-    
-};
+const InfantCareNeeds = z.object({
+    breast_pump: z.string().min(1, 'Breast pump information required'),
+    breast_pump_notes: z.string().min(1, 'Breast pump notes required'),
+    breastfeeding_support: z.string().min(1, 'Breastfeeding support information required'),
+    breastfeeding_support_notes: z.string().min(1, 'Breastfeeding support notes required'),
+    car_seat: z.string().min(1, 'Car seat information required'),
+    car_seat_notes: z.string().min(1, 'Car seat notes required'),
+    childcare: z.string().min(1, 'Childcare information required'),
+    childcare_notes: z.string().min(1, 'Childcare notes required'),
+    clothing: z.string().min(1, 'Clothing information required'),
+    clothing_notes: z.string().min(1, 'Clothing notes required'),
+    crib: z.string().min(1, 'Crib information required'),
+    crib_notes: z.string().min(1, 'Crib notes required'),
+    diapers: z.string().min(1, 'Diapers information required'),
+    diapers_notes: z.string().min(1, 'Diapers notes required'),
+    infant_formula: z.string().min(1, 'Infant formula information required'),
+    infant_formula_notes: z.string().min(1, 'Infant formula notes required'),
+    infant_stroller: z.string().min(1, 'Infant stroller information required'),
+    infant_stroller_notes: z.string().min(1, 'Infant stroller notes required'),
+    other: z.string().min(1, 'Other information required'),
+    other_name: z.string().min(1, 'Other name required'),
+    other_notes: z.string().min(1, 'Other notes required')
+});
 
-type infantCareNeeds = {
-    breast_pump: string;
-    breast_pump_notes: string;
-    breastfeeding_support: string;
-    breastfeeding_support_notes: string;
-    car_seat: string;
-    car_seat_notes: string;
-    childcare: string;
-    childcare_notes: string;
-    clothing: string;
-    clothing_notes: string;
-    crib: string;
-    crib_notes: string;
-    diapers: string;
-    diapers_notes: string;
-    infant_formula: string;
-    infant_formula_notes: string;
-    infant_stroller: string;
-    infant_stroller_notes: string;
-    other: string;
-    other_notes: string;
-};
+const InfantMeds = z.object({
+    medication: z.string().min(1, 'Medication required'),
+    dose: z.string().min(1, 'Dose required'),
+    prescriber: z.string().min(1, 'Prescriber required'),
+    notes: z.string().min(1, 'Notes required')
+});
 
-type infantMeds = {
-    medication: string;
-    dose: string;
-    prescriber: string;
-    notes: string;
-};
+const InfantInformationInputs = z.object({
+    child_name: z.string().min(1, 'Child name required'),
+    date_of_birth: z.string().min(1, 'Date of birth required'),
+    sex: z.string().min(1, 'Sex required'),
+    birth_weight: z.string().min(1, 'Birth weight required'),
+    gestational_age_at_birth: z.string().min(1, 'Gestional age at birth required'),
+    NICU_stay: z.string().min(1, 'NICU stay information required'),
+    NICU_length_of_stay: z.string().min(1, 'NICU length of stay required'),
+    pediatrician_name: z.string().min(1, 'Pediatrician name required'),
+    pediatrician_contact_info: z.string().min(1, 'Pediatrician phone number required'),
+    infant_urine_drug_screening_at_birth: z.string().min(1, 'Infant urine drug screening at birth info required'),
+    infant_urine_drug_screening_at_birth_specify: z.string().min(1, 'Infant urine drug screening at birth specification required'),
+    meconium_results: z.string().min(1, 'Meconium results required'),
+    meconium_results_specify: z.string().min(1, 'Meconium results specification required'),
+    neonatal_opiod_withdraw: z.string().min(1, 'Neonatal opiod withdraw info required'),
+    neonatal_opiod_withdraw_treatment_method: z.string().min(1, 'Neonatal opiod withdraw treatment method required'),
+    DX_problems_additional_information: z.string().min(1, 'DX Problems/Additional Information required'),
+    infant_care_needs_items: z.array(InfantCareNeeds),
+    where_will_baby_sleep: z.string().min(1, 'Baby sleeping information required'),
+    where_will_baby_sleep_specify: z.string().min(1, 'Baby sleeping specification required'),
+    infant_care_needs_additional_notes: z.string().min(1, 'Infant care additional notes required'),
+    infant_medications: z.array(InfantMeds),
+    infant_medication_notes: z.string().min(1, 'Infant medication notes required'),
+    father_name: z.string().min(1, 'Father name required'),
+    father_date_of_birth: z.string().min(1, 'Father date of birth required'),
+    father_street_address: z.string().min(1, 'Father street address required'),
+    father_city: z.string().min(1, 'Father city required'),
+    father_state: z.string().min(1, 'Father state required'),
+    father_zip_code: z.string().min(1, 'Father zip code required'),
+    father_primary_phone_numbers: z.string().min(1, 'Father phone number required'),
+    father_involved_in_babys_life: z.string().min(1, "Father involvement in baby's life required"),
+    father_involved_in_babys_life_comments: z.string().min(1, "Father involvement in baby's life comments required"),
+    father_notes: z.string().min(1, "Father notes required"),
+});
+type InfantInformationInputs = z.infer<typeof InfantInformationInputs>;
+
+const InfantInformationResponse = InfantInformationInputs.extend({
+    id: z.string(),
+    user_id: z.string()
+});
 
 export default function InfantInformation() {
-    const { register, control, handleSubmit } = useForm<Inputs>({
+    const navigate = useNavigate();
+
+    const { register, control, handleSubmit, formState: { errors } } = useForm<InfantInformationInputs>({
+        resolver: zodResolver(InfantInformationInputs),
         defaultValues: {
-            infant_medication: [{
+            infant_medications: [{
                 medication: '',
                 dose: '',
                 prescriber: '',
@@ -105,7 +118,7 @@ export default function InfantInformation() {
 
     const { fields: infantMedsFields, append: appendInfantMed, remove: removeInfantMed } = useFieldArray({
         control,
-        name: "infant_medication"
+        name: "infant_medications"
     });
 
     const { fields: infantCareNeedsItemsFields } = useFieldArray({
@@ -113,18 +126,34 @@ export default function InfantInformation() {
         name: "infant_care_needs_items"
     })
 
-    const onSubmit: SubmitHandler<Inputs> = data => {
-        console.log(data);
-    };
-    
+    const { mutate } = useMutation(async (data: InfantInformationInputs) => {
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+
+        InfantInformationResponse.parse(responseData);
+
+        return responseData;
+    }, {
+        onSuccess: (responseData) => {
+            alert("Infant Information added successfully!");
+            console.log("InfantInformation data added successfully.", responseData);
+
+            navigate('/dashboard');
+        },
+        onError: () => {
+            alert("Error while adding InfantInformation data.");
+        }
+    });
+
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
-            <form onSubmit={handleSubmit(onSubmit)} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4">
+            <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4">
                 <p className="font-medium">Child's Name</p>
                 <input {...register("child_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.child_name && <span className="label-text-alt text-red-500">{errors.child_name.message}</span>}
 
                 <p className="font-medium">Date of Birth</p>
-                <input {...register("date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <input {...register("date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                {errors.date_of_birth && <span className="label-text-alt text-red-500">{errors.date_of_birth.message}</span>}
 
                 <p className="font-medium">Sex</p>
                 {["Male", "Female"].map((status) => (
@@ -132,38 +161,42 @@ export default function InfantInformation() {
                         <input {...register("sex")} className="mr-2" type="radio" value={status} />
                         {status}
                     </label>))}
-                
-                <p className="font-medium">Birth Weight</p>
-                <select {...register("birth_weight")} className="form-select border border-gray-300 rounded-md px-2 py-2">
-                    {Array.from({ length: (15.0 - 0.0) * 10 + 1}, (_, index) => (index / 10).toFixed(1)).map((weight) => (
-                        <option value={weight} key={weight}>
-                            {weight} lbs
-                        </option>))}
-                </select>
+                {errors.sex && <span className="label-text-alt text-red-500">{errors.sex.message}</span>}
 
-                <p className="font-medium">Gestational Age at Birth</p>
-                <select {...register("gestational_age_at_birth")} className="form-select border border-gray-300 rounded-md px-2 py-2">
-                    {Array.from({ length: 51 }, (_, index) => index).map((week) => (
-                        <option key={week} value={week}>
-                            {week} {week === 1 ? 'week' : 'weeks'}
-                         </option>))}
-                    </select>
-                
+
+                <p className="font-medium">Birth Weight (lbs)</p>
+                <input {...register("birth_weight")} className="border border-gray-300 px-4 py-2 rounded-md" />
+                <div>
+                    {errors.birth_weight && <span className="label-text-alt text-red-500">{errors.birth_weight.message}</span>}
+                </div>
+
+                <p className="font-medium">Gestational Age at Birth (Weeks)</p>
+                <input {...register("gestational_age_at_birth")} className="border border-gray-300 px-4 py-2 rounded-md" />
+                <div>
+                    {errors.gestational_age_at_birth && <span className="label-text-alt text-red-500">{errors.gestational_age_at_birth.message}</span>}
+                </div>
+
                 <p className="font_medium">NICU</p>
                 {["Yes", "No"].map((status) => (
                     <label key={status} className="flex items-center">
                         <input {...register("NICU_stay")} className="mr-2" type="radio" value={status} />
                         {status}
                     </label>))}
+                {errors.NICU_stay && <span className="label-text-alt text-red-500">{errors.NICU_stay.message}</span>}
 
                 <p className="font-medium">Length of Stay (Days)</p>
-                <input {...register("NICU_length_of_stay")} className="border border-gray-300 px-4 py-2" />
+                <input {...register("NICU_length_of_stay")} className="border border-gray-300 px-4 py-2 rounded-md" />
+                <div>
+                    {errors.NICU_length_of_stay && <span className="label-text-alt text-red-500">{errors.NICU_length_of_stay.message}</span>}
+                </div>
 
-                <p className="font-medium">Pediatricain Name</p>
+                <p className="font-medium">Pediatrician Name</p>
                 <input {...register("pediatrician_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.pediatrician_name && <span className="label-text-alt text-red-500">{errors.pediatrician_name.message}</span>}
 
-                <p className="font-medium">Pediatrican Phone Number</p>
-                <input {...register("pediatrician_contact_information")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Pediatrician Phone Number</p>
+                <input {...register("pediatrician_contact_info")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.pediatrician_contact_info && <span className="label-text-alt text-red-500">{errors.pediatrician_contact_info.message}</span>}
 
                 <p className="font-medium">Infant Urine Drug Screening at Birth</p>
                 {["Negative", "Not Completed", "Positive"].map((status) => (
@@ -171,9 +204,11 @@ export default function InfantInformation() {
                         <input {...register("infant_urine_drug_screening_at_birth")} className="mr-2" type="radio" value={status} />
                         {status}
                     </label>))}
-                
+                {errors.infant_urine_drug_screening_at_birth && <span className="label-text-alt text-red-500">{errors.infant_urine_drug_screening_at_birth.message}</span>}
+
                 <p className="font-medium">Specify</p>
                 <input {...register("infant_urine_drug_screening_at_birth_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.infant_urine_drug_screening_at_birth_specify && <span className="label-text-alt text-red-500">{errors.infant_urine_drug_screening_at_birth_specify.message}</span>}
 
                 <p className="font-medium">Meconium Results</p>
                 {["Negative", "Not Completed", "Positive"].map((status) => (
@@ -181,9 +216,11 @@ export default function InfantInformation() {
                         <input {...register("meconium_results")} className="mr-2" type="radio" value={status} />
                         {status}
                     </label>))}
+                {errors.meconium_results && <span className="label-text-alt text-red-500">{errors.meconium_results.message}</span>}
 
                 <p className="font-medium">Specify</p>
-                <input {...register("meconium_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <input {...register("meconium_results_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.meconium_results_specify && <span className="label-text-alt text-red-500">{errors.meconium_results_specify.message}</span>}
 
                 <p className="font-medium">Neonatal Opiod Withdraw/Neonatal Abstinence Syndrom</p>
                 {["Yes", "No"].map((status) => (
@@ -191,195 +228,264 @@ export default function InfantInformation() {
                         <input {...register("neonatal_opiod_withdraw")} className="mr-2" type="radio" value={status} />
                         {status}
                     </label>))}
-                
+                {errors.neonatal_opiod_withdraw && <span className="label-text-alt text-red-500">{errors.neonatal_opiod_withdraw.message}</span>}
+
                 <p className="font-medium">Treatement Method</p>
                 <input {...register("neonatal_opiod_withdraw_treatment_method")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.neonatal_opiod_withdraw_treatment_method && <span className="label-text-alt text-red-500">{errors.neonatal_opiod_withdraw_treatment_method.message}</span>}
 
                 <p className="font-medium">DX/Problems and Additional Information</p>
-                <input {...register("DX_problems_addional_information")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <input {...register("DX_problems_additional_information")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.DX_problems_additional_information && <span className="label-text-alt text-red-500">{errors.DX_problems_additional_information.message}</span>}
 
                 <p className="font-medium text-xl">Infant Care Needs</p>
 
                 {infantCareNeedsItemsFields.map((item, index) => (
                     <div key={item.id} className="space-y-4">
                         <p className="font-medium">Breast Pump</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.breast_pump`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.breast_pump && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.breast_pump?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.breast_pump_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.breast_pump_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.breast_pump_notes?.message}</span>)}
 
                         <p className="font-medium">Breastfeeding Support</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.breastfeeding_support`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.breastfeeding_support && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.breastfeeding_support?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.breastfeeding_support_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.breastfeeding_support_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.breastfeeding_support_notes?.message}</span>)}
 
                         <p className="font-medium">Car Seat</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.car_seat`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.car_seat && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.car_seat?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.car_seat_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.car_seat_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.car_seat_notes?.message}</span>)}
 
                         <p className="font-medium">Childcare</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.childcare`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.childcare && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.childcare?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.childcare_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.childcare_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.childcare_notes?.message}</span>)}
 
                         <p className="font-medium">Clothing</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.clothing`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.clothing && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.clothing?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.clothing_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.clothing_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.clothing_notes?.message}</span>)}
 
                         <p className="font-medium">Crib</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.crib`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.crib && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.crib?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.crib_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.crib_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.crib_notes?.message}</span>)}
 
                         <p className="font-medium">Diapers</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.diapers`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.diapers && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.diapers?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.diapers_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.diapers_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.diapers_notes?.message}</span>)}
 
                         <p className="font-medium">Infant Formula</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.infant_formula`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.infant_formula && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.infant_formula?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.infant_formula_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.infant_formula_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.infant_formula_notes?.message}</span>)}
 
                         <p className="font-medium">Infant Stroller</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.infant_stroller`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.infant_stroller && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.infant_stroller?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.infant_stroller_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.infant_stroller_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.infant_stroller_notes?.message}</span>)}
 
                         <p className="font-medium">Other</p>
-                        {["No", "Yes", "Pending"].map((status) => (
+                        <input {...register(`infant_care_needs_items.${index}.other_name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.other_name && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.other_name?.message}</span>)}
+
+                        {["Yes", "No", "Pending"].map((status) => (
                             <label key={status} className="flex items-center">
                                 <input {...register(`infant_care_needs_items.${index}.other`)} className="mr-2" type="radio" value={status} />
                                 {status}
                             </label>))}
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.other && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.other?.message}</span>)}
 
                         <p className="font-medium">Notes</p>
                         <input {...register(`infant_care_needs_items.${index}.other_notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_care_needs_items && errors.infant_care_needs_items[index]?.other_notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_care_needs_items[index]?.other_notes?.message}</span>)}
                     </div>))}
 
-                    <p className="font-medium">Where Will Baby Sleep</p>
-                    {["Crib/Bassinet", "Sharing a Bed With Others", "Other"].map((status) => (
-                            <label key={status} className="flex items-center">
-                                <input {...register("where_will_baby_sleep")} className="mr-2" type="radio" value={status} />
-                                {status}
-                            </label>))}
-                    <input {...register("where_will_baby_sleep_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Where Will Baby Sleep</p>
+                {["Crib/Bassinet", "Sharing a Bed With Others", "Other"].map((status) => (
+                    <label key={status} className="flex items-center">
+                        <input {...register("where_will_baby_sleep")} className="mr-2" type="radio" value={status} />
+                        {status}
+                    </label>))}
+                {errors.where_will_baby_sleep && <span className="label-text-alt text-red-500">{errors.where_will_baby_sleep.message}</span>}
 
-                    <p className="font-medium">Additional Notes</p>
-                    <input {...register("infant_care_needs_additional_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Specify Where Baby Will Sleep</p>
+                <input {...register("where_will_baby_sleep_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.where_will_baby_sleep_specify && <span className="label-text-alt text-red-500">{errors.where_will_baby_sleep_specify.message}</span>}
 
-                    <p className="font-medium text-xl">Infant's Medications</p>
-                    {infantMedsFields.map((item, index) => (
-                        <div key={item.id} className="space-y-6 pt-6">
-                            <p className="font-medium">Medication</p>
-                            <input {...register(`infant_medication.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Additional Notes</p>
+                <input {...register("infant_care_needs_additional_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.infant_care_needs_additional_notes && <span className="label-text-alt text-red-500">{errors.infant_care_needs_additional_notes.message}</span>}
 
-                            <p className="font-medium">Dose</p>
-                            <input {...register(`infant_medication.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium text-xl">Infant's Medications</p>
+                {infantMedsFields.map((item, index) => (
+                    <div key={item.id} className="space-y-6 pt-6">
+                        <p className="font-medium">Medication</p>
+                        <input {...register(`infant_medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_medications && errors.infant_medications[index]?.medication && (
+                            <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.medication?.message}</span>)}
 
-                            <p className="font-medium">Prescriber</p>
-                            <input {...register(`infant_medication.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        <p className="font-medium">Dose</p>
+                        <input {...register(`infant_medications.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_medications && errors.infant_medications[index]?.dose && (
+                            <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.dose?.message}</span>)}
 
-                            <p className="font-medium">Notes</p>
-                            <input {...register(`infant_medication.${index}.notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        </div>))}
+                        <p className="font-medium">Prescriber</p>
+                        <input {...register(`infant_medications.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_medications && errors.infant_medications[index]?.prescriber && (
+                            <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.prescriber?.message}</span>)}
 
-                        <div className="flex justify-between pt-6">
-                            <button type="button" onClick={() => appendInfantMed({medication: '', dose: '', prescriber: '', notes: ''})} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
-                            <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Medication</button>
-                        </div>
+                        <p className="font-medium">Notes</p>
+                        <input {...register(`infant_medications.${index}.notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.infant_medications && errors.infant_medications[index]?.notes && (
+                            <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.notes?.message}</span>)}
+                    </div>))}
 
-                    <p className="font-medium text-xl">Infant's Father Demographics</p>
-                    
-                    <p className="font-medium">Name</p>
-                    <input {...register("father_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <div className="flex justify-between pt-6">
+                    <button type="button" onClick={() => appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
+                    <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Medication</button>
+                </div>
 
-                    <p className="font-medium">Date of Birth</p>
-                    <input {...register("father_date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                <p className="font-medium">Infant Medication Notes</p>
+                <input {...register("infant_medication_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.infant_medication_notes && <span className="label-text-alt text-red-500">{errors.infant_medication_notes.message}</span>}
 
-                    <p className="font-medium">Street Address</p>
-                    <input {...register("father_street_address")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium text-xl">Infant's Father Demographics</p>
 
-                    <p className="font-medium">City</p>
-                    <input {...register('father_city')} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Name</p>
+                <input {...register("father_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_name && <span className="label-text-alt text-red-500">{errors.father_name.message}</span>}
 
-                    <p className="font-medium">State</p>
-                    <input {...register("father_state")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Date of Birth</p>
+                <input {...register("father_date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                {errors.father_date_of_birth && <span className="label-text-alt text-red-500">{errors.father_date_of_birth.message}</span>}
 
-                    <p className="font-medium">Zip Code</p>
-                    <input {...register("father_zip_code")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Street Address</p>
+                <input {...register("father_street_address")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_street_address && <span className="label-text-alt text-red-500">{errors.father_street_address.message}</span>}
 
-                    <p className="font-medium">Phone Number</p>
-                    <input {...register("father_primary_phone_number")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">City</p>
+                <input {...register('father_city')} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_city && <span className="label-text-alt text-red-500">{errors.father_city.message}</span>}
 
-                    <p className="font-medium">Will be/is involved in Baby's Life</p>
-                    {["Yes", "No", "Unsure"].map((status) => (
-                            <label key={status} className="flex items-center">
-                                <input {...register("father_involved_in_babys_life")} className="mr-2" type="radio" value={status} />
-                                {status}
-                            </label>))}
+                <p className="font-medium">State</p>
+                <input {...register("father_state")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_state && <span className="label-text-alt text-red-500">{errors.father_state.message}</span>}
 
-                    <p className="font-medium">Comments</p>
-                    <input {...register("father_involved_in_babys_life_comments")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Zip Code</p>
+                <input {...register("father_zip_code")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_zip_code && <span className="label-text-alt text-red-500">{errors.father_zip_code.message}</span>}
 
+                <p className="font-medium">Phone Number</p>
+                <input {...register("father_primary_phone_numbers")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_primary_phone_numbers && <span className="label-text-alt text-red-500">{errors.father_primary_phone_numbers.message}</span>}
 
-                    <p className="font-medium">Additional Notes</p>
-                    <input {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <p className="font-medium">Will be/is involved in Baby's Life</p>
+                {["Yes", "No", "Unsure"].map((status) => (
+                    <label key={status} className="flex items-center">
+                        <input {...register("father_involved_in_babys_life")} className="mr-2" type="radio" value={status} />
+                        {status}
+                    </label>))}
+                {errors.father_involved_in_babys_life && <span className="label-text-alt text-red-500">{errors.father_involved_in_babys_life.message}</span>}
 
-                    <div className="flex justify-center py-6">
-                        <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
-                    </div>
+                <p className="font-medium">Comments</p>
+                <input {...register("father_involved_in_babys_life_comments")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_involved_in_babys_life_comments && <span className="label-text-alt text-red-500">{errors.father_involved_in_babys_life_comments.message}</span>}
+
+                <p className="font-medium">Additional Notes</p>
+                <input {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.father_notes && <span className="label-text-alt text-red-500">{errors.father_notes.message}</span>}
+
+                <div className="flex justify-center py-6">
+                    <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
+                </div>
             </form>
-        </div>
+        </div >
     )
 }
