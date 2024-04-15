@@ -19,6 +19,12 @@ const deliveryModesEnum = z.enum([
 ]);
 const deliveryModes = Object.values(deliveryModesEnum.Values);
 
+const attendedPostpartumEnum = z.enum([
+    "Yes",
+    "No"
+]);
+const attendedPostpartum = Object.values(attendedPostpartumEnum.Values);
+
 const MaternalMedicalHistoryInputs = z.object({
     gestational_age: z.string().min(1, 'Gestational age is required'),
     anticipated_delivery_date: z.string().min(1, 'Anticipated delivery date is required'),
@@ -71,21 +77,21 @@ export default function MaternalMedicalHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-          try {
-            const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_medical_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-            const userData = response.data;
-            Object.keys(userData).forEach(key => {
-              if (key !== 'id' && key !== 'user_id') {
-                const formKey = key as keyof MaternalMedicalHistoryInputs;
-                setValue(formKey, userData[key]);
-              }
-            });
-          } catch (error) {
-            console.error('Error fetching user data:', error);
-          }
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_medical_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof MaternalMedicalHistoryInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
         };
         fetchUserData();
-      }, []);
+    }, []);
 
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
@@ -144,14 +150,11 @@ export default function MaternalMedicalHistory() {
 
                 <p className="font-medium">Attended Postpartum Visit</p>
                 <div className="flex flex-col space-y-2">
-                    <label className="inline-flex items-center">
-                        <input {...register("attended_postpartum_visit", { required: true })} type="radio" value="true" className="form-radio" />
-                        <span className="ml-2">Yes</span>
-                    </label>
-                    <label className="inline-flex items-center">
-                        <input {...register("attended_postpartum_visit")} type="radio" value='' className="form-radio" />
-                        <span className="ml-2">No</span>
-                    </label>
+                    {attendedPostpartum.map((status) => (
+                        <label key={status} className="inline-flex items-center">
+                            <input {...register("attended_postpartum_visit")} type="radio" value={status} className="form-radio" />
+                            <span className="ml-2">{status}</span>
+                        </label>))}
                     {errors.attended_postpartum_visit && <span className="label-text-alt text-red-500">{errors.attended_postpartum_visit.message}</span>}
                 </div>
 
