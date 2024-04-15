@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { useEffect } from 'react';
 
 const diagnosesSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
@@ -17,7 +18,7 @@ export const PsychiatricHistoryInputsSchema = z.object({
     notes: z.string().min(1, "Notes is required"),
     obgyn: z.string().min(1, "OB/GYN or Primary Care Provider is required"),
 });
-export type PsychiatricHistoryInputsType = z.infer<typeof PsychiatricHistoryInputsSchema>
+export type PsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
 
 const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
     id: z.string(),
@@ -25,7 +26,7 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
-    const { register, handleSubmit, control, formState: { errors } } = useForm<PsychiatricHistoryInputsType>({
+    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
             diagnoses: []
@@ -53,7 +54,25 @@ export default function PsychiatricHistory() {
         })
     };
 
-    const { mutate } = useMutation(async (data: PsychiatricHistoryInputsType) => {
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_psychiatric_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof PsychiatricHistoryInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
         PsychiatricHistoryResponseSchema.parse(responseData);
@@ -61,6 +80,7 @@ export default function PsychiatricHistory() {
         return responseData;
     }, {
         onSuccess: (responseData) => {
+            alert("Psychiatric History added successfully!")
             console.log("PsychiatricHistory data added successfully", responseData);
         },
         onError: () => {
