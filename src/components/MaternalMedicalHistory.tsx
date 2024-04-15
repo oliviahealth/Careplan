@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react"
 
 const CurrentMedicationList = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -35,7 +36,7 @@ const MaternalMedicalHistoryInputs = z.object({
     notes: z.string().min(1, 'Notes is required'),
     obgyn: z.string().min(1, 'Obgyn is required')
 });
-type MaternalMedicalHistoryInputsType = z.infer<typeof MaternalMedicalHistoryInputs>;
+type MaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputs>;
 
 const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
     id: z.string(),
@@ -45,7 +46,7 @@ const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
 export default function MaternalMedicalHistory() {
     const navigate = useNavigate();
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm<MaternalMedicalHistoryInputsType>({
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MaternalMedicalHistoryInputs>({
         resolver: zodResolver(MaternalMedicalHistoryInputs),
         defaultValues: {
             current_medication_list: [],
@@ -68,8 +69,26 @@ export default function MaternalMedicalHistory() {
         remove(fields.length - 1);
     };
 
-    const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputsType) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
+    useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_medical_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+            const userData = response.data;
+            Object.keys(userData).forEach(key => {
+              if (key !== 'id' && key !== 'user_id') {
+                const formKey = key as keyof MaternalMedicalHistoryInputs;
+                setValue(formKey, userData[key]);
+              }
+            });
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        };
+        fetchUserData();
+      }, []);
+
+    const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
         MaternalMedicalHistoryResponse.parse(responseData);
 

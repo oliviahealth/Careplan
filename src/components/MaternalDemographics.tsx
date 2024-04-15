@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { states } from "../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { useEffect } from 'react';
 
 
 const livingArrangementsEnum = z.enum([
@@ -60,10 +61,28 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 export default function MaternalDemographics() {
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_demographics/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+        const userData = response.data;
+        Object.keys(userData).forEach(key => {
+          if (key !== 'id' && key !== 'user_id') {
+            const formKey = key as keyof MaternalDemographicsInputsType;
+            setValue(formKey, userData[key]);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchUserData();
+  }, []);
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
+    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
     MaternalDemographicsResponseSchema.parse(responseData);
 
