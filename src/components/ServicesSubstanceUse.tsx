@@ -5,13 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { useEffect } from "react";
 
 const Medications = z.object({
     medication: z.string().min(1, 'Medication required'),
     dose: z.string().min(1, 'Dose required')
 });
 
-const ServicesSubstanceUseInputs = z.object({
+const MedicalServicesSubstanceUseInputs = z.object({
     mat_engaged: z.string().min(1, 'MAT engaged required'),
     date_used_mat: z.string(),
     medications: z.array(Medications),
@@ -23,9 +24,9 @@ const ServicesSubstanceUseInputs = z.object({
     addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required'),
     mat_provider: z.string().min(1, 'MAT provider required'),
 });
-type ServicesSubstanceUseInputsType = z.infer<typeof ServicesSubstanceUseInputs>
+type MedicalServicesSubstanceUseInputs = z.infer<typeof MedicalServicesSubstanceUseInputs>
 
-const ServicesSubstanceUseResponse = ServicesSubstanceUseInputs.extend({
+const MedicalServicesSubstanceUseResponse = MedicalServicesSubstanceUseInputs.extend({
     id: z.string(),
     user_id: z.string()
 });
@@ -44,10 +45,9 @@ export default function ServicesSubstanceUse() {
         setShowAddictionServiceDate(value === 'Prior Use');
     };
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm<ServicesSubstanceUseInputsType>({
-        resolver: zodResolver(ServicesSubstanceUseInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MedicalServicesSubstanceUseInputs>({
+        resolver: zodResolver(MedicalServicesSubstanceUseInputs),
         defaultValues: {
-            medications: [{ medication: '', dose: '' }],
             date_used_mat: '',
             date_used_medicine_service: ''
         },
@@ -71,11 +71,33 @@ export default function ServicesSubstanceUse() {
         }
     };
 
-    const { mutate } = useMutation(async (data: ServicesSubstanceUseInputsType) => {
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_medical_services_for_substance_use/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof MedicalServicesSubstanceUseInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+
+                setShowMatDate(userData.mat_engaged === 'Prior MAT use');
+                setShowAddictionServiceDate(userData.used_addiction_medicine_services === 'Prior Use')
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+
+    const { mutate } = useMutation(async (data: MedicalServicesSubstanceUseInputs) => {
 
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
-        ServicesSubstanceUseResponse.parse(responseData);
+        MedicalServicesSubstanceUseResponse.parse(responseData);
 
         return responseData;
     }, {
@@ -110,7 +132,7 @@ export default function ServicesSubstanceUse() {
                     </>
                 }
 
-                {fields.map((fields, index) => (
+                {fields.map((_fields, index) => (
                     <div key={index} className="py-6 space-y-6">
 
                         <p className="font-medium">Medication</p>

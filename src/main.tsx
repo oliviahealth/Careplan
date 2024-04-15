@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
             <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
             <Route path='/substance-use-history' element={<SubstanceUseHistory />} />
-            <Route path='/services-substance-use' element={<ServicesSubstanceUse />} />
+            <Route path='/medical-services-for-substance-use' element={<ServicesSubstanceUse />} />
           </Route>
         </Routes>
       </BrowserRouter>
