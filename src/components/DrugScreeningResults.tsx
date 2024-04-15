@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react"
 
 const DrugTest = z.object({
     test_ordered: z.string().min(1, 'Test name required'),
@@ -20,7 +21,7 @@ const DrugScreeningResultsInputs = z.object({
     tests: z.array(DrugTest),
     provider_ordering_UDS: z.string().min(1, ' Provider ordering UDS or Recovery Coach name required')
 })
-type DrugScreeningResultsInputsType = z.infer<typeof DrugScreeningResultsInputs>;
+type DrugScreeningResultsInputs = z.infer<typeof DrugScreeningResultsInputs>;
 
 const DrugScreeningResultsResponse = DrugScreeningResultsInputs.extend({
     id: z.string(),
@@ -30,7 +31,7 @@ const DrugScreeningResultsResponse = DrugScreeningResultsInputs.extend({
 export default function DrugScreeningResults() {
     const navigate = useNavigate();
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm<DrugScreeningResultsInputsType>({
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<DrugScreeningResultsInputs>({
         resolver: zodResolver(DrugScreeningResultsInputs),
         defaultValues: {
             tests: [{
@@ -68,7 +69,25 @@ export default function DrugScreeningResults() {
         remove(fields.length - 1);
     };
 
-    const { mutate } = useMutation(async (data: DrugScreeningResultsInputsType) => {
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_drug_screening_results/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof DrugScreeningResultsInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const { mutate } = useMutation(async (data: DrugScreeningResultsInputs) => {
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_drug_screening_results', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
         DrugScreeningResultsResponse.parse(responseData);
