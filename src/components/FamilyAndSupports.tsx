@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react"
 
 const HouseholdMember = z.object({
     person: z.string().min(1, "Household member required"),
@@ -52,7 +53,7 @@ export default function FamilyAndSupports() {
 
     const navigate = useNavigate();
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm<FamilyAndSupportsInputs>({
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<FamilyAndSupportsInputs>({
         resolver: zodResolver(FamilyAndSupportsInputs),
         defaultValues: {
             people_living_in_home: [{
@@ -105,6 +106,24 @@ export default function FamilyAndSupports() {
         control,
         name: 'strength_of_client_and_support_system'
     })
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_family_and_supports/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof FamilyAndSupportsInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
 
