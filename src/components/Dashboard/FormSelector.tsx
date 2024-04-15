@@ -9,6 +9,16 @@ interface FormSelectorProps {
   userID: string;
 }
 
+//temporarily creating a function that generates UUID for keys inside map functions
+//need to find a work around for installing uuid through 'npm i uuid' (mac arm64 error)
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const FormSelector: React.FC<FormSelectorProps> = ({
   name,
   path,
@@ -230,7 +240,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const MaternalMedicalHistoryMedicationList = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Name: {x.name} </div>
           <div> Dose: {x.dose} </div>
           <div> Prescriber: {x.prescriber} </div>
@@ -243,7 +253,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const PscyhiatricHistoryDiagnoses = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Provider: {x.provider} </div>
           <div> Phone Number: {x.phone_number} </div>
           <div> Diagnosis: {x.diagnosis} </div>
@@ -257,7 +267,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const MedicalServicesForSubstanceUseMedications = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Medication: {x.medication} </div>
           <div> Dose: {x.dose} </div>
         </div>
@@ -288,7 +298,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const DrugScreeningResultsTests = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Test: {x.test_ordered} </div>
           <div> Date of Test: {x.date_collected} </div>
           <div> Provider name: {x.provider} </div>
@@ -305,7 +315,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const FamilyAndSupportsPeopleInHome = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Person: {x.person} </div>
           <div> Date of Birth: {x.date_of_birth} </div>
           <div> Relation: {x.relation} </div>
@@ -317,7 +327,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const FamilyAndSupportsChildrenNotHome = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Person: {x.person} </div>
           <div> Date of Birth: {x.date_of_birth} </div>
           <div> Caregiver: {x.caregiver} </div>
@@ -327,38 +337,72 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const FamilyAndSupportsArrays = (data: any) => {
-    return (
-      <div>
-        {Object.keys(data).map((item, index) => (
-          <span key={index}>
-            {data[item]}{index === Object.keys(data).length - 1 ? "" : ", "}
-          </span>
-        ))}
-      </div>
-    );
-  };
+  const FamilyAndSupportsCurrentSupportSystem = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div key={generateUUID()}>
+          <div>Person: {x.person}</div>
+          <div>Relation: {x.relation}</div>
+        </div>
+      )
+    })
+  }
+
+  const FamilyAndSupportsStrengthSupportSystem = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div key={generateUUID()}>
+          <div>Strength: {x.strength}</div>
+        </div>
+      )
+    })
+  }
+
+  const FamilyAndSupportsGoals = (data: any) => {
+    return data.map((x: any) => {
+      return (
+        <div key={generateUUID()}>
+          <div>Goal: {x.goal}</div>
+        </div>
+      )
+    })
+  }
 
   const InfantInformationInfantCareNeeds = (data: any) => {
 
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
+      breast_pump_notes: "Breast Pump Notes",
       breastfeeding_support: "Breastfeeding Support",
+      breastfeeding_support_notes: "Breastfeeding Support Notes",
       car_seat: "Car Seat",
+      car_seat_notes: "Car Seat Notes",
       childcare: "Childcare",
+      childcare_notes: "Childcare Notes",
       clothing: "Clothing",
+      clothing_notes: "Clothing Notes",
       crib: "Crib",
+      crib_notes: "Crib Notes",
       diapers: "Diapers",
+      diapers_notes: "Diapers Notes",
       infant_formula: "Infant Formula",
+      infant_formula_notes: "Infant Formula Notes",
       infant_stroller: "Infant Stroller",
-      other: "Other"
+      infant_stroller_notes: "Infant Stroller Notes",
+      other: "Other",
+      other_name: "Other Name",
+      other_notes: "Other Notes"
     };
-  
+
     return (
       <div>
-        {Object.keys(data).map((item, index) => (
+        {data.map((item: any, index: number) => (
           <div key={index}>
-            <div>{namesMap[item] || item}: {data[item]}</div>
+            {Object.keys(item).map((key: string, idx: number) => (
+              <div key={idx}>
+                <div>{namesMap[key] || key}: {item[key]}</div>
+              </div>
+            ))}
           </div>
         ))}
       </div>
@@ -368,7 +412,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const InfantInformationMedications = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Medication: {x.medication} </div>
           <div> Dose: {x.dose} </div>
           <div> Prescriber: {x.prescriber} </div>
@@ -384,7 +428,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       organization: "Organization",
       organization_contact_information: "Organization Contact Info"
     };
-  
+
     return (
       <div>
         {Object.keys(data).map((item, index) => (
@@ -411,7 +455,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const RelapsePreventionPlanSafeCaregivers = (data: any) => {
     return data.map((x: any) => {
       return (
-        <div>
+        <div key={generateUUID()}>
           <div> Name: {x.name} </div>
           <div> Contact Number: {x.contact_number} </div>
           <div> Relationship: {x.relationship} </div>
@@ -442,8 +486,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
                 ) : fieldNames.familyAndSupports[key] && key === 'clients_children_not_living_in_home' ? (
                   FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' || key === 'strength_of_client_and_support_system' || key === 'goals' ? (
-                  FamilyAndSupportsArrays((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' ? (
+                  FamilyAndSupportsCurrentSupportSystem((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'strength_of_client_and_support_system' ? (
+                  FamilyAndSupportsStrengthSupportSystem((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'goals' ? (
+                  FamilyAndSupportsGoals((formData as any)?.[key] || [])
                 ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
                   InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
                 ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
