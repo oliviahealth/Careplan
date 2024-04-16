@@ -466,7 +466,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const renderFields = (fields: { [key: string]: string }) => {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 py-4 text-sm">
+      <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
         {Object.entries<string>(fields)
           .map(([key, fieldName]) => (
             <React.Fragment key={key}>
