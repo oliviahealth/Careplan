@@ -9,7 +9,7 @@ import axios from 'axios'
 const DrugInfo = z.object({
     ever_used: z.string().min(1, 'Field required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
-    date_last_used: z.string().min(1, 'Date required'),
+    date_last_used: z.string(),
     notes: z.string().min(1, 'Notes required')
 })
 
