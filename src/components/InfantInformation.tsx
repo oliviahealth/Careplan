@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
 
 const InfantCareNeeds = z.object({
     breast_pump: z.string().min(1, 'Breast pump information required'),
@@ -43,7 +44,7 @@ const InfantInformationInputs = z.object({
     birth_weight: z.string().min(1, 'Birth weight required'),
     gestational_age_at_birth: z.string().min(1, 'Gestional age at birth required'),
     NICU_stay: z.string().min(1, 'NICU stay information required'),
-    NICU_length_of_stay: z.string().min(1, 'NICU length of stay required'),
+    NICU_length_of_stay: z.string(),
     pediatrician_name: z.string().min(1, 'Pediatrician name required'),
     pediatrician_contact_info: z.string().min(1, 'Pediatrician phone number required'),
     infant_urine_drug_screening_at_birth: z.string().min(1, 'Infant urine drug screening at birth info required'),
@@ -78,9 +79,15 @@ const InfantInformationResponse = InfantInformationInputs.extend({
 });
 
 export default function InfantInformation() {
+
+    const [showNICUStay, setShowNICUStay] = useState(false);
+    const handleShowNICUStay = (value: string) => {
+        setShowNICUStay(value === 'Yes');
+    };
+
     const navigate = useNavigate();
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm<InfantInformationInputs>({
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<InfantInformationInputs>({
         resolver: zodResolver(InfantInformationInputs),
         defaultValues: {
             infant_medications: [{
@@ -112,7 +119,7 @@ export default function InfantInformation() {
                 other: '',
                 other_notes: ''
 
-            }]
+            }],
         },
     });
 
@@ -125,6 +132,25 @@ export default function InfantInformation() {
         control,
         name: "infant_care_needs_items"
     })
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_infant_information/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof InfantInformationInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+                setShowNICUStay(userData.NICU_stay === 'Yes');
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const { mutate } = useMutation(async (data: InfantInformationInputs) => {
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
@@ -179,16 +205,20 @@ export default function InfantInformation() {
                 <p className="font_medium">NICU</p>
                 {["Yes", "No"].map((status) => (
                     <label key={status} className="flex items-center">
-                        <input {...register("NICU_stay")} className="mr-2" type="radio" value={status} />
+                        <input {...register("NICU_stay")} className="mr-2" type="radio" value={status} onChange={(e) => handleShowNICUStay(e.target.value)} />
                         {status}
                     </label>))}
                 {errors.NICU_stay && <span className="label-text-alt text-red-500">{errors.NICU_stay.message}</span>}
 
-                <p className="font-medium">Length of Stay (Days)</p>
-                <input {...register("NICU_length_of_stay")} className="border border-gray-300 px-4 py-2 rounded-md" />
-                <div>
-                    {errors.NICU_length_of_stay && <span className="label-text-alt text-red-500">{errors.NICU_length_of_stay.message}</span>}
-                </div>
+                {showNICUStay && (
+                    <>
+                        <p className="font-medium">Length of Stay (Days)</p>
+                        <input {...register("NICU_length_of_stay")} className="border border-gray-300 px-4 py-2 rounded-md" />
+                        <div>
+                            {errors.NICU_length_of_stay && <span className="label-text-alt text-red-500">{errors.NICU_length_of_stay.message}</span>}
+                        </div>
+                    </>
+                )}
 
                 <p className="font-medium">Pediatrician Name</p>
                 <input {...register("pediatrician_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
@@ -222,7 +252,7 @@ export default function InfantInformation() {
                 <input {...register("meconium_results_specify")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.meconium_results_specify && <span className="label-text-alt text-red-500">{errors.meconium_results_specify.message}</span>}
 
-                <p className="font-medium">Neonatal Opiod Withdraw/Neonatal Abstinence Syndrom</p>
+                <p className="font-medium">Neonatal Opiod Withdraw/Neonatal Abstinence Syndrome</p>
                 {["Yes", "No"].map((status) => (
                     <label key={status} className="flex items-center">
                         <input {...register("neonatal_opiod_withdraw")} className="mr-2" type="radio" value={status} />
@@ -230,7 +260,7 @@ export default function InfantInformation() {
                     </label>))}
                 {errors.neonatal_opiod_withdraw && <span className="label-text-alt text-red-500">{errors.neonatal_opiod_withdraw.message}</span>}
 
-                <p className="font-medium">Treatement Method</p>
+                <p className="font-medium">Treatment Method</p>
                 <input {...register("neonatal_opiod_withdraw_treatment_method")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.neonatal_opiod_withdraw_treatment_method && <span className="label-text-alt text-red-500">{errors.neonatal_opiod_withdraw_treatment_method.message}</span>}
 
