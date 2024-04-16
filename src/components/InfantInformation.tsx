@@ -83,6 +83,9 @@ export default function InfantInformation() {
     const [showNICUStay, setShowNICUStay] = useState(false);
     const handleShowNICUStay = (value: string) => {
         setShowNICUStay(value === 'Yes');
+        if (value === 'No') {
+            setValue('NICU_length_of_stay', 'N/A');
+        }
     };
 
     const navigate = useNavigate();
@@ -145,6 +148,9 @@ export default function InfantInformation() {
                     }
                 });
                 setShowNICUStay(userData.NICU_stay === 'Yes');
+                if (userData.NICU_stay === 'No') {
+                    setValue('NICU_length_of_stay', 'N/A')
+                }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
