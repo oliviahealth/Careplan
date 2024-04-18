@@ -501,51 +501,49 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const renderFields = (fields: { [key: string]: string }) => {
     return (
-      <div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 py-4 text-sm">
-          {Object.entries<string>(fields)
-            .map(([key, fieldName]) => (
-              <React.Fragment key={key}>
-                <div className="flex flex-row gap-1">
-                  <div className="font-semibold">{fieldName}:</div>
-                  {fieldNames.maternalMedicalHistory[key] && key === 'current_medication_list' ? (
-                    MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
-                  ) : fieldNames.psychiatricHistory[key] && key === 'diagnoses' ? (
-                    PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
-                  ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
-                    MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-                  ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
-                    SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
-                  ) : fieldNames.drugScreeningResults[key] && key === 'tests' ? (
-                    DrugScreeningResultsTests((formData as any)?.[key] || [])
-                  ) : fieldNames.familyAndSupports[key] && key === 'people_living_in_home' ? (
-                    FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-                  ) : fieldNames.familyAndSupports[key] && key === 'clients_children_not_living_in_home' ? (
-                    FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-                  ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' ? (
-                    FamilyAndSupportsCurrentSupportSystem((formData as any)?.[key] || [])
-                  ) : fieldNames.familyAndSupports[key] && key === 'strength_of_client_and_support_system' ? (
-                    FamilyAndSupportsStrengthSupportSystem((formData as any)?.[key] || [])
-                  ) : fieldNames.familyAndSupports[key] && key === 'goals' ? (
-                    FamilyAndSupportsGoals((formData as any)?.[key] || [])
-                  ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
-                    InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
-                  ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
-                    InfantInformationMedications((formData as any)?.[key] || [])
-                  ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
-                    FamilyAndSupportsServices((formData as any)?.[key] || [])
-                  ) : fieldNames.relapsePreventionPlan[key] && key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
-                    RelapsePreventionPlanArrays((formData as any)?.[key] || [])
-                  ) : fieldNames.relapsePreventionPlan[key] && key === 'safe_caregivers' ? (
-                    RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
-                  ) :
-                    (
-                      <div>{(formData as any)?.[key]}</div>
-                    )}
-                </div>
-              </React.Fragment>
-            ))}
-        </div>
+      <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
+        {Object.entries<string>(fields)
+          .map(([key, fieldName]) => (
+            <React.Fragment key={key}>
+              <div className="flex flex-row gap-1">
+                <div className="font-semibold">{fieldName}:</div>
+                {fieldNames.maternalMedicalHistory[key] && key === 'current_medication_list' ? (
+                  MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
+                ) : fieldNames.psychiatricHistory[key] && key === 'diagnoses' ? (
+                  PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
+                  MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
+                ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
+                  SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
+                ) : fieldNames.drugScreeningResults[key] && key === 'tests' ? (
+                  DrugScreeningResultsTests((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'people_living_in_home' ? (
+                  FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'clients_children_not_living_in_home' ? (
+                  FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' ? (
+                  FamilyAndSupportsCurrentSupportSystem((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'strength_of_client_and_support_system' ? (
+                  FamilyAndSupportsStrengthSupportSystem((formData as any)?.[key] || [])
+                ) : fieldNames.familyAndSupports[key] && key === 'goals' ? (
+                  FamilyAndSupportsGoals((formData as any)?.[key] || [])
+                ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
+                  InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
+                ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
+                  InfantInformationMedications((formData as any)?.[key] || [])
+                ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
+                  FamilyAndSupportsServices((formData as any)?.[key] || [])
+                ) : fieldNames.relapsePreventionPlan[key] && key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
+                  RelapsePreventionPlanArrays((formData as any)?.[key] || [])
+                ) : fieldNames.relapsePreventionPlan[key] && key === 'safe_caregivers' ? (
+                  RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
+                ) :
+                  (
+                    <div>{(formData as any)?.[key]}</div>
+                  )}
+              </div>
+            </React.Fragment>
+          ))}
       </div>
     );
   };
