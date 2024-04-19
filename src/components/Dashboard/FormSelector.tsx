@@ -17,8 +17,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   const [completed, setCompleted] = useState<boolean>(true);
-  const [submissions, setSubmissions] = useState<any[]>([]); 
-  const [selectedSubmissionID, setSelectedSubmissionID]  = useState<string | null>(null);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
 
   const fetchSubmissions = async () => {
     try {
@@ -48,7 +48,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   };
 
   const handleDeleteSubmission = async (submissionID: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete?");
+    const confirmed = window.confirm("Are you sure you want to delete this submission?");
 
     if (confirmed) {
       try {
@@ -63,18 +63,26 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const renderSubmissions = () => {
     return (
-      <div>
-        {submissions.map((submission: any) => (
-          <div key={submission.id}>
+      <div className="relative flex">
+        <select
+          value={selectedSubmissionID || ''}
+          onChange={(e) => handleSubmissionClick(e.target.value)}
+          className="block bg-white border border-gray-300 hover:border-gray-400 mr-2 px-4 py-2 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        >
+          {submissions.map((submission: any) => (
+            <option key={submission.id} value={submission.id}>
+              Submission {submission.timestamp}
+            </option>
+          ))}
+        </select>
+        {selectedSubmissionID && (
           <button
-            onClick={() => handleSubmissionClick(submission.id)}
-            className={`rounded-md py-2 px-4 ${selectedSubmissionID === submission.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-700 hover:text-white`}
+            onClick={() => handleDeleteSubmission(selectedSubmissionID)}
+            className="border border-gray-300 hover:border-gray-400 rounded-lg shadow-sm px-2 py-2 text-white bg-red-700 hover:bg-red-800"
           >
-            Submission {submission.timestamp}
+            Delete
           </button>
-            <button className="underline font-semibold" onClick={() => handleDeleteSubmission(submission.id)}>Delete</button>
-          </div>
-        ))}
+        )}
       </div>
     );
   };
@@ -574,14 +582,18 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           {name === 'Infant Information' && formData && renderFields(fieldNames.infantInformation)}
           {name === 'Referrals and Services' && formData && renderFields(fieldNames.referralsAndServices)}
           {name === 'Relapse Prevention Plan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
-          <div>
-            {renderSubmissions()}
+
+          <div className="flex justify-between">
+            <div className="flex">
+              {renderSubmissions()}
+            </div>
+            <div className="flex">
+              <Link to={path} className="button-filled font-semibold">
+                Edit
+              </Link>
+            </div>
           </div>
-          <div className="flex justify-end">
-            <Link to={path} className="button-filled font-semibold">
-              Edit
-            </Link>
-          </div>
+
         </div>
       </div>
     </div>
