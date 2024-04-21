@@ -112,7 +112,7 @@ export default function DrugScreeningResults() {
 
                     <div key={field.id} className="py-6 space-y-6">
 
-                        <p className="font-semibold">Complete with Provider Ordering UDS or Recovery Coach</p>
+                        <p className="font-semibold text-red-700">Complete with Provider Ordering UDS or Recovery Coach</p>
                         <div className="w-full h-px bg-gray-300"></div>
 
                         <p className="font-medium">Test Ordered</p>
