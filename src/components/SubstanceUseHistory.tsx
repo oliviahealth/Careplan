@@ -32,8 +32,7 @@ const SubstanceUseHistoryInputs = z.object({
     prescription_drugs: DrugInfo,
     tobacco: DrugInfo,
     other_drugs: z.array(AdditionalDrugs),
-    notes: z.string().min(1, 'Additional Notes Required'),
-    treatment_case_manager: z.string().min(1, 'Treatment case manager required')
+    notes: z.string().min(1, 'Additional Notes Required')
 })
 export type SubstanceUseHistoryInputs = z.infer<typeof SubstanceUseHistoryInputs>
 
@@ -49,7 +48,7 @@ export default function SubstanceUseHistory() {
     type DrugVisibilityState = {
         [key: string]: boolean;
     };
-    
+
     const [showDrugDate, setShowDrugDate] = useState<DrugVisibilityState>({
         alcohol: false,
         benzodiazepines: false,
@@ -67,7 +66,7 @@ export default function SubstanceUseHistory() {
             [drug]: value === 'Yes',
         }));
     };
-    
+
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<SubstanceUseHistoryInputs>({
 
@@ -129,6 +128,9 @@ export default function SubstanceUseHistory() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4">
 
+                <p className="font-semibold text-red-700">Complete with Treatment Case Manager or Recovery Coach</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 {(['alcohol', 'benzodiazepines', 'cocaine', 'heroin', 'kush', 'marijuana', 'methamphetamine', 'prescription_drugs', 'tobacco'] as const).map(drug => (
                     <div key={drug} className="pt-10">
                         <div className="flex flex-nowrap space-x-4">
@@ -136,7 +138,7 @@ export default function SubstanceUseHistory() {
                                 <p className="font-medium">Have they used {drug.charAt(0).toUpperCase() + drug.slice(1)}?</p>
                                 {['Yes', 'No'].map((status) => (
                                     <label key={status} className="inline-flex items-center">
-                                        <input {...register(`${drug}.ever_used`)} className="mr-2" type="radio" value={status} onChange={(e) => handleDrugDate(drug, e.target.value)}/>
+                                        <input {...register(`${drug}.ever_used`)} className="mr-2" type="radio" value={status} onChange={(e) => handleDrugDate(drug, e.target.value)} />
                                         {status}
                                     </label>
                                 ))}
@@ -220,10 +222,6 @@ export default function SubstanceUseHistory() {
                 <p className="font-medium">Other Notes</p>
                 <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
-
-                <p className="font-medium">Treatment Case Manager or Recovery Coach Name</p>
-                <input {...register("treatment_case_manager")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.treatment_case_manager && <span className="label-text-alt text-red-500">{errors.treatment_case_manager.message}</span>}
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>

@@ -21,8 +21,7 @@ const MedicalServicesSubstanceUseInputs = z.object({
     used_addiction_medicine_services: z.string().min(1, 'This field is required'),
     date_used_medicine_service: z.string(),
     addiction_medicine_clinic: z.string().min(1, 'Addiction medicine clinic name required'),
-    addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required'),
-    mat_provider: z.string().min(1, 'MAT provider required'),
+    addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required')
 });
 type MedicalServicesSubstanceUseInputs = z.infer<typeof MedicalServicesSubstanceUseInputs>
 
@@ -116,6 +115,9 @@ export default function ServicesSubstanceUse() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
 
+                <p className="font-semibold text-red-700">Complete with MAT Provider</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 <p className="font-medium">Medication Assisted Treatment (MAT) engaged?</p>
                 {["Never", "Currently", "Prior MAT use"].map((status) => (
                     <label key={status} className="flex pt-2">
@@ -185,10 +187,6 @@ export default function ServicesSubstanceUse() {
                 <p className="font-medium">Addiction Medicine Clinic Phone Number</p>
                 <input {...register("addiction_medicine_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.addiction_medicine_clinic_phone && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic_phone.message}</span>}
-
-                <p className="font-medium">MAT Provider</p>
-                <input {...register("mat_provider")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.mat_provider && <span className="label-text-alt text-red-500">{errors.mat_provider.message}</span>}
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
