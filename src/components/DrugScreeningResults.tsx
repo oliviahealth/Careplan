@@ -19,7 +19,6 @@ const DrugTest = z.object({
 
 const DrugScreeningResultsInputs = z.object({
     tests: z.array(DrugTest),
-    provider_ordering_UDS: z.string().min(1, ' Provider ordering UDS or Recovery Coach name required')
 })
 type DrugScreeningResultsInputs = z.infer<typeof DrugScreeningResultsInputs>;
 
@@ -107,9 +106,15 @@ export default function DrugScreeningResults() {
 
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
+
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
                 {fields.map((field, index) => (
+
                     <div key={field.id} className="py-6 space-y-6">
+
+                        <p className="font-semibold">Complete with Provider Ordering UDS or Recovery Coach</p>
+                        <div className="w-full h-px bg-gray-300"></div>
+
                         <p className="font-medium">Test Ordered</p>
                         <input {...register(`tests.${index}.test_ordered`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.tests && errors.tests[index]?.test_ordered && (
@@ -171,10 +176,6 @@ export default function DrugScreeningResults() {
                     <button type="button" onClick={addNewDrugTest} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Test</button>
                     <button type="button" onClick={removeLastDrugTest} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Last Test</button>
                 </div>
-
-                <p className="font-medium">Provider ordering UDS or Recover Coach Name</p>
-                <input {...register("provider_ordering_UDS")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.provider_ordering_UDS && <span className="label-text-alt text-red-500">{errors.provider_ordering_UDS.message}</span>}
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
