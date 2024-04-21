@@ -179,6 +179,9 @@ export default function InfantInformation() {
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4">
+                <p className="font-semibold text-red-700">Complete with Pediatrician</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 <p className="font-medium">Child's Name</p>
                 <input {...register("child_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.child_name && <span className="label-text-alt text-red-500">{errors.child_name.message}</span>}
