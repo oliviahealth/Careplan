@@ -1,4 +1,3 @@
-// import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 import { useForm, useFieldArray } from "react-hook-form"
 import { useMutation } from 'react-query'
 import { useNavigate } from "react-router-dom"
@@ -40,7 +39,6 @@ const FamilyAndSupportsInputs = z.object({
     current_support_system: z.array(SupportSystem),
     strength_of_client_and_support_system: z.array(Strengths),
     goals: z.array(Goals).min(1, "Goals required"),
-    recovery_coach: z.string().min(1, "Social Worker or Recovery Coach required"),
 });
 type FamilyAndSupportsInputs = z.infer<typeof FamilyAndSupportsInputs>
 
@@ -77,8 +75,7 @@ export default function FamilyAndSupports() {
             notes: '',
             strength_of_client_and_support_system: [{
                 strength: ''
-            }],
-            recovery_coach: '',
+            }]
         },
     });
 
@@ -145,6 +142,9 @@ export default function FamilyAndSupports() {
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4">
+                <p className="font-semibold text-red-700">Complete with Recovery Coach or Social Worker</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 <p className="font-medium text-xl">Current Living Arrangement</p>
                 {householdMemberFields.map((field, index) => (
                     <div key={field.id} className="space-y-6 py-6">
@@ -249,10 +249,6 @@ export default function FamilyAndSupports() {
                     <button type="button" onClick={() => appendGoal({ goal: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Goal</button>
                     <button type="button" onClick={() => removeGoal(goalsFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Goal</button>
                 </div>
-
-                <p className="font-medium text-xl">Social Worker or Recovery Coach</p>
-                <input {...register("recovery_coach")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.recovery_coach && <span className="label-text-alt text-red-500">{errors.recovery_coach.message}</span>}
 
                 <div className="flex justify-center py-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
