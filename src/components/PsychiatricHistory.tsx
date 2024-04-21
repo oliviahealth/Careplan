@@ -16,7 +16,6 @@ const diagnosesSchema = z.object({
 export const PsychiatricHistoryInputsSchema = z.object({
     diagnoses: z.array(diagnosesSchema),
     notes: z.string().min(1, "Notes is required"),
-    obgyn: z.string().min(1, "OB/GYN or Primary Care Provider is required"),
 });
 export type PsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
 
@@ -29,7 +28,13 @@ export default function PsychiatricHistory() {
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
-            diagnoses: []
+            diagnoses: [{
+                diagnosis: '',
+                provider: '',
+                phone_number: '',
+                date_of_diagnosis: '',
+                taking_medication: '',
+            }]
         },
     });
 
@@ -90,9 +95,15 @@ export default function PsychiatricHistory() {
 
     return (
         <div className="flex  justify-center w-full p-2 mt-2 text-base font-OpenSans">
+
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <p className="font-semibold text-red-700">Complete with: OB/GYN, Primary Care Provider, or Mental Health Provider</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 {fields.map((field, index) => (
+
                     <div key={field.id} className="py-6">
+
                         <p className="font-medium pt-6">Diagnosis</p>
                         <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
@@ -129,7 +140,8 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
                         )}
 
-                    </div>))}
+                    </div>
+                ))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>
@@ -139,11 +151,6 @@ export default function PsychiatricHistory() {
                 <p className="font-medium">Notes</p>
                 <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
-
-                <p className="font-medium whitespace-nowrap">OB/GYN, Primary Care Provider, or Mental Health Provider Name</p>
-                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
-
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
