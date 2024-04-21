@@ -40,7 +40,6 @@ const MaternalMedicalHistoryInputs = z.object({
     current_medication_list: z.array(CurrentMedicationList),
     med_problems_diagnoses: z.string().min(1, 'required'),
     notes: z.string().min(1, 'Notes is required'),
-    obgyn: z.string().min(1, 'Obgyn is required')
 });
 type MaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputs>;
 
@@ -114,6 +113,10 @@ export default function MaternalMedicalHistory() {
     return (
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+
+                <p className="font-semibold text-red-700">Complete with OB/GYN or Primary Care Provider</p>
+                <div className="w-full h-px bg-gray-300"></div>
+                
                 <p className="font-medium text-xl whitespace-nowrap">Prenatal Care (for current or most recent pregnancy)</p>
                 <div className="space-y-7">
                     <div className="flex flex-col flex-grow">
@@ -230,10 +233,6 @@ export default function MaternalMedicalHistory() {
                 <p className="font-medium">Other Notes</p>
                 <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
-
-                <p className="font-medium">OB/GYN or Primary Provider Name</p>
-                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
