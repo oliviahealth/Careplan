@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const diagnosesSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
@@ -15,10 +16,9 @@ const diagnosesSchema = z.object({
 
 export const PsychiatricHistoryInputsSchema = z.object({
     diagnoses: z.array(diagnosesSchema),
-    notes: z.string().min(1, "Notes is required"),
-    obgyn: z.string().min(1, "OB/GYN or Primary Care Provider is required"),
+    notes: z.string().default(""),
 });
-export type PsychiatricHistoryInputsType = z.infer<typeof PsychiatricHistoryInputsSchema>
+export type PsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
 
 const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
     id: z.string(),
@@ -27,19 +27,24 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 
 export default function PsychiatricHistory() {
     const navigate = useNavigate();
-
-    const { register, handleSubmit, control, formState: { errors } } = useForm<PsychiatricHistoryInputsType>({
+    
+    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
-            diagnoses: []
+            diagnoses: [{
+                diagnosis: '',
+                provider: '',
+                phone_number: '',
+                date_of_diagnosis: '',
+                taking_medication: '',
+            }]
         },
     });
 
-    const { fields, append, remove } = useFieldArray({ control, name: 'diagnoses' })
-
-    const removeLastDiagnoses = () => {
-        remove(fields.length - 1);
-    }
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'diagnoses'
+    })
 
     const addNewDiagnoses = () => {
         append({
@@ -51,8 +56,26 @@ export default function PsychiatricHistory() {
         })
     };
 
-    const { mutate } = useMutation(async (data: PsychiatricHistoryInputsType) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get_psychiatric_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const userData = response.data;
+                Object.keys(userData).forEach(key => {
+                    if (key !== 'id' && key !== 'user_id') {
+                        const formKey = key as keyof PsychiatricHistoryInputs;
+                        setValue(formKey, userData[key]);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
 
         PsychiatricHistoryResponseSchema.parse(responseData);
 
@@ -71,9 +94,15 @@ export default function PsychiatricHistory() {
 
     return (
         <div className="flex  justify-center w-full p-2 mt-2 text-base font-OpenSans">
+
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <p className="font-semibold text-red-700">Complete with: OB/GYN, Primary Care Provider, or Mental Health Provider</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 {fields.map((field, index) => (
+
                     <div key={field.id} className="py-6">
+
                         <p className="font-medium pt-6">Diagnosis</p>
                         <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
@@ -92,7 +121,7 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
                         )}
 
-                        <p className="font-medium pt-6">Date of Diagnosis</p>
+                        <p className="font-medium">Date of Diagnosis</p>
                         <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>
@@ -110,21 +139,18 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
                         )}
 
-                    </div>))}
+                        <div className='flex justify-end'>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
+                        </div>
+                    </div>
+                ))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>
-                    <button type="button" onClick={removeLastDiagnoses} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
                 </div>
 
                 <p className="font-medium">Notes</p>
-                <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
-
-                <p className="font-medium whitespace-nowrap">OB/GYN, Primary Care Provider, or Mental Health Provider Name</p>
-                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
-
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>

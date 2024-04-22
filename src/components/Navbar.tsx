@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
           <Link to={"/dashboard"} className="block md:flex button">
             Client Dashboard
           </Link>
-          <Link to={"/"} className="block md:flex button ">
+          <Link to={"/"} className="block md:flex button md:button-filled ">
             Sign In
           </Link>
         </div>
