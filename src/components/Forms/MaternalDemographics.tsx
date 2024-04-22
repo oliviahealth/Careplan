@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { states } from "../../utils";
 import { useMutation } from 'react-query'
@@ -55,10 +56,11 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
   id: z.string(),
   user_id: z.string()
 });
-type MaternalDemographicsResponseSchema = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
-  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) } );
+  const navigate = useNavigate();
+
+  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
     const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
@@ -68,15 +70,16 @@ export default function MaternalDemographics() {
     return responseData;
   }, {
     onSuccess: (responseData) => {
-      console.log("Maternal demographics data added successfully", responseData);
-    },
-    onError: (err) => {
-      alert("Error while adding maternal demographics data");
+      alert("Maternal demographics data added successfully!");
+      console.log("MaternalDemographics data added successfully", responseData);
 
-      console.error(err);
+      navigate("/dashboard");
+    },
+    onError: () => {
+      alert("Error while adding MaternalDemographics data.");
     }
   });
-  
+
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
@@ -85,13 +88,11 @@ export default function MaternalDemographics() {
         <input {...register("name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
         {errors.name && <span className="label-text-alt text-red-500">{errors.name.message}</span>}
 
-
         <p className="font-medium">Date of Birth</p>
         <input {...register("date_of_birth")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
         {errors.date_of_birth && <span className="label-text-alt text-red-500">{errors.date_of_birth.message}</span>}
 
         <p className="font-medium text-xl">Address and Contact Information</p>
-
         <p className="font-medium my-6">Current Living Arrangements</p>
         <div className="flex flex-col space-y-2">
           {livingArrangements.map((status) => (
@@ -99,31 +100,46 @@ export default function MaternalDemographics() {
               <input {...register("current_living_arrangement")} type="radio" value={status} className="form-radio" />
               <span className="ml-2">{status}</span>
             </label>))}
+
+          {errors.current_living_arrangement && <span className="label-text-alt text-red-500">{errors.current_living_arrangement.message}</span>}
         </div>
-        {errors.current_living_arrangement && <span className="label-text-alt text-red-500">{errors.current_living_arrangement.message}</span>}
 
-        <p className="font-medium">Street Address</p>
-        <input {...register("street_address")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.street_address && <span className="label-text-alt text-red-500">{errors.street_address.message}</span>}
+        <div className="flex flex-nowrap space-x-4 py-6">
+          <div className="flex flex-col flex-grow lg:w-full md:w-full sm:w-auto">
+            <p className="font-medium whitespace-nowrap">Street Address</p>
+            <input {...register("street_address")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.street_address && <span className="label-text-alt text-red-500">{errors.street_address.message}</span>}
+          </div>
 
-        <p className="font-medium">City</p>
-        <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.city && <span className="label-text-alt text-red-500">{errors.city.message}</span>}
+          <div className="flex flex-col flex-grow lg:w-3/4 md:w-3/4 sm:w-3/4">
+            <p className="font-medium">City</p>
+            <input {...register("city")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.city && <span className="label-text-alt text-red-500">{errors.city.message}</span>}
+          </div>
 
-        <p className="font-medium">State</p>
-        <select  {...register("state")} className="dropdown border border-gray-300 px-2 py-2 rounded-md w-full font-medium">
-          <option disabled value="">State</option>
-          {states.map((state) => (<option key={state}>{state}</option>))}
-        </select>
-        {errors.state && <span className="label-text-alt text-red-500">{errors.state.message}</span>}
+          <div className="flex flex-col flex-grow lg:w-1/3 md:w-full sm:w-3/4">
+            <p className="font-medium">State</p>
+            <select {...register("state")} className="dropdown border border-gray-300 px-4 py-2 rounded-md w-full">
+              <option selected disabled>--</option>
+              {states.map((state) => (<option key={state}>{state}</option>))}
+            </select>
+            {errors.state && <span className="label-text-alt text-red-500">{errors.state.message}</span>}
+          </div>
+        </div>
 
-        <p className="font-medium">Zip Code</p>
-        <input  {...register("zip_code")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.zip_code && <span className="label-text-alt text-red-500">{errors.zip_code.message}</span>}
+        <div className="flex flex-nowrap space-x-4">
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Zip Code</p>
+            <input {...register("zip_code")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.zip_code && <span className="label-text-alt text-red-500">{errors.zip_code.message}</span>}
+          </div>
 
-        <p className="font-medium">County</p>
-        <input {...register("county")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.county && <span className="label-text-alt text-red-500">{errors.county.message}</span>}
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">County</p>
+            <input {...register("county")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.county && <span className="label-text-alt text-red-500">{errors.county.message}</span>}
+          </div>
+        </div>
 
         <p className="font-medium">Primary Phone Number</p>
         <input {...register("primary_phone_number")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
@@ -140,15 +156,21 @@ export default function MaternalDemographics() {
         </div>
         {errors.phone_type && <span className="label-text-alt text-red-500">{errors.phone_type.message}</span>}
 
+
         <p className="font-medium text-xl">Emergency Contact</p>
+        <div className="flex flex-nowrap space-x-4">
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Name</p>
+            <input {...register("emergency_contact")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.emergency_contact && <span className="label-text-alt text-red-500">{errors.emergency_contact.message}</span>}
+          </div>
 
-        <p className="font-medium">Name</p>
-        <input {...register("emergency_contact")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.emergency_contact && <span className="label-text-alt text-red-500">{errors.emergency_contact.message}</span>}
-
-        <p className="font-medium">Emergency Contact Phone Number</p>
-        <input {...register("emergency_contact_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.emergency_contact_phone && <span className="label-text-alt text-red-500">{errors.emergency_contact_phone.message}</span>}
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Phone Number</p>
+            <input {...register("emergency_contact_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+            {errors.emergency_contact_phone && <span className="label-text-alt text-red-500">{errors.emergency_contact_phone.message}</span>}
+          </div>
+        </div>
 
         <p className="font-medium">Emergency Contact Relationship</p>
         <input {...register("relationship")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
@@ -171,22 +193,30 @@ export default function MaternalDemographics() {
         <input {...register("insurance_plan")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
         {errors.insurance_plan && <span className="label-text-alt text-red-500">{errors.insurance_plan.message}</span>}
 
-        <p className="font-medium">Insurance Effective Date</p>
-        <input {...register("effective_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-        {errors.effective_date && <span className="label-text-alt text-red-500">{errors.effective_date.message}</span>}
+        <div className="flex flex-nowrap space-x-4 pt-6">
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Effective Date</p>
+            <input {...register("effective_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+            {errors.effective_date && <span className="label-text-alt text-red-500">{errors.effective_date.message}</span>}
+          </div>
 
-        <p className="font-medium">Insurance Subscriber ID</p>
-        <input {...register("subscriber_id")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.subscriber_id && <span className="label-text-alt text-red-500">{errors.subscriber_id.message}</span>}
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Subscriber ID</p>
+            <input {...register("subscriber_id")} className="border border-gray-300 px-4 py-2.5 rounded-md w-full" />
+            {errors.subscriber_id && <span className="label-text-alt text-red-500">{errors.subscriber_id.message}</span>}
+          </div>
 
-        <p className="font-medium">Insurance Group ID</p>
-        <input {...register("group_id")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-        {errors.group_id && <span className="label-text-alt text-red-500">{errors.group_id.message}</span>}
+          <div className="flex flex-col flex-grow">
+            <p className="font-medium">Group ID</p>
+            <input {...register("group_id")} className="border border-gray-300 px-4 py-2.5 rounded-md w-full" />
+            {errors.group_id && <span className="label-text-alt text-red-500">{errors.group_id.message}</span>}
+          </div>
+        </div>
 
         <div className="flex justify-center">
           <button type="submit" className="bg-[#AFAFAFAF] w-full text-black px-20 py-2 mt-6 rounded-md">Save</button>
         </div>
       </form>
     </div>
-  );
+  )
 }
