@@ -8,9 +8,9 @@ import './index.css'
 import Layout from './components/Layout.tsx';
 
 import LandingPage from './components/LandingPage.tsx'
-import Dashboard from './components/ClientDashboard/Dashboard.tsx'
+import Dashboard from './components/Dashboard/Dashboard.tsx'
 
-import MaternalDemographics from './components/MaternalDemographics.tsx';
+import MaternalDemographics from './components/Forms/MaternalDemographics.tsx';
 import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
 import PsychiatricHistory from './components/PsychiatricHistory.tsx';
 import ServicesSubstanceUse from './components/ServicesSubstanceUse.tsx';
@@ -29,7 +29,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/maternal-demographics' element={<MaternalDemographics />} />
             <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
             <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
-            <Route path='services-substance-use' element={<ServicesSubstanceUse />} />
+            <Route path='/services-substance-use' element={<ServicesSubstanceUse />} />
             <Route path='/drug-screening-results' element ={<DrugScreeningResults />} />
           </Route>
         </Routes>

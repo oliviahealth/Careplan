@@ -17,6 +17,10 @@ export default {
     },
     },
   },
+  daisyui: {
+    themes: ["light"],
+    // styled: false,
+  },
   corePlugins: {
     fontWeight: false
   },
