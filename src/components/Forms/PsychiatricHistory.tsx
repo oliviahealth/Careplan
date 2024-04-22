@@ -60,7 +60,7 @@ export default function PsychiatricHistory() {
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/api/get_psychiatric_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
+                const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof PsychiatricHistoryInputs;

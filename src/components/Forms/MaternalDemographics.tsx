@@ -60,7 +60,6 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 
 export default function MaternalDemographics() {
   const navigate = useNavigate();
-<<<<<<< HEAD:src/components/MaternalDemographics.tsx
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
@@ -68,7 +67,7 @@ export default function MaternalDemographics() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_demographics/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-        const userData = response.data;
+        const userData = response.data[response.data.length - 1];
         Object.keys(userData).forEach(key => {
           if (key !== 'id' && key !== 'user_id') {
             const formKey = key as keyof MaternalDemographicsInputsType;
@@ -81,10 +80,6 @@ export default function MaternalDemographics() {
     };
     fetchUserData();
   }, []);
-=======
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
->>>>>>> main:src/components/Forms/MaternalDemographics.tsx
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
     const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));

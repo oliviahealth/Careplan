@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const HouseholdMember = z.object({
     person: z.string().min(1, "Household member required"),
@@ -24,21 +24,15 @@ const SupportSystem = z.object({
     relation: z.string().min(1, "Relation required")
 });
 
-const Goals = z.object({
-    goal: z.string().min(1, "Goal required")
-})
-
-const Strengths = z.object({
-    strength: z.string().min(1, "Strength required")
-})
+const Goals = z.string().min(1, "Goal required")
 
 const FamilyAndSupportsInputs = z.object({
     people_living_in_home: z.array(HouseholdMember),
     clients_children_not_living_in_home: z.array(Child),
     notes: z.string().min(1, "Notes required"),
     current_support_system: z.array(SupportSystem),
-    strength_of_client_and_support_system: z.array(Strengths),
-    goals: z.array(Goals).min(1, "Goals required"),
+    strength_of_client_and_support_system: z.string().min(1, "Strengths required"),
+    goals: z.array(Goals)
 });
 type FamilyAndSupportsInputs = z.infer<typeof FamilyAndSupportsInputs>
 
@@ -48,6 +42,22 @@ const FamilyAndSupportsResponse = FamilyAndSupportsInputs.extend({
 })
 
 export default function FamilyAndSupports() {
+
+    const [goals, setGoals] = useState<string[]>([""]);
+
+    const addGoal = () => {
+        setGoals((prevGoals: any) => [...prevGoals, ""]);
+    };
+
+    const removeGoal = (index: number) => {
+        setGoals((prevGoals: any) => prevGoals.filter((_: any, i: any) => i !== index));
+    };
+
+    const handleGoalChange = (index: number, value: string) => {
+        setGoals((prevGoals: any) =>
+            prevGoals.map((goal: any, i: any) => (i === index ? value : goal))
+        );
+    };
 
     const navigate = useNavigate();
 
@@ -65,17 +75,12 @@ export default function FamilyAndSupports() {
                 caregiver: '',
                 caregiver_number: '',
             }],
-            goals: [{
-                goal: '',
-            }],
+            goals: [],
             current_support_system: [{
                 name: '',
                 relation: '',
             }],
             notes: '',
-            strength_of_client_and_support_system: [{
-                strength: ''
-            }]
         },
     });
 
@@ -89,26 +94,16 @@ export default function FamilyAndSupports() {
         name: 'clients_children_not_living_in_home'
     });
 
-    const { fields: goalsFields, append: appendGoal, remove: removeGoal } = useFieldArray({
-        control,
-        name: 'goals'
-    });
-
     const { fields: supportFields, append: appendSupport, remove: removeSupport } = useFieldArray({
         control,
         name: 'current_support_system'
     });
 
-    const { fields: strengthFields, append: appendStrength, remove: removeStrength } = useFieldArray({
-        control,
-        name: 'strength_of_client_and_support_system'
-    })
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/api/get_family_and_supports/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
+                const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof FamilyAndSupportsInputs;
@@ -123,6 +118,8 @@ export default function FamilyAndSupports() {
     }, []);
 
     const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
+
+        // const goalsArray = data.goals.map(goal => goal.goal);
 
         const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_family_and_supports', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
         FamilyAndSupportsResponse.parse(responseData);
@@ -200,7 +197,7 @@ export default function FamilyAndSupports() {
                 </div>
 
                 <p className="font-medium text-xl">Notes</p>
-                <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
 
                 <p className="font-medium text-xl">Current Support System</p>
@@ -223,31 +220,30 @@ export default function FamilyAndSupports() {
                 </div>
 
                 <p className="font-medium text-xl">Strengths of Client and Support System</p>
-                {strengthFields.map((field, index) => (
-                    <div key={field.id} className="space-y-6 py-6">
-                        <p className="font-medium">Strength</p>
-                        <input {...register(`strength_of_client_and_support_system.${index}.strength`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.strength_of_client_and_support_system && errors.strength_of_client_and_support_system[index]?.strength && (
-                            <span className="label-text-alt text-red-500">{errors.strength_of_client_and_support_system[index]?.strength?.message}</span>)}
-                    </div>))}
-                <div className="flex justify-center">
-                    <button type="button" onClick={() => appendStrength({ strength: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Strength</button>
-                    <button type="button" onClick={() => removeStrength(strengthFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Strength</button>
-                </div>
+                <textarea {...register("strength_of_client_and_support_system")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.strength_of_client_and_support_system && <span className="label-text-alt text-red-500">{errors.strength_of_client_and_support_system.message}</span>}
 
                 <p className="font-medium text-xl">Goals (Parenting, Breastfeeding, Recovery, Etc.)</p>
 
-                {goalsFields.map((field, index) => (
-                    <div key={field.id} className="space-y-6 py-6">
+                {goals.map((goal: any, index: any) => (
+                    <div key={index} className="space-y-6 py-6">
                         <p className="font-medium">Goal</p>
-                        <input {...register(`goals.${index}.goal`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.goals && errors.goals[index]?.goal && (
-                            <span className="label-text-alt text-red-500">{errors.goals[index]?.goal?.message}</span>)}
-                    </div>))}
+                        <input
+                            type="text"
+                            value={goal}
+                            onChange={(e) => handleGoalChange(index, e.target.value)}
+                            className="border border-gray-300 px-4 py-2 rounded-md w-full"
+                        />
+                    </div>
 
+                ))}
                 <div className="flex justify-center pb-6">
-                    <button type="button" onClick={() => appendGoal({ goal: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Goal</button>
-                    <button type="button" onClick={() => removeGoal(goalsFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Goal</button>
+                    <button type="button" onClick={addGoal} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">
+                        + Add Goal
+                    </button>
+                    <button type="button" onClick={() => removeGoal(goals.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">
+                        - Remove Goal
+                    </button>
                 </div>
 
                 <div className="flex justify-center py-6">

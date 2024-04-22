@@ -71,7 +71,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         >
           {submissions.map((submission: any) => (
             <option key={submission.id} value={submission.id}>
-              Submission {submission.timestamp}
+              Submission {new Date(submission.timestamp).toLocaleString("en-US", {timeZone: "America/Chicago"})} CST
             </option>
           ))}
         </select>
@@ -143,13 +143,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       prior_complications: "Complications During Prior Pregnancies",
       med_problems_diagnoses: "Medical Problems Requiring Ongoing Care",
       current_medication_list: "Current Medication List",
-      notes: "Notes",
-      obgyn: "OB/GYN or Primary Care Provider"
+      notes: "Notes"
     },
     psychiatricHistory: {
       diagnoses: "Diagnoses",
-      notes: "Notes",
-      obgyn: "OB/GYN"
+      notes: "Notes"
     },
     medicalServicesForSubstanceUse: {
       mat_engaged: "Medication Assisted Treatment (MAT) Engaged",
@@ -160,8 +158,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       used_addiction_medicine_services: "Addiction Medicine Services",
       date_used_medicine_service: "Date of Last Medicine Service",
       addiction_medicine_clinic: "Addiction Medicine Clinic",
-      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information",
-      mat_provider: "MAT Provider"
+      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information"
     },
     substanceUseHistory: {
       alcohol: "Alcohol",
@@ -174,12 +171,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       tobacco: "Tobacco",
       other1: "Other",
       other2: "Other",
-      notes: "Notes",
-      treatment_case_manager: "Treatment Case Manager"
+      notes: "Notes"
     },
     drugScreeningResults: {
-      tests: "Tests",
-      provider_ordering_UDS: "Provider Ordering UDS"
+      tests: "Tests"
     },
     familyAndSupports: {
       people_living_in_home: "List of People Living in the Home",
@@ -187,8 +182,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       notes: "Notes",
       current_support_system: "Current Support System",
       strength_of_client_and_support_system: "Strengths of Client and Support System",
-      goals: "Goals",
-      recovery_coach: "Recovery Coach"
+      goals: "Goals"
     },
     infantInformation: {
       child_name: "Child's Name",
@@ -275,8 +269,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       three_people_to_talk_to: "Three people to talk to",
       safe_caregivers: "Safe Caregivers",
       have_naloxone: "Have Naloxone",
-      comments: "Comments",
-      recovery_coach: "Social Worker or Recovery Coach"
+      comments: "Comments"
     }
   }
 
@@ -391,24 +384,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     })
   }
 
-  const FamilyAndSupportsStrengthSupportSystem = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Strength: {x.strength}</div>
-        </div>
-      )
-    })
-  }
-
-  const FamilyAndSupportsGoals = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Goal: {x.goal}</div>
-        </div>
-      )
-    })
+  const FamilyAndSupportsGoals = (data: string[]) => {
+    return (
+      <div>
+        {data.map((goal, index) => (
+          <span key={index}>
+            {goal}{index !== data.length - 1 ? ", " : ""}
+          </span>
+        ))}
+      </div>
+    );
   }
 
   const InfantInformationInfantCareNeeds = (data: any) => {
@@ -521,7 +506,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
                 ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
                   MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-                ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
+                ) : fieldNames.substanceUseHistory[key] && key !== 'notes' ? (
                   SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
                 ) : fieldNames.drugScreeningResults[key] && key === 'tests' ? (
                   DrugScreeningResultsTests((formData as any)?.[key] || [])
@@ -531,15 +516,13 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
                 ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' ? (
                   FamilyAndSupportsCurrentSupportSystem((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'strength_of_client_and_support_system' ? (
-                  FamilyAndSupportsStrengthSupportSystem((formData as any)?.[key] || [])
                 ) : fieldNames.familyAndSupports[key] && key === 'goals' ? (
                   FamilyAndSupportsGoals((formData as any)?.[key] || [])
                 ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
                   InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
                 ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
                   InfantInformationMedications((formData as any)?.[key] || [])
-                ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
+                ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' ? (
                   FamilyAndSupportsServices((formData as any)?.[key] || [])
                 ) : fieldNames.relapsePreventionPlan[key] && key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
                   RelapsePreventionPlanArrays((formData as any)?.[key] || [])

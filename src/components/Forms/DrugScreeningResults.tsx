@@ -72,7 +72,7 @@ export default function DrugScreeningResults() {
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/api/get_drug_screening_results/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
+                const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof DrugScreeningResultsInputs;
