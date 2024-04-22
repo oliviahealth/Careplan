@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
-import { states } from "../utils";
+import { states } from "../../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
@@ -60,6 +60,7 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 
 export default function MaternalDemographics() {
   const navigate = useNavigate();
+<<<<<<< HEAD:src/components/MaternalDemographics.tsx
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
@@ -80,6 +81,10 @@ export default function MaternalDemographics() {
     };
     fetchUserData();
   }, []);
+=======
+  
+  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
+>>>>>>> main:src/components/Forms/MaternalDemographics.tsx
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
     const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
