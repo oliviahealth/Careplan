@@ -14,7 +14,7 @@ import MaternalDemographics from './components/Forms/MaternalDemographics.tsx';
 import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
 import PsychiatricHistory from './components/PsychiatricHistory.tsx';
 import ServicesSubstanceUse from './components/ServicesSubstanceUse.tsx';
-import SubstanceUseHistory from './components/SubstanceUseHistory.tsx';
+import DrugScreeningResults from './components/DrugScreeningResults.tsx';
 
 const queryClient = new QueryClient();
 
@@ -29,8 +29,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/maternal-demographics' element={<MaternalDemographics />} />
             <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
             <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
-            <Route path='/substance-use-history' element={<SubstanceUseHistory />} />
-            <Route path='/medical-services-for-substance-use' element={<ServicesSubstanceUse />} />
+            <Route path='/services-substance-use' element={<ServicesSubstanceUse />} />
+            <Route path='/drug-screening-results' element ={<DrugScreeningResults />} />
           </Route>
         </Routes>
       </BrowserRouter>
