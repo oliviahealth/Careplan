@@ -11,9 +11,8 @@ import LandingPage from './components/LandingPage.tsx'
 import Dashboard from './components/Dashboard/Dashboard.tsx'
 
 import MaternalDemographics from './components/Forms/MaternalDemographics.tsx';
-import MaternalMedicalHistory from './components/Forms/MaternalMedicalHistory.tsx';
-import MaternalPsychiatricHistory from './components/Forms/MaternalPsychiatricHistory.tsx';
-import BackPage from './components/BackPage.tsx';
+import MaternalMedicalHistory from './components/MaternalMedicalHistory.tsx';
+import PsychiatricHistory from './components/PsychiatricHistory.tsx';
 
 const queryClient = new QueryClient();
 
@@ -25,9 +24,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route element={<Layout />}>
             <Route path='/' element={<LandingPage />} />
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/maternal-demographics' element={<BackPage><MaternalDemographics /></BackPage>} />
-            <Route path='/maternal-medical-history' element={<BackPage><MaternalMedicalHistory /></BackPage>} />
-            <Route path='/maternal-psychiatric-history' element={<BackPage><MaternalPsychiatricHistory /></BackPage>} />
+            <Route path='/maternal-demographics' element={<MaternalDemographics />} />
+            <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
+            <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
           </Route>
         </Routes>
       </BrowserRouter>

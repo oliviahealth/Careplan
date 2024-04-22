@@ -59,7 +59,7 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 
 export default function MaternalDemographics() {
   const navigate = useNavigate();
-
+  
   const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
