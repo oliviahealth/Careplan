@@ -4,6 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const diagnosesSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
@@ -25,6 +26,8 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
+    const navigate = useNavigate();
+    
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
@@ -79,8 +82,10 @@ export default function PsychiatricHistory() {
         return responseData;
     }, {
         onSuccess: (responseData) => {
-            alert("Psychiatric History added successfully!")
+            alert("Psychiatric history added successfully");
             console.log("PsychiatricHistory data added successfully", responseData);
+
+            navigate('/dashboard');
         },
         onError: () => {
             alert("Error while adding PsychiatricHistory data.");
@@ -150,7 +155,6 @@ export default function PsychiatricHistory() {
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>
                 </div>
-
             </form>
         </div>
     )

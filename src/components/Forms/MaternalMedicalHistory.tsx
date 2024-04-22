@@ -1,0 +1,223 @@
+import { useForm, SubmitHandler, useFieldArray } from "react-hook-form"
+import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../../utils/interfaces.tsx';
+import { useMutation } from 'react-query'
+import { useNavigate } from "react-router-dom"
+import axios from 'axios'
+import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const CurrentMedicationList = z.object({
+    name: z.string().min(1, 'Name is required'),
+    dose: z.string().min(1, 'Dose is required'),
+    prescriber: z.string().min(1, 'Prescriber is required'),
+    notes: z.string().min(1, 'Notes is required')
+});
+
+const deliveryModesEnum = z.enum([
+    "Vaginal",
+    "Cesarean"
+]);
+const deliveryModes = Object.values(deliveryModesEnum.Values);
+
+const MaternalMedicalHistoryInputs = z.object({
+    gestational_age: z.string().min(1, 'Gestational age is required'),
+    anticipated_delivery_date: z.string().min(1, 'Anticipated delivery date is required'),
+    planned_mode_delivery: deliveryModesEnum,
+    actual_mode_delivery: deliveryModesEnum,
+    attended_postpartum_visit: z.string(),
+    postpartum_visit_location: z.string().min(1, 'Postpartum visit location is required'),
+    postpartum_visit_date: z.string().min(1, 'Postpartum visit date is required'),
+    total_num_pregnancies: z.string().min(1, 'Total number of pregnancies is required'),
+    total_num_live_births: z.string().min(1, 'Total number of live births is required'),
+    total_num_children_with_mother: z.string().min(1, 'Total number of children with mother is required'),
+    prior_complications: z.string().min(1, 'Prior complications is required'),
+    current_medication_list: z.array(CurrentMedicationList),
+    med_problems_diagnoses: z.string().min(1, 'required'),
+    notes: z.string().min(1, 'Notes is required'),
+    obgyn: z.string().min(1, 'Obgyn is required')
+});
+type MaternalMedicalHistoryInputsType = z.infer<typeof MaternalMedicalHistoryInputs>;
+
+const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
+    id: z.string(),
+    user_id: z.string()
+});
+
+export default function MaternalMedicalHistory() {
+    const navigate = useNavigate();
+
+    const { register, control, handleSubmit, formState: { errors } } = useForm<MaternalMedicalHistoryInputsType>({
+        resolver: zodResolver(MaternalMedicalHistoryInputs),
+        defaultValues: {
+            current_medication_list: [],
+        }
+    });
+
+    const { fields, append, remove } = useFieldArray({ control, name: 'current_medication_list' })
+
+    // Adds a new blank medication object to current_medication_list which also creates a new UI component
+    const addNewMedication = () => {
+        append({
+            name: '',
+            dose: '',
+            prescriber: '',
+            notes: ''
+        })
+    };
+
+    const removeLastMedication = () => {
+        remove(fields.length - 1);
+    };
+
+    const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputsType) => {
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "4653d517-dd6b-4d71-a152-2059cdc61177" }));
+
+        MaternalMedicalHistoryResponse.parse(responseData);
+
+        return responseData;
+    }, {
+        onSuccess: (responseData) => {
+            alert("Maternal medical history added successfully!");
+            console.log("MaternalMedicalHistory data added successfully.", responseData);
+
+            navigate('/dashboard');
+        },
+        onError: () => {
+            alert("Error while adding MaternalMedicalHistory data.");
+        }
+    });
+
+    return (
+        <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
+            <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <p className="font-medium text-xl whitespace-nowrap">Prenatal Care (for current or most recent pregnancy)</p>
+                <div className="space-y-7">
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Gestation Age at Entry of Care</p>
+                        <select {...register("gestational_age")} className="border border-gray-300 px-4 py-2 rounded-md w-full">
+                            {[...Array(100).keys()].map(age => (<option key={age} value={age}>{age}</option>))}
+                        </select>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-medium">Anticipated Delivery Date</p>
+                        <input {...register("anticipated_delivery_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                    </div>
+                </div>
+
+                <p className="font-medium">Planned Mode of Delivery</p>
+                <div className="flex flex-col space-y-2">
+                    {deliveryModes.map((status) => (
+                        <label key={status} className="inline-flex items-center">
+                            <input {...register("planned_mode_delivery")} type="radio" value={status} className="form-radio" />
+                            <span className="ml-2">{status}</span>
+                        </label>))}
+                    {errors.planned_mode_delivery && <span className="label-text-alt text-red-500">{errors.planned_mode_delivery.message}</span>}
+                </div>
+
+                <p className="font-medium">Actual Mode of Delivery</p>
+                <div className="flex flex-col space-y-2">
+                    {deliveryModes.map((status) => (
+                        <label key={status} className="inline-flex items-center">
+                            <input {...register("actual_mode_delivery")} type="radio" value={status} className="form-radio" />
+                            <span className="ml-2">{status}</span>
+                        </label>))}
+                    {errors.actual_mode_delivery && <span className="label-text-alt text-red-500">{errors.actual_mode_delivery.message}</span>}
+                </div>
+
+                <p className="font-medium">Attended Postpartum Visit</p>
+                <div className="flex flex-col space-y-2">
+                    <label className="inline-flex items-center">
+                        <input {...register("attended_postpartum_visit", { required: true })} type="radio" value="true" className="form-radio" />
+                        <span className="ml-2">Yes</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                        <input {...register("attended_postpartum_visit")} type="radio" value='' className="form-radio" />
+                        <span className="ml-2">No</span>
+                    </label>
+                    {errors.attended_postpartum_visit && <span className="label-text-alt text-red-500">{errors.attended_postpartum_visit.message}</span>}
+                </div>
+
+                <p className="font-medium">Postpartum Visit Location</p>
+                <input {...register("postpartum_visit_location")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.postpartum_visit_location && <span className="label-text-alt text-red-500">{errors.postpartum_visit_location.message}</span>}
+
+                <p className="font-medium">Date Completed</p>
+                <input {...register("postpartum_visit_date")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                {errors.postpartum_visit_date && <span className="label-text-alt text-red-500">{errors.postpartum_visit_date.message}</span>}
+
+                <p className="font-medium text-xl">Obstetric History</p>
+
+                <p className="font-medium">Total Number of Pregnancies</p>
+                <select {...register("total_num_pregnancies")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+                    {Array.from({ length: 6 }, (_, i) => (<option key={i} value={i}>{i}</option>))}
+                </select>
+                {errors.total_num_pregnancies && <span className="label-text-alt text-red-500">{errors.total_num_pregnancies.message}</span>}
+
+                <p className="font-medium">Number of Live Births</p>
+                <select {...register("total_num_live_births")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+                    {Array.from({ length: 6 }, (_, i) => (<option key={i} value={i}>{i}</option>))}
+                </select>
+                {errors.total_num_live_births && <span className="label-text-alt text-red-500">{errors.total_num_live_births.message}</span>}
+
+                <p className="font-medium">Number of Children Living with Mother</p>
+                <select {...register("total_num_children_with_mother")} className="dropdown border rounded-md border-gray-300 p-3 font-medium">
+                    {Array.from({ length: 6 }, (_, i) => (<option key={i} value={i}>{i}</option>))}
+                </select>
+                {errors.total_num_children_with_mother && <span className="label-text-alt text-red-500">{errors.total_num_children_with_mother.message}</span>}
+
+                <p className="font-medium">Please Explain Complications During Prior Pregnancies</p>
+                <textarea {...register("prior_complications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.prior_complications && <span className="label-text-alt text-red-500">{errors.prior_complications.message}</span>}
+
+                <p className="font-medium text-xl pt-6">Medical Problems Requiring Ongoing Care</p>
+
+                <p className="font-medium">Diagnoses</p>
+                <textarea {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.med_problems_diagnoses && <span className="label-text-alt text-red-500">{errors.med_problems_diagnoses.message}</span>}
+
+                <p className="font-medium text-xl">Current Medication List</p>
+                {fields.map((field, index) => (
+                    <div key={field.id} className="py-4">
+                        <p className="font-medium pt-6">Medication {index + 1}</p>
+                        <input {...register(`current_medication_list.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.current_medication_list && errors.current_medication_list[index]?.name && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.name?.message}</span>
+                        )}
+
+                        <p className="font-medium pt-6">Dose</p>
+                        <input {...register(`current_medication_list.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.current_medication_list && errors.current_medication_list[index]?.dose && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.dose?.message}</span>
+                        )}
+                        <p className="font-medium pt-6">Prescriber</p>
+                        <input {...register(`current_medication_list.${index}.prescriber`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.current_medication_list && errors.current_medication_list[index]?.prescriber && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.prescriber?.message}</span>
+                        )}
+
+                        <p className="font-medium pt-6">Medication Notes</p>
+                        <input {...register(`current_medication_list.${index}.notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.current_medication_list && errors.current_medication_list[index]?.notes && (
+                            <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.notes?.message}</span>
+                        )}                    </div>))}
+
+                <div className="flex justify-center">
+                    <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
+                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
+                </div>
+
+                <p className="font-medium">Other Notes</p>
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
+
+                <p className="font-medium">OB/GYN or Primary Provider Name</p>
+                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
+
+                <div className="flex justify-center">
+                    <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
+                </div>
+            </form>
+        </div>
+    )
+}
