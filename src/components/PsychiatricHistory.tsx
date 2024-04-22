@@ -15,7 +15,7 @@ const diagnosesSchema = z.object({
 
 export const PsychiatricHistoryInputsSchema = z.object({
     diagnoses: z.array(diagnosesSchema),
-    notes: z.string().min(1, "Notes is required"),
+    notes: z.string().default(""),
 });
 export type PsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
 
@@ -42,12 +42,6 @@ export default function PsychiatricHistory() {
         control,
         name: 'diagnoses'
     })
-
-    const removeLastDiagnoses = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
-    }
 
     const addNewDiagnoses = () => {
         append({
@@ -140,17 +134,18 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
                         )}
 
+                        <div className='flex justify-end'>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
+                        </div>
                     </div>
                 ))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>
-                    <button type="button" onClick={removeLastDiagnoses} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
                 </div>
 
                 <p className="font-medium">Notes</p>
-                <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
 
                 <div className="flex justify-center pt-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>

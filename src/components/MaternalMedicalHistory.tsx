@@ -1,5 +1,4 @@
 import { useForm, useFieldArray } from "react-hook-form"
-// import { MaternalMedicalHistorySchema, MaternalMedicalHistorySchemaType } from '../utils/interfaces.tsx';
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { z } from 'zod'
@@ -22,11 +21,10 @@ const MaternalMedicalHistoryInputs = z.object({
     total_num_pregnancies: z.string().min(1, 'Total number of pregnancies is required'),
     total_num_live_births: z.string().min(1, 'Total number of live births is required'),
     total_num_children_with_mother: z.string().min(1, 'Total number of children with mother is required'),
-    prior_complications: z.string().min(1, 'Prior complications is required'),
+    prior_complications: z.string().default(""),
     current_medication_list: z.array(CurrentMedicationList),
-    med_problems_diagnoses: z.string().min(1, 'required'),
-    notes: z.string().min(1, 'Notes is required'),
-    obgyn: z.string().min(1, 'Obgyn is required')
+    med_problems_diagnoses: z.string().default(""),
+    notes: z.string().default(""),
 });
 type MaternalMedicalHistoryInputsType = z.infer<typeof MaternalMedicalHistoryInputs>;
 
@@ -52,12 +50,6 @@ export default function MaternalMedicalHistory() {
         control,
         name: 'current_medication_list'
     })
-
-    const removeLastMedication = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
-    };
 
     const addNewMedication = () => {
         append({
@@ -161,13 +153,13 @@ export default function MaternalMedicalHistory() {
                 {errors.total_num_children_with_mother && <span className="label-text-alt text-red-500">{errors.total_num_children_with_mother.message}</span>}
 
                 <p className="font-medium">Please Explain Complications During Prior Pregnancies</p>
-                <input {...register("prior_complications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("prior_complications")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.prior_complications && <span className="label-text-alt text-red-500">{errors.prior_complications.message}</span>}
 
                 <p className="font-medium text-xl pt-6">Medical Problems Requiring Ongoing Care</p>
 
                 <p className="font-medium">Diagnoses</p>
-                <input {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.med_problems_diagnoses && <span className="label-text-alt text-red-500">{errors.med_problems_diagnoses.message}</span>}
 
                 <p className="font-medium text-xl">Current Medication List</p>
@@ -194,20 +186,20 @@ export default function MaternalMedicalHistory() {
                         <input {...register(`current_medication_list.${index}.notes`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.current_medication_list && errors.current_medication_list[index]?.notes && (
                             <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.notes?.message}</span>
-                        )}                    </div>))}
+                        )}
+                        
+                        <div className="flex justify-end">
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6  rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
+                        </div>
+                    </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
-                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
                 </div>
 
                 <p className="font-medium">Other Notes</p>
-                <input {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
-
-                <p className="font-medium">OB/GYN or Primary Provider Name</p>
-                <input {...register("obgyn")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.obgyn && <span className="label-text-alt text-red-500">{errors.obgyn.message}</span>}
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
