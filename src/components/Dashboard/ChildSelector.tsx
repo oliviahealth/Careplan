@@ -14,8 +14,8 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
       <div className="flex flex-col gap-1 text-sm">
         <div className="font-semibold">First Name Last Name</div>
         <div className="flex flex-row">
-          <img className="w-4 mr-2" src={`./images/${actionsRequired ? "action" : "check"}.svg`} />
-          <div className={`${actionsRequired ? "text-red-500" : "text-gray-400"}`}>
+          <img className="w-3 mr-2" src={`./images/${actionsRequired ? "action" : "check"}.svg`} />
+          <div className={`text-xs ${actionsRequired ? "text-red-500" : "text-gray-400"}`}>
             {actionsRequired ? "Actions Required" : "No Actions Required"}
           </div>
         </div>

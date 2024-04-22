@@ -13,7 +13,13 @@ function Dashboard() {
     <div className="flex flex-row">
       <LeftSidebar />
       <div className="pl-10 pr-32 py-10 w-full">
-        <div className="text-3xl font-semibold">First Name Last Name</div>
+        <div className="flex flex-row justify-between items-center md:items-baseline">
+          <div className="flex text-3xl font-semibold">First Name Last Name</div>
+          <div className="flex pr-10">
+            <img className="w-6 hidden md:block" src="./images/meatballs.svg"></img>
+            <img className="h-8 md:hidden block" src="./images/kebab.svg"></img>
+          </div>
+        </div>
 
         <div className="mt-8 flex flex-col gap-2">
           <FormSelector name="Maternal Demographics" path="/maternal-demographics" apiUrl="maternal_demographics" userID={user_id}></FormSelector>

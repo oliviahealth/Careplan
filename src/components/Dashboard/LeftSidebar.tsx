@@ -10,7 +10,7 @@ function LeftSidebar() {
         </div>
             <div className="rounded-xl bg-gray-200 text-gray-400 flex flex-row items-center">
             <img className="w-3 mx-2" src="./images/search.svg"/>
-                Search for patients {/* TODO: needs to be a functional search component */}
+                Search for children {/* TODO: needs to be a functional search component */}
             </div>
         </div>
         <div className="flex flex-col gap-4 overflow-x-auto min-h-[calc(100vh-230px)] border-r-2 border-gray-200 p-5"> 
