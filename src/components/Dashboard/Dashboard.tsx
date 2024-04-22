@@ -15,7 +15,7 @@ function Dashboard() {
       <div className="pl-10 pr-32 py-10 w-full">
         <div className="flex flex-row justify-between items-center md:items-baseline">
           <div className="flex text-3xl font-semibold">First Name Last Name</div>
-          <div className="flex pr-10">
+          <div className="flex pr-6">
             <img className="w-6 hidden md:block" src="./images/meatballs.svg"></img>
             <img className="h-8 md:hidden block" src="./images/kebab.svg"></img>
           </div>
