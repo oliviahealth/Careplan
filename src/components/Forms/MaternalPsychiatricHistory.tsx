@@ -1,5 +1,5 @@
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-
+import { months } from "../../utils";
 
 type DiagnosesInputs = {
     diagnosis: string,
