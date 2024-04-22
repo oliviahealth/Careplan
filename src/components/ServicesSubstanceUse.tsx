@@ -64,12 +64,6 @@ export default function ServicesSubstanceUse() {
         })
     };
 
-    const removeLastMedication = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
-    };
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -148,12 +142,15 @@ export default function ServicesSubstanceUse() {
                         {errors.medications && errors.medications[index]?.dose && (
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
                         )}
+
+                        <div className="flex justify-end">
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
+                        </div>
                     </div>))}
 
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
-                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
                 </div>
 
                 <p className="font-medium">MAT Clinic</p>
