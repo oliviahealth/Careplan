@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Chevron from "../Chevron";
 import Accordion from "../Accordion";
 
 interface FormSelectorProps {
