@@ -9,12 +9,18 @@ function Dashboard() {
   const user_id = user ? user.id : "";
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-col md:flex-row md:px-0 px-10">
       <LeftSidebar />
-      <div className="pl-10 pr-32 py-10 w-full">
-        <div className="text-3xl font-semibold">First Name Last Name</div>
+      <div className="md:pl-10 md:pr-32 py-5 md:py-10 w-full">
+        <div className="flex flex-row justify-between items-center md:items-baseline">
+          <div className="flex text-2xl md:text-3xl font-semibold">First Name Last Name</div>
+          <div className="flex pr-3 md:pr-6">
+            <img className="w-6 hidden md:block" src="./images/meatballs.svg"></img>
+            <img className="h-6 md:hidden block" src="./images/kebab.svg"></img>
+          </div>
+        </div>
 
-        <div className="mt-8 flex flex-col gap-2">
+        <div className="mt-5 md:mt-10 flex flex-col gap-2">
           <FormSelector name="Maternal Demographics" path="/maternal-demographics" apiUrl="maternal_demographics" userID={user_id}></FormSelector>
           <FormSelector name="Maternal Medical History" path="/maternal-medical-history" apiUrl="maternal_medical_history" userID={user_id}></FormSelector>
           <FormSelector name="Psychiatric History" path="/psychiatric-history" apiUrl="psychiatric_history" userID={user_id}></FormSelector>
