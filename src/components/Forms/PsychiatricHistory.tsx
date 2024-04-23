@@ -5,6 +5,7 @@ import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAppStore from '../../store/useAppStore';
 
 const diagnosesSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
@@ -26,6 +27,10 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+
     const navigate = useNavigate();
     
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
@@ -59,7 +64,7 @@ export default function PsychiatricHistory() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_psychiatric_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_psychiatric_history/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
@@ -75,7 +80,7 @@ export default function PsychiatricHistory() {
     }, []);
 
     const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: user_id }));
 
         PsychiatricHistoryResponseSchema.parse(responseData);
 

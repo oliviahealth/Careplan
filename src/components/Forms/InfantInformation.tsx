@@ -5,6 +5,7 @@ import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
+import useAppStore from "../../store/useAppStore";
 
 const InfantCareNeeds = z.object({
     breast_pump: z.string().min(1, 'Breast pump information required'),
@@ -80,6 +81,9 @@ const InfantInformationResponse = InfantInformationInputs.extend({
 
 export default function InfantInformation() {
 
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+
     const [showNICUStay, setShowNICUStay] = useState(false);
     const handleShowNICUStay = (value: string) => {
         setShowNICUStay(value === 'Yes');
@@ -139,7 +143,7 @@ export default function InfantInformation() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_infant_information/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
@@ -159,7 +163,7 @@ export default function InfantInformation() {
     }, []);
 
     const { mutate } = useMutation(async (data: InfantInformationInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: user_id }));
 
         InfantInformationResponse.parse(responseData);
 

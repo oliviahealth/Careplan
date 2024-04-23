@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import useAppStore from "../../store/useAppStore";
 
 const DrugInfo = z.object({
     ever_used: z.string().min(1, 'Field required'),
@@ -42,6 +43,9 @@ const SubstanceUseHistoryReponse = SubstanceUseHistoryInputs.extend({
 });
 
 export default function SubstanceUseHistory() {
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
 
     const navigate = useNavigate();
 
@@ -84,7 +88,7 @@ export default function SubstanceUseHistory() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_substance_use_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_substance_use_history/${user_id}`)
                 const userData = response.data[response.data.length - 1];;
 
                 Object.keys(userData).forEach(key => {
@@ -109,7 +113,7 @@ export default function SubstanceUseHistory() {
 
     const { mutate } = useMutation(async (data: SubstanceUseHistoryInputs) => {
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: user_id }));
         SubstanceUseHistoryReponse.parse(responseData);
         return responseData;
     }, {

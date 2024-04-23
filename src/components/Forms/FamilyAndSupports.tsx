@@ -5,6 +5,7 @@ import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react"
+import useAppStore from '../../store/useAppStore.ts';
 
 const HouseholdMember = z.object({
     person: z.string().min(1, "Household member required"),
@@ -42,6 +43,9 @@ const FamilyAndSupportsResponse = FamilyAndSupportsInputs.extend({
 })
 
 export default function FamilyAndSupports() {
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
 
     const [goals, setGoals] = useState<string[]>([""]);
 
@@ -102,12 +106,18 @@ export default function FamilyAndSupports() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_family_and_supports/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_family_and_supports/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof FamilyAndSupportsInputs;
-                        setValue(formKey, userData[key]);
+                        if (formKey === 'goals') {
+                            if (Array.isArray(userData[key]) && typeof userData[key][0] === 'string') {
+                                setGoals(userData[key]);
+                            }
+                        } else {
+                            setValue(formKey, userData[key]);
+                        }
                     }
                 });
             } catch (error) {
@@ -119,9 +129,7 @@ export default function FamilyAndSupports() {
 
     const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
 
-        // const goalsArray = data.goals.map(goal => goal.goal);
-
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_family_and_supports', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_family_and_supports', { ...data, user_id: user_id }));
         FamilyAndSupportsResponse.parse(responseData);
         return responseData;
     }, {

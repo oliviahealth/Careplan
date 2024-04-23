@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from "react";
+import useAppStore from "../../store/useAppStore";
 
 const Medications = z.object({
     medication: z.string().min(1, 'Medication required'),
@@ -31,6 +32,9 @@ const MedicalServicesSubstanceUseResponse = MedicalServicesSubstanceUseInputs.ex
 });
 
 export default function MedicalServicesForSubstanceUse() {
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
 
     const navigate = useNavigate();
 
@@ -73,7 +77,7 @@ export default function MedicalServicesForSubstanceUse() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_medical_services_for_substance_use/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
@@ -94,7 +98,7 @@ export default function MedicalServicesForSubstanceUse() {
 
     const { mutate } = useMutation(async (data: MedicalServicesSubstanceUseInputs) => {
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user_id }));
 
         MedicalServicesSubstanceUseResponse.parse(responseData);
 

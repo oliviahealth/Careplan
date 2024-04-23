@@ -7,7 +7,6 @@ function Dashboard() {
 
   const { user } = useAppStore();
   const user_id = user ? user.id : "";
-  console.log(user_id)
 
   return (
     <div className="flex flex-row">

@@ -4,6 +4,8 @@ import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react"
+import { useNavigate } from "react-router-dom";
+import useAppStore from "../../store/useAppStore";
 
 const CurrentMedicationList = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -49,6 +51,11 @@ const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
 
 export default function MaternalMedicalHistory() {
 
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+    console.log(user_id)
+
+    const navigate = useNavigate();
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MaternalMedicalHistoryInputs>({
         resolver: zodResolver(MaternalMedicalHistoryInputs),
@@ -77,7 +84,7 @@ export default function MaternalMedicalHistory() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_medical_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
@@ -93,14 +100,16 @@ export default function MaternalMedicalHistory() {
     }, []);
 
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: user_id }));
 
         MaternalMedicalHistoryResponse.parse(responseData);
 
         return responseData;
     }, {
         onSuccess: (responseData) => {
+            alert("Maternal Medical History data added successfully!");
             console.log("MaternalMedicalHistory data added successfully.", responseData);
+            navigate('/dashboard')
         },
         onError: () => {
             alert("Error while adding MaternalMedicalHistory data.");

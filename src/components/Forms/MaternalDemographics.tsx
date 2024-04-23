@@ -6,7 +6,7 @@ import { states } from "../../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
-
+import useAppStore from '../../store/useAppStore';
 
 const livingArrangementsEnum = z.enum([
   "Rent/Own a Home",
@@ -59,6 +59,10 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 });
 
 export default function MaternalDemographics() {
+
+  const { user } = useAppStore();
+  const user_id = user ? user.id : "";
+
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
@@ -66,7 +70,7 @@ export default function MaternalDemographics() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_demographics/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+        const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_demographics/${user_id}`)
         const userData = response.data[response.data.length - 1];
         Object.keys(userData).forEach(key => {
           if (key !== 'id' && key !== 'user_id') {
@@ -82,7 +86,7 @@ export default function MaternalDemographics() {
   }, []);
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: user_id }));
 
     MaternalDemographicsResponseSchema.parse(responseData);
 

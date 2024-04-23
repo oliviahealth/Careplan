@@ -5,6 +5,7 @@ import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react"
+import useAppStore from '../../store/useAppStore.ts';
 
 const DrugTest = z.object({
     test_ordered: z.string().min(1, 'Test name required'),
@@ -28,7 +29,11 @@ const DrugScreeningResultsResponse = DrugScreeningResultsInputs.extend({
 });
 
 export default function DrugScreeningResults() {
+
     const navigate = useNavigate();
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<DrugScreeningResultsInputs>({
         resolver: zodResolver(DrugScreeningResultsInputs),
@@ -71,7 +76,7 @@ export default function DrugScreeningResults() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_drug_screening_results/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
+                const response = await axios.get(`http://127.0.0.1:5000/api/get_drug_screening_results/${user_id}`)
                 const userData = response.data[response.data.length - 1];
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
@@ -87,7 +92,7 @@ export default function DrugScreeningResults() {
     }, []);
 
     const { mutate } = useMutation(async (data: DrugScreeningResultsInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_drug_screening_results', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_drug_screening_results', { ...data, user_id: user_id }));
 
         DrugScreeningResultsResponse.parse(responseData);
         console.log(responseData)
