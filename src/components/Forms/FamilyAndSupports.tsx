@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
 const HouseholdMember = z.object({
@@ -20,20 +20,13 @@ const Child = z.object({
     caregiver_number: z.string().min(1, "Caregiver number required"),
 });
 
-const SupportSystem = z.object({
-    name: z.string().min(1, "Support system name required"),
-    relation: z.string().min(1, "Relation required")
-});
-
-const Goals = z.string().min(1, "Goal required")
-
 const FamilyAndSupportsInputs = z.object({
     people_living_in_home: z.array(HouseholdMember),
     clients_children_not_living_in_home: z.array(Child),
-    notes: z.string().min(1, "Notes required"),
-    current_support_system: z.array(SupportSystem),
+    notes: z.string().nullable(),
+    current_support_system: z.string().min(1, "Current support system required"),
     strength_of_client_and_support_system: z.string().min(1, "Strengths required"),
-    goals: z.array(Goals)
+    goals: z.string().min(1, "Goal(s) required")
 });
 type FamilyAndSupportsInputs = z.infer<typeof FamilyAndSupportsInputs>
 
@@ -46,22 +39,6 @@ export default function FamilyAndSupports() {
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
-
-    const [goals, setGoals] = useState<string[]>([""]);
-
-    const addGoal = () => {
-        setGoals((prevGoals: any) => [...prevGoals, ""]);
-    };
-
-    const removeGoal = (index: number) => {
-        setGoals((prevGoals: any) => prevGoals.filter((_: any, i: any) => i !== index));
-    };
-
-    const handleGoalChange = (index: number, value: string) => {
-        setGoals((prevGoals: any) =>
-            prevGoals.map((goal: any, i: any) => (i === index ? value : goal))
-        );
-    };
 
     const navigate = useNavigate();
 
@@ -79,16 +56,13 @@ export default function FamilyAndSupports() {
                 caregiver: '',
                 caregiver_number: '',
             }],
-            goals: [],
-            current_support_system: [{
-                name: '',
-                relation: '',
-            }],
+            goals: '',
+            current_support_system: '',
             notes: '',
         },
     });
 
-    const { fields: householdMemberFields, append: appendHouseholdMember, remove: removeHouseholdMember } = useFieldArray({
+    const { fields: householdMemberFields, append: appendHouseholdMember, remove: removeMember } = useFieldArray({
         control,
         name: 'people_living_in_home'
     });
@@ -96,11 +70,6 @@ export default function FamilyAndSupports() {
     const { fields: childrenFields, append: appendChild, remove: removeChild } = useFieldArray({
         control,
         name: 'clients_children_not_living_in_home'
-    });
-
-    const { fields: supportFields, append: appendSupport, remove: removeSupport } = useFieldArray({
-        control,
-        name: 'current_support_system'
     });
 
     useEffect(() => {
@@ -111,13 +80,7 @@ export default function FamilyAndSupports() {
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof FamilyAndSupportsInputs;
-                        if (formKey === 'goals') {
-                            if (Array.isArray(userData[key]) && typeof userData[key][0] === 'string') {
-                                setGoals(userData[key]);
-                            }
-                        } else {
-                            setValue(formKey, userData[key]);
-                        }
+                        setValue(formKey, userData[key]);
                     }
                 });
             } catch (error) {
@@ -167,11 +130,15 @@ export default function FamilyAndSupports() {
                         <input {...register(`people_living_in_home.${index}.relation`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.people_living_in_home && errors.people_living_in_home[index]?.relation && (
                             <span className="label-text-alt text-red-500">{errors.people_living_in_home[index]?.relation?.message}</span>)}
+
+                        <div className="flex justify-end">
+                            <button type="button" onClick={() => removeMember(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Member</button>
+
+                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={() => appendHouseholdMember({ person: '', date_of_birth: '', relation: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Member</button>
-                    <button type="button" onClick={() => removeHouseholdMember(householdMemberFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Member</button>
                 </div>
 
                 <p className="font-medium text-xl">Client's Children NOT Living in the home</p>
@@ -197,11 +164,13 @@ export default function FamilyAndSupports() {
                         {errors.clients_children_not_living_in_home && errors.clients_children_not_living_in_home[index]?.caregiver_number && (
                             <span className="label-text-alt text-red-500">{errors.clients_children_not_living_in_home[index]?.caregiver_number?.message}</span>)}
 
+                        <div className="flex justify-end">
+                            <button type="button" onClick={() => removeChild(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Child</button>
+                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={() => appendChild({ name: '', date_of_birth: '', caregiver: '', caregiver_number: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Another Child</button>
-                    <button type="button" onClick={() => removeChild(childrenFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Child</button>
                 </div>
 
                 <p className="font-medium text-xl">Notes</p>
@@ -209,50 +178,16 @@ export default function FamilyAndSupports() {
                 {errors.notes && <span className="label-text-alt text-red-500">{errors.notes.message}</span>}
 
                 <p className="font-medium text-xl">Current Support System</p>
-
-                {supportFields.map((field, index) => (
-                    <div key={field.id} className="space-y-6 py-6">
-                        <p className="font-medium">Name</p>
-                        <input {...register(`current_support_system.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.current_support_system && errors.current_support_system[index]?.name && (
-                            <span className="label-text-alt text-red-500">{errors.current_support_system[index]?.name?.message}</span>)}
-
-                        <p className="font-medium">Relation</p>
-                        <input {...register(`current_support_system.${index}.relation`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.current_support_system && errors.current_support_system[index]?.relation && (
-                            <span className="label-text-alt text-red-500">{errors.current_support_system[index]?.relation?.message}</span>)}
-                    </div>))}
-                <div className="flex justify-center">
-                    <button type="button" onClick={() => appendSupport({ name: '', relation: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Support</button>
-                    <button type="button" onClick={() => removeSupport(supportFields.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Support</button>
-                </div>
+                <textarea {...register("current_support_system")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.current_support_system && <span className="label-text-alt text-red-500">{errors.current_support_system.message}</span>}
 
                 <p className="font-medium text-xl">Strengths of Client and Support System</p>
                 <textarea {...register("strength_of_client_and_support_system")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.strength_of_client_and_support_system && <span className="label-text-alt text-red-500">{errors.strength_of_client_and_support_system.message}</span>}
 
                 <p className="font-medium text-xl">Goals (Parenting, Breastfeeding, Recovery, Etc.)</p>
-
-                {goals.map((goal: any, index: any) => (
-                    <div key={index} className="space-y-6 py-6">
-                        <p className="font-medium">Goal</p>
-                        <input
-                            type="text"
-                            value={goal}
-                            onChange={(e) => handleGoalChange(index, e.target.value)}
-                            className="border border-gray-300 px-4 py-2 rounded-md w-full"
-                        />
-                    </div>
-
-                ))}
-                <div className="flex justify-center pb-6">
-                    <button type="button" onClick={addGoal} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">
-                        + Add Goal
-                    </button>
-                    <button type="button" onClick={() => removeGoal(goals.length - 1)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">
-                        - Remove Goal
-                    </button>
-                </div>
+                <textarea {...register("goals")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.goals && <span className="label-text-alt text-red-500">{errors.goals.message}</span>}
 
                 <div className="flex justify-center py-6">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md">Save</button>

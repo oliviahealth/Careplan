@@ -10,15 +10,15 @@ import useAppStore from "../../store/useAppStore";
 const DrugInfo = z.object({
     ever_used: z.string().min(1, 'Field required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
-    date_last_used: z.string(),
-    notes: z.string().min(1, 'Notes required')
+    date_last_used: z.string().nullable(),
+    notes: z.string().nullable()
 })
 
 const AdditionalDrugs = z.object({
     drug_used: z.string().min(1, 'Substance name required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
     date_last_used: z.string().min(1, 'Date required'),
-    notes: z.string().min(1, 'Notes required')
+    notes: z.string().nullable()
 });
 type AdditionalDrugs = z.infer<typeof AdditionalDrugs>
 
@@ -33,7 +33,7 @@ const SubstanceUseHistoryInputs = z.object({
     prescription_drugs: DrugInfo,
     tobacco: DrugInfo,
     other_drugs: z.array(AdditionalDrugs),
-    notes: z.string().min(1, 'Additional Notes Required')
+    notes: z.string().nullable()
 })
 export type SubstanceUseHistoryInputs = z.infer<typeof SubstanceUseHistoryInputs>
 
@@ -48,6 +48,10 @@ export default function SubstanceUseHistory() {
     const user_id = user ? user.id : "";
 
     const navigate = useNavigate();
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
 
     type DrugVisibilityState = {
         [key: string]: boolean;
@@ -64,11 +68,14 @@ export default function SubstanceUseHistory() {
         prescription_drugs: false,
         tobacco: false,
     });
-    const handleDrugDate = (drug: string, value: string) => {
+    const handleDrugDate = (drug: keyof DrugVisibilityState, value: string) => {
         setShowDrugDate(prevState => ({
             ...prevState,
             [drug]: value === 'Yes',
         }));
+        if (value === 'No') {
+            setValue(`${drug}.date_last_used` as keyof SubstanceUseHistoryInputs, null);
+        }
     };
 
 
@@ -94,7 +101,11 @@ export default function SubstanceUseHistory() {
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof SubstanceUseHistoryInputs;
-                        setValue(formKey, userData[key]);
+                        if (key === 'date_last_used') {
+                            setValue(formKey, formatDate(new Date(userData[key])));
+                        } else {
+                            setValue(formKey, userData[key]);
+                        }
 
                         setShowDrugDate(prevState => ({
                             ...prevState,

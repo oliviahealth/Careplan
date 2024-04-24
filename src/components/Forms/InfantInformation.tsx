@@ -9,26 +9,26 @@ import useAppStore from "../../store/useAppStore";
 
 const InfantCareNeeds = z.object({
     breast_pump: z.string().min(1, 'Breast pump information required'),
-    breast_pump_notes: z.string().min(1, 'Breast pump notes required'),
+    breast_pump_notes: z.string().nullable(),
     breastfeeding_support: z.string().min(1, 'Breastfeeding support information required'),
-    breastfeeding_support_notes: z.string().min(1, 'Breastfeeding support notes required'),
+    breastfeeding_support_notes: z.string().nullable(),
     car_seat: z.string().min(1, 'Car seat information required'),
-    car_seat_notes: z.string().min(1, 'Car seat notes required'),
+    car_seat_notes: z.string().nullable(),
     childcare: z.string().min(1, 'Childcare information required'),
-    childcare_notes: z.string().min(1, 'Childcare notes required'),
+    childcare_notes: z.string().nullable(),
     clothing: z.string().min(1, 'Clothing information required'),
-    clothing_notes: z.string().min(1, 'Clothing notes required'),
+    clothing_notes: z.string().nullable(),
     crib: z.string().min(1, 'Crib information required'),
-    crib_notes: z.string().min(1, 'Crib notes required'),
+    crib_notes: z.string().nullable(),
     diapers: z.string().min(1, 'Diapers information required'),
-    diapers_notes: z.string().min(1, 'Diapers notes required'),
+    diapers_notes: z.string().nullable(),
     infant_formula: z.string().min(1, 'Infant formula information required'),
-    infant_formula_notes: z.string().min(1, 'Infant formula notes required'),
+    infant_formula_notes: z.string().nullable(),
     infant_stroller: z.string().min(1, 'Infant stroller information required'),
-    infant_stroller_notes: z.string().min(1, 'Infant stroller notes required'),
-    other: z.string().min(1, 'Other information required'),
-    other_name: z.string().min(1, 'Other name required'),
-    other_notes: z.string().min(1, 'Other notes required')
+    infant_stroller_notes: z.string().nullable(),
+    other: z.string().nullable(),
+    other_name: z.string().nullable(),
+    other_notes: z.string().nullable()
 });
 
 const InfantMeds = z.object({
@@ -45,22 +45,22 @@ const InfantInformationInputs = z.object({
     birth_weight: z.string().min(1, 'Birth weight required'),
     gestational_age_at_birth: z.string().min(1, 'Gestional age at birth required'),
     NICU_stay: z.string().min(1, 'NICU stay information required'),
-    NICU_length_of_stay: z.string(),
+    NICU_length_of_stay: z.string().nullable(),
     pediatrician_name: z.string().min(1, 'Pediatrician name required'),
     pediatrician_contact_info: z.string().min(1, 'Pediatrician phone number required'),
     infant_urine_drug_screening_at_birth: z.string().min(1, 'Infant urine drug screening at birth info required'),
-    infant_urine_drug_screening_at_birth_specify: z.string().min(1, 'Infant urine drug screening at birth specification required'),
+    infant_urine_drug_screening_at_birth_specify: z.string().nullable(),
     meconium_results: z.string().min(1, 'Meconium results required'),
-    meconium_results_specify: z.string().min(1, 'Meconium results specification required'),
+    meconium_results_specify: z.string().nullable(),
     neonatal_opiod_withdraw: z.string().min(1, 'Neonatal opiod withdraw info required'),
-    neonatal_opiod_withdraw_treatment_method: z.string().min(1, 'Neonatal opiod withdraw treatment method required'),
+    neonatal_opiod_withdraw_treatment_method: z.string().nullable(),
     DX_problems_additional_information: z.string().min(1, 'DX Problems/Additional Information required'),
     infant_care_needs_items: z.array(InfantCareNeeds),
     where_will_baby_sleep: z.string().min(1, 'Baby sleeping information required'),
-    where_will_baby_sleep_specify: z.string().min(1, 'Baby sleeping specification required'),
-    infant_care_needs_additional_notes: z.string().min(1, 'Infant care additional notes required'),
+    where_will_baby_sleep_specify: z.string().nullable(),
+    infant_care_needs_additional_notes: z.string().nullable(),
     infant_medications: z.array(InfantMeds),
-    infant_medication_notes: z.string().min(1, 'Infant medication notes required'),
+    infant_medication_notes: z.string().nullable(),
     father_name: z.string().min(1, 'Father name required'),
     father_date_of_birth: z.string().min(1, 'Father date of birth required'),
     father_street_address: z.string().min(1, 'Father street address required'),
@@ -69,8 +69,8 @@ const InfantInformationInputs = z.object({
     father_zip_code: z.string().min(1, 'Father zip code required'),
     father_primary_phone_numbers: z.string().min(1, 'Father phone number required'),
     father_involved_in_babys_life: z.string().min(1, "Father involvement in baby's life required"),
-    father_involved_in_babys_life_comments: z.string().min(1, "Father involvement in baby's life comments required"),
-    father_notes: z.string().min(1, "Father notes required"),
+    father_involved_in_babys_life_comments: z.string().nullable(),
+    father_notes: z.string().nullable(),
 });
 type InfantInformationInputs = z.infer<typeof InfantInformationInputs>;
 
@@ -88,11 +88,15 @@ export default function InfantInformation() {
     const handleShowNICUStay = (value: string) => {
         setShowNICUStay(value === 'Yes');
         if (value === 'No') {
-            setValue('NICU_length_of_stay', 'N/A');
+            setValue('NICU_length_of_stay', null);
         }
     };
 
     const navigate = useNavigate();
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<InfantInformationInputs>({
         resolver: zodResolver(InfantInformationInputs),
@@ -148,12 +152,15 @@ export default function InfantInformation() {
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof InfantInformationInputs;
+                        if (key === 'date_of_birth' || key === 'father_date_of_birth') {
+                            setValue(formKey, formatDate(new Date(userData[key])));
+                        }
                         setValue(formKey, userData[key]);
                     }
                 });
                 setShowNICUStay(userData.NICU_stay === 'Yes');
                 if (userData.NICU_stay === 'No') {
-                    setValue('NICU_length_of_stay', 'N/A')
+                    setValue('NICU_length_of_stay', null)
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -476,7 +483,7 @@ export default function InfantInformation() {
                 </div>
 
                 <p className="font-medium">Infant Medication Notes</p>
-                <input {...register("infant_medication_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("infant_medication_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.infant_medication_notes && <span className="label-text-alt text-red-500">{errors.infant_medication_notes.message}</span>}
 
                 <p className="font-medium text-xl">Infant's Father Demographics</p>
@@ -522,7 +529,7 @@ export default function InfantInformation() {
                 {errors.father_involved_in_babys_life_comments && <span className="label-text-alt text-red-500">{errors.father_involved_in_babys_life_comments.message}</span>}
 
                 <p className="font-medium">Additional Notes</p>
-                <input {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.father_notes && <span className="label-text-alt text-red-500">{errors.father_notes.message}</span>}
 
                 <div className="flex justify-center py-6">

@@ -28,6 +28,10 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 
 export default function PsychiatricHistory() {
 
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
+
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
 
@@ -69,6 +73,9 @@ export default function PsychiatricHistory() {
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof PsychiatricHistoryInputs;
+                        if(key === 'date_of_diagnoses') {
+                            setValue(formKey, formatDate(new Date(userData[key])));
+                        }
                         setValue(formKey, userData[key]);
                     }
                 });
@@ -126,7 +133,7 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
                         )}
 
-                        <p className="font-medium">Date of Diagnosis</p>
+                        <p className="font-medium pt-6">Date of Diagnosis</p>
                         <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>

@@ -15,12 +15,12 @@ const Medications = z.object({
 
 const MedicalServicesSubstanceUseInputs = z.object({
     mat_engaged: z.string().min(1, 'MAT engaged required'),
-    date_used_mat: z.string(),
+    date_used_mat: z.string().nullable(),
     medications: z.array(Medications),
     mat_clinic_name: z.string().min(1, 'MAT clinic name required'),
     mat_clinic_phone: z.string().min(1, 'MAT clinic phone number required'),
     used_addiction_medicine_services: z.string().min(1, 'This field is required'),
-    date_used_medicine_service: z.string(),
+    date_used_medicine_service: z.string().nullable(),
     addiction_medicine_clinic: z.string().min(1, 'Addiction medicine clinic name required'),
     addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required')
 });
@@ -38,14 +38,24 @@ export default function MedicalServicesForSubstanceUse() {
 
     const navigate = useNavigate();
 
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
+
     const [showMatDate, setShowMatDate] = useState(false)
     const handleShowMatDate = (value: string) => {
         setShowMatDate(value === 'Prior MAT use');
+        if(value !== 'Prior MAT use') {
+            setValue('date_used_mat', null);
+        }
     };
 
     const [showAddictionServiceDate, setShowAddictionServiceDate] = useState(false)
     const handleShowAddictionServiceDate = (value: string) => {
         setShowAddictionServiceDate(value === 'Prior Use');
+        if(value !== 'Prior Use') {
+            setValue('date_used_medicine_service', null);
+        }
     };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MedicalServicesSubstanceUseInputs>({
@@ -68,26 +78,30 @@ export default function MedicalServicesForSubstanceUse() {
         })
     };
 
-    const removeLastMedication = () => {
-        if (fields.length > 0) {
-            remove(fields.length - 1);
-        }
-    };
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof MedicalServicesSubstanceUseInputs;
-                        setValue(formKey, userData[key]);
-                    }
-                });
+                if (response.data && response.data.length > 0) {
 
-                setShowMatDate(userData.mat_engaged === 'Prior MAT use');
-                setShowAddictionServiceDate(userData.used_addiction_medicine_services === 'Prior Use')
+
+                    const userData = response.data[response.data.length - 1];
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof MedicalServicesSubstanceUseInputs;
+                            if (key === 'date_used_mat' || key === 'date_used_medicine_service') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }                            
+                        }
+                    });
+
+                    setShowMatDate(userData.mat_engaged === 'Prior MAT use');
+                    setShowAddictionServiceDate(userData.used_addiction_medicine_services === 'Prior Use')
+                } else {
+                    console.log('No user data found.');
+                }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -152,12 +166,16 @@ export default function MedicalServicesForSubstanceUse() {
                         {errors.medications && errors.medications[index]?.dose && (
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
                         )}
+
+                        <div className="flex justify-end">
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
+
+                        </div>
                     </div>))}
 
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
-                    <button type="button" onClick={removeLastMedication} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
                 </div>
 
                 <p className="font-medium">MAT Clinic</p>

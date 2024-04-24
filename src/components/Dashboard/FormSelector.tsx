@@ -19,9 +19,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   const [completed, setCompleted] = useState<boolean>(true);
   const [submissions, setSubmissions] = useState<any[]>([]);
-  const [selectedSubmissionID, setSelectedSubmissionID] = useState<
-    string | null
-  >(null);
+  const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
 
   const fetchSubmissions = async () => {
     try {
@@ -401,30 +399,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsCurrentSupportSystem = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Person: {x.person}</div>
-          <div>Relation: {x.relation}</div>
-        </div>
-      );
-    });
-  };
-
-  const FamilyAndSupportsGoals = (data: string[]) => {
-    return (
-      <div>
-        {data.map((goal, index) => (
-          <span key={index}>
-            {goal}
-            {index !== data.length - 1 ? ", " : ""}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
   const InfantInformationInfantCareNeeds = (data: any) => {
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
@@ -533,17 +507,15 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             <div className="flex flex-row gap-1">
               <div className="font-semibold">{fieldName}:</div>
               {fieldNames.maternalMedicalHistory[key] &&
-              key === "current_medication_list" ? (
+                key === "current_medication_list" ? (
                 MaternalMedicalHistoryMedicationList(
-                  (formData as any)?.[key] || []
-                )
+                  (formData as any)?.[key] || [])
               ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
                 PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
               ) : fieldNames.medicalServicesForSubstanceUse[key] &&
                 key === "medications" ? (
                 MedicalServicesForSubstanceUseMedications(
-                  (formData as any)?.[key] || []
-                )
+                  (formData as any)?.[key] || [])
               ) : fieldNames.substanceUseHistory[key] && key !== "notes" ? (
                 SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
               ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
@@ -554,13 +526,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
               ) : fieldNames.familyAndSupports[key] &&
                 key === "clients_children_not_living_in_home" ? (
                 FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-              ) : fieldNames.familyAndSupports[key] &&
-                key === "current_support_system" ? (
-                FamilyAndSupportsCurrentSupportSystem(
-                  (formData as any)?.[key] || []
-                )
-              ) : fieldNames.familyAndSupports[key] && key === "goals" ? (
-                FamilyAndSupportsGoals((formData as any)?.[key] || [])
               ) : fieldNames.infantInformation[key] &&
                 key === "infant_care_needs_items" ? (
                 InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
@@ -571,15 +536,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                 key !== "additional_notes" ? (
                 FamilyAndSupportsServices((formData as any)?.[key] || [])
               ) : (fieldNames.relapsePreventionPlan[key] &&
-                  key === "three_things_that_trigger_desire_to_use") ||
+                key === "three_things_that_trigger_desire_to_use") ||
                 key === "three_skills_you_enjoy" ||
                 key === "three_people_to_talk_to" ? (
                 RelapsePreventionPlanArrays((formData as any)?.[key] || [])
               ) : fieldNames.relapsePreventionPlan[key] &&
                 key === "safe_caregivers" ? (
                 RelapsePreventionPlanSafeCaregivers(
-                  (formData as any)?.[key] || []
-                )
+                  (formData as any)?.[key] || [])
               ) : (
                 <div>{(formData as any)?.[key]}</div>
               )}
@@ -593,36 +557,16 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   return (
     <div>
       <Accordion title={name} completed={completed}>
-      {name === "Maternal Demographics" &&
-          formData &&
-          renderFields(fieldNames.maternalDemographics)}
-        {name === "Maternal Medical History" &&
-          formData &&
-          renderFields(fieldNames.maternalMedicalHistory)}
-        {name === "Psychiatric History" &&
-          formData &&
-          renderFields(fieldNames.psychiatricHistory)}
-        {name === "Medical Services For Substance Use" &&
-          formData &&
-          renderFields(fieldNames.medicalServicesForSubstanceUse)}
-        {name === "Substance Use History" &&
-          formData &&
-          renderFields(fieldNames.substanceUseHistory)}
-        {name === "Drug Screening Results" &&
-          formData &&
-          renderFields(fieldNames.drugScreeningResults)}
-        {name === "Family & Supports" &&
-          formData &&
-          renderFields(fieldNames.familyAndSupports)}
-        {name === "Infant Information" &&
-          formData &&
-          renderFields(fieldNames.infantInformation)}
-        {name === "Referrals and Services" &&
-          formData &&
-          renderFields(fieldNames.referralsAndServices)}
-        {name === "Relapse Prevention Plan" &&
-          formData &&
-          renderFields(fieldNames.relapsePreventionPlan)}
+        {name === "Maternal Demographics" && formData && renderFields(fieldNames.maternalDemographics)}
+        {name === "Maternal Medical History" && formData && renderFields(fieldNames.maternalMedicalHistory)}
+        {name === "Psychiatric History" && formData && renderFields(fieldNames.psychiatricHistory)}
+        {name === "Substance Use History" && formData && renderFields(fieldNames.substanceUseHistory)}
+        {name === "Medical Services For Substance Use" && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
+        {name === "Drug Screening Results" && formData && renderFields(fieldNames.drugScreeningResults)}
+        {name === "Family & Supports" && formData && renderFields(fieldNames.familyAndSupports)}
+        {name === "Infant Information" && formData && renderFields(fieldNames.infantInformation)}
+        {name === "Referrals and Services" && formData && renderFields(fieldNames.referralsAndServices)}
+        {name === "Relapse Prevention Plan" && formData && renderFields(fieldNames.relapsePreventionPlan)}
 
         <div className="flex justify-between mt-6">
           <div className="flex">{renderSubmissions()}</div>

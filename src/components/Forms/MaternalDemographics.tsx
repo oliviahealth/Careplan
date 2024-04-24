@@ -65,6 +65,10 @@ export default function MaternalDemographics() {
 
   const navigate = useNavigate();
 
+  const formatDate = (date: any) => {
+    return date.toISOString().split('T')[0];
+  };
+
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   useEffect(() => {
@@ -75,7 +79,11 @@ export default function MaternalDemographics() {
         Object.keys(userData).forEach(key => {
           if (key !== 'id' && key !== 'user_id') {
             const formKey = key as keyof MaternalDemographicsInputsType;
-            setValue(formKey, userData[key]);
+            if (key === 'date_of_birth' || key === 'effective_date') {
+              setValue(formKey, formatDate(new Date(userData[key])));
+            } else {
+              setValue(formKey, userData[key]);
+            }
           }
         });
       } catch (error) {

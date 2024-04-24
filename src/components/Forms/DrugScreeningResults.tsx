@@ -13,7 +13,7 @@ const DrugTest = z.object({
     provider: z.string().min(1, 'Test provider required'),
     provider_location: z.string().min(1, 'Test location requried'),
     results: z.string().min(1, 'Test results requried'),
-    specify_results: z.string().min(1, 'Test results specification requried'),
+    specify_results: z.string().nullable(),
     provider_reviewed: z.string().min(1, 'Reviewed with provider requried'),
     date_reviewed: z.string().min(1, 'Test date reviewed requried')
 })
@@ -34,6 +34,10 @@ export default function DrugScreeningResults() {
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<DrugScreeningResultsInputs>({
         resolver: zodResolver(DrugScreeningResultsInputs),
@@ -81,6 +85,9 @@ export default function DrugScreeningResults() {
                 Object.keys(userData).forEach(key => {
                     if (key !== 'id' && key !== 'user_id') {
                         const formKey = key as keyof DrugScreeningResultsInputs;
+                        if (key === 'date_reviewed') {
+                            setValue(formKey, formatDate(new Date(userData[key])));
+                        }
                         setValue(formKey, userData[key]);
                     }
                 });

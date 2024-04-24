@@ -24,8 +24,8 @@ function Dashboard() {
           <FormSelector name="Maternal Demographics" path="/maternal-demographics" apiUrl="maternal_demographics" userID={user_id}></FormSelector>
           <FormSelector name="Maternal Medical History" path="/maternal-medical-history" apiUrl="maternal_medical_history" userID={user_id}></FormSelector>
           <FormSelector name="Psychiatric History" path="/psychiatric-history" apiUrl="psychiatric_history" userID={user_id}></FormSelector>
-          <FormSelector name="Medical Services For Substance Use" path="/medical-services-for-substance-use" apiUrl="medical_services_for_substance_use" userID={user_id}></FormSelector>
           <FormSelector name="Substance Use History" path="/substance-use-history" apiUrl="substance_use_history" userID={user_id}></FormSelector>
+          <FormSelector name="Medical Services For Substance Use" path="/medical-services-for-substance-use" apiUrl="medical_services_for_substance_use" userID={user_id}></FormSelector>
           <FormSelector name="Drug Screening Results" path="/drug-screening-results" apiUrl="drug_screening_results" userID={user_id}></FormSelector>
           <FormSelector name="Family & Supports" path="/family-and-supports" apiUrl="family_and_supports" userID={user_id}></FormSelector>
           <FormSelector name="Infant Information" path="/infant-information" apiUrl="infant_information" userID={user_id}></FormSelector>
