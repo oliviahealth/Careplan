@@ -2,7 +2,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useState } from 'react'
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import useAppStore from "../../store/useAppStore";
@@ -43,6 +43,8 @@ const SubstanceUseHistoryReponse = SubstanceUseHistoryInputs.extend({
 });
 
 export default function SubstanceUseHistory() {
+
+    const { submissionId } = useParams();
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
@@ -94,28 +96,29 @@ export default function SubstanceUseHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_substance_use_history/${user_id}`)
-                const userData = response.data[response.data.length - 1];;
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_substance_use_history/${user_id}/${submissionId}`)
+                    const userData = response.data;
 
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof SubstanceUseHistoryInputs;
-                        if (key === 'date_last_used') {
-                            setValue(formKey, formatDate(new Date(userData[key])));
-                        } else {
-                            setValue(formKey, userData[key]);
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof SubstanceUseHistoryInputs;
+                            if (key === 'date_last_used') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }
+
+                            setShowDrugDate(prevState => ({
+                                ...prevState,
+                                [key]: userData[key]?.ever_used === 'Yes',
+                            }));
                         }
-
-                        setShowDrugDate(prevState => ({
-                            ...prevState,
-                            [key]: userData[key]?.ever_used === 'Yes',
-                        }));
-                    }
-                });
-                console.log('working', userData)
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
@@ -123,19 +126,29 @@ export default function SubstanceUseHistory() {
 
 
     const { mutate } = useMutation(async (data: SubstanceUseHistoryInputs) => {
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_substance_use_history/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: user_id }));
-        SubstanceUseHistoryReponse.parse(responseData);
-        return responseData;
+        const userData = responseData.data
+        SubstanceUseHistoryReponse.parse(userData);
+        console.log(userData)
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Substance Use History added successfully!");
-            console.log("SubstanceUseHistory data added successfully", responseData);
-
-            navigate("/dashboard");
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Substance Use History ${method} successfully!`);
+            console.log(`SubstanceUseHistory data ${method} successfully.`, userData);
+            navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding SubstanceUseHistory data.");
+            alert("Error while adding/updating SubstanceUseHistory data.");
         }
     });
 

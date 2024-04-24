@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form"
 import { useMutation } from 'react-query'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,8 @@ const FamilyAndSupportsResponse = FamilyAndSupportsInputs.extend({
 })
 
 export default function FamilyAndSupports() {
+
+    const { submissionId } = useParams();
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
@@ -74,36 +76,49 @@ export default function FamilyAndSupports() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_family_and_supports/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof FamilyAndSupportsInputs;
-                        setValue(formKey, userData[key]);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_family_and_supports/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof FamilyAndSupportsInputs;
+                            setValue(formKey, userData[key]);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
     const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_family_and_supports', { ...data, user_id: user_id }));
-        FamilyAndSupportsResponse.parse(responseData);
-        return responseData;
-    }, {
-        onSuccess: (responseData) => {
-            alert("Family And Supports added successfully!");
-            console.log("FamilyAndSupports data added successfully.", responseData);
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_family_and_supports/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_family_and_supports', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-            navigate('/dashboard');
+        const userData = responseData.data;
+        FamilyAndSupportsResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
+    }, {
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Family And Supports ${method} successfully!`);
+            console.log(`Family And Supports data ${method} successfully.`, userData);
+            navigate("/dashboard");
         },
         onError: () => {
-            alert("Error while adding FamilyAndSupports data.");
+            alert("Error while adding/updating MaternalDemographics data.");
         }
     })
 

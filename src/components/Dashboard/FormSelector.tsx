@@ -71,6 +71,13 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   };
 
   const renderSubmissions = () => {
+
+    const sortedSubmissions = [...submissions].sort((a: any, b: any) => {
+      a = new Date(a.timestamp);
+      b = new Date(b.timestamp)
+      return a.getTime() - b.getTime();
+    });
+
     return (
       <div className="relative flex">
         <select
@@ -78,7 +85,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           onChange={(e) => handleSubmissionClick(e.target.value)}
           className="block bg-white border border-neutral-300 hover:border-neutral-400 mr-2 px-4 py-2 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
-          {submissions.map((submission: any) => (
+          {sortedSubmissions.map((submission: any) => (
             <option key={submission.id} value={submission.id}>
               Submission{" "}
               {new Date(submission.timestamp).toLocaleString("en-US", {
@@ -89,12 +96,17 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           ))}
         </select>
         {selectedSubmissionID && (
-          <button
-            onClick={() => handleDeleteSubmission(selectedSubmissionID)}
-            className="border border-neutral-300 hover:border-neutral-400 rounded-lg shadow-sm px-2 py-2 text-white bg-red-700 hover:bg-red-800"
-          >
-            Delete
-          </button>
+          <>
+            <Link to={`${path}/${selectedSubmissionID}`} className="button-filled font-semibold">
+              Edit
+            </Link>
+            <button
+              onClick={() => handleDeleteSubmission(selectedSubmissionID)}
+              className="border border-neutral-300 hover:border-neutral-400 rounded-lg shadow-sm px-2 py-2 text-white bg-red-700 hover:bg-red-800"
+            >
+              Delete
+            </button>
+          </>
         )}
       </div>
     );
@@ -572,7 +584,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div className="flex">{renderSubmissions()}</div>
           <div className="flex">
             <Link to={path} className="button-filled font-semibold">
-              Edit
+              New Submission
             </Link>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from 'react'
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from "react";
@@ -33,6 +33,8 @@ const MedicalServicesSubstanceUseResponse = MedicalServicesSubstanceUseInputs.ex
 
 export default function MedicalServicesForSubstanceUse() {
 
+    const { submissionId } = useParams();
+
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
 
@@ -45,7 +47,7 @@ export default function MedicalServicesForSubstanceUse() {
     const [showMatDate, setShowMatDate] = useState(false)
     const handleShowMatDate = (value: string) => {
         setShowMatDate(value === 'Prior MAT use');
-        if(value !== 'Prior MAT use') {
+        if (value !== 'Prior MAT use') {
             setValue('date_used_mat', null);
         }
     };
@@ -53,7 +55,7 @@ export default function MedicalServicesForSubstanceUse() {
     const [showAddictionServiceDate, setShowAddictionServiceDate] = useState(false)
     const handleShowAddictionServiceDate = (value: string) => {
         setShowAddictionServiceDate(value === 'Prior Use');
-        if(value !== 'Prior Use') {
+        if (value !== 'Prior Use') {
             setValue('date_used_medicine_service', null);
         }
     };
@@ -80,12 +82,10 @@ export default function MedicalServicesForSubstanceUse() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}`)
-                if (response.data && response.data.length > 0) {
-
-
-                    const userData = response.data[response.data.length - 1];
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}/${submissionId}`)
+                    const userData = response.data;
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
                             const formKey = key as keyof MedicalServicesSubstanceUseInputs;
@@ -93,36 +93,43 @@ export default function MedicalServicesForSubstanceUse() {
                                 setValue(formKey, formatDate(new Date(userData[key])));
                             } else {
                                 setValue(formKey, userData[key]);
-                            }                            
+                            }
                         }
                     });
 
                     setShowMatDate(userData.mat_engaged === 'Prior MAT use');
                     setShowAddictionServiceDate(userData.used_addiction_medicine_services === 'Prior Use')
-                } else {
-                    console.log('No user data found.');
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
 
     const { mutate } = useMutation(async (data: MedicalServicesSubstanceUseInputs) => {
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user_id }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        MedicalServicesSubstanceUseResponse.parse(responseData);
-
-        return responseData;
+        const userData = responseData.data;
+        MedicalServicesSubstanceUseResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Maternal Services For Substance Use added successfully!");
-            console.log("MaternalServicesForSubstanceUse data added successfully.", responseData);
-
-            navigate('/dashboard');
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Maternal Services For Substance Use ${method} successfully!`);
+            console.log(`MaternalServicesForSubstanceUse data ${method} successfully.`, userData);
+            navigate('/dashboard')
         },
         onError: () => {
             alert("Error while adding Maternal Services For Substance Use data.");

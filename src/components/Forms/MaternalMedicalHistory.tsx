@@ -4,7 +4,7 @@ import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useAppStore from "../../store/useAppStore";
 
 const CurrentMedicationList = z.object({
@@ -22,9 +22,9 @@ const MaternalMedicalHistoryInputs = z.object({
     attended_postpartum_visit: z.string().min(1, 'Postpartum visit attendance is required'),
     postpartum_visit_location: z.string().nullable(),
     postpartum_visit_date: z.string().nullable(),
-    total_num_pregnancies: z.number().min(0, 'Total number of pregnancies is required'),
-    total_num_live_births: z.number().min(0, 'Total number of live births is required'),
-    total_num_children_with_mother: z.number().min(1, 'Total number of children with mother is required'),
+    total_num_pregnancies: z.string().min(0, 'Total number of pregnancies is required'),
+    total_num_live_births: z.string().min(0, 'Total number of live births is required'),
+    total_num_children_with_mother: z.string().min(1, 'Total number of children with mother is required'),
     prior_complications: z.string().default(""),
     current_medication_list: z.array(CurrentMedicationList),
     med_problems_diagnoses: z.string().min(1, 'required'),
@@ -38,6 +38,8 @@ const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
 });
 
 export default function MaternalMedicalHistory() {
+
+    const { submissionId } = useParams();
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
@@ -83,46 +85,55 @@ export default function MaternalMedicalHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof MaternalMedicalHistoryInputs;
-                        if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
-                            setValue(formKey, formatDate(new Date(userData[key])));
-                        } else if (key === 'gestational_age') {
-                            setValue(formKey, parseInt(userData[key]));
-                        } else {
-                            setValue(formKey, userData[key]);
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof MaternalMedicalHistoryInputs;
+                            if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }
                         }
-                    }
-                });
+                    });
 
-                setShowPostpartumLocationDate(userData.attended_postpartum_visit === 'Yes');
+                    setShowPostpartumLocationDate(userData.attended_postpartum_visit === 'Yes');
 
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
-    
-        const { data: responseData } = await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: user_id });
-    
-        MaternalMedicalHistoryResponse.parse(responseData);
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_medical_history/${submissionId}`, { ...data, user_id: user_id });
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        return responseData;
+        const userData = responseData.data;
+        MaternalMedicalHistoryResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Maternal Medical History data added successfully!");
-            console.log("MaternalMedicalHistory data added successfully.", responseData);
+        onSuccess: (data) => {
+            const {userData, method} = data;
+            alert(`Maternal Medical History ${method} successfully!`);
+            console.log(`Maternal Medical History data ${method} successfully.`, userData);
             navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding MaternalMedicalHistory data.");
+            alert("Error while adding/updating MaternalMedicalHistory data.");
         }
     });
 
@@ -136,7 +147,7 @@ export default function MaternalMedicalHistory() {
                 <p className="font-medium text-xl whitespace-nowrap">Prenatal Care (for current or most recent pregnancy)</p>
 
                 <p className="font-medium">Gestational Age at Entry of Care</p>
-                <input {...register("gestational_age")} className="border border-gray-300 px-4 py-2 rounded-md w-full"/>
+                <input {...register("gestational_age")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.gestational_age && <span className="label-text-alt text-red-500">{errors.gestational_age.message}</span>}
 
                 <p className="font-medium">Anticipated Delivery Date</p>

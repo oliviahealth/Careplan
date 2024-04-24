@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,6 +81,7 @@ const InfantInformationResponse = InfantInformationInputs.extend({
 
 export default function InfantInformation() {
 
+    const { submissionId } = useParams();
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
 
@@ -146,44 +147,56 @@ export default function InfantInformation() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof InfantInformationInputs;
-                        if (key === 'date_of_birth' || key === 'father_date_of_birth') {
-                            setValue(formKey, formatDate(new Date(userData[key])));
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof InfantInformationInputs;
+                            if (key === 'date_of_birth' || key === 'father_date_of_birth') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }
                         }
-                        setValue(formKey, userData[key]);
+                    });
+                    setShowNICUStay(userData.NICU_stay === 'Yes');
+                    if (userData.NICU_stay === 'No') {
+                        setValue('NICU_length_of_stay', null)
                     }
-                });
-                setShowNICUStay(userData.NICU_stay === 'Yes');
-                if (userData.NICU_stay === 'No') {
-                    setValue('NICU_length_of_stay', null)
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
             }
         };
         fetchUserData();
     }, []);
 
     const { mutate } = useMutation(async (data: InfantInformationInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: user_id }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_infant_information/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        InfantInformationResponse.parse(responseData);
-
-        return responseData;
+        const userData = responseData.data;
+        InfantInformationResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Infant Information added successfully!");
-            console.log("InfantInformation data added successfully.", responseData);
-
-            navigate('/dashboard');
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Infant Information ${method} successfully!`);
+            console.log(`InfantInformation data ${method} successfully.`, userData);
+            navigate("/dashboard");
         },
         onError: () => {
-            alert("Error while adding InfantInformation data.");
+            alert("Error while adding/updating MaternalDemographics data.");
         }
     });
 

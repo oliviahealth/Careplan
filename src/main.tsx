@@ -36,14 +36,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route element={<Layout />}>
             <Route path='/' element={<LandingPage />} />
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/maternal-demographics' element={<MaternalDemographics />} />
-            <Route path='/maternal-medical-history' element={<MaternalMedicalHistory />} />
-            <Route path='/psychiatric-history' element={<PsychiatricHistory />} />
-            <Route path='/medical-services-for-substance-use' element={<MedicalServicesForSubstanceUse />} />
-            <Route path='/substance-use-history' element={<SubstanceUseHistory />} />
-            <Route path='/drug-screening-results' element={<DrugScreeningResults />} />
-            <Route path='/family-and-supports' element={<FamilyAndSupports />} />
-            <Route path='/infant-information' element={<InfantInformation />} />
+            <Route path='/maternal-demographics/:submissionId?' element={<MaternalDemographics />} />
+            <Route path='/maternal-medical-history/:submissionId?' element={<MaternalMedicalHistory />} />
+            <Route path='/psychiatric-history/:submissionId?' element={<PsychiatricHistory />} />
+            <Route path='/medical-services-for-substance-use/:submissionId?' element={<MedicalServicesForSubstanceUse />} />
+            <Route path='/substance-use-history/:submissionId?' element={<SubstanceUseHistory />} />
+            <Route path='/drug-screening-results/:submissionId?' element={<DrugScreeningResults />} />
+            <Route path='/family-and-supports/:submissionId?' element={<FamilyAndSupports />} />
+            <Route path='/infant-information/:submissionId?' element={<InfantInformation />} />
           </Route>
         </Routes>
       </BrowserRouter>

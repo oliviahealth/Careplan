@@ -1,6 +1,6 @@
 import { useForm, useFieldArray } from "react-hook-form"
 import { useMutation } from 'react-query'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +15,7 @@ const DrugTest = z.object({
     results: z.string().min(1, 'Test results requried'),
     specify_results: z.string().nullable(),
     provider_reviewed: z.string().min(1, 'Reviewed with provider requried'),
-    date_reviewed: z.string().min(1, 'Test date reviewed requried')
+    date_reviewed: z.string().nullable()
 })
 
 const DrugScreeningResultsInputs = z.object({
@@ -29,6 +29,8 @@ const DrugScreeningResultsResponse = DrugScreeningResultsInputs.extend({
 });
 
 export default function DrugScreeningResults() {
+
+    const { submissionId } = useParams();
 
     const navigate = useNavigate();
 
@@ -79,40 +81,51 @@ export default function DrugScreeningResults() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_drug_screening_results/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof DrugScreeningResultsInputs;
-                        if (key === 'date_reviewed') {
-                            setValue(formKey, formatDate(new Date(userData[key])));
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_drug_screening_results/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof DrugScreeningResultsInputs;
+                            if (key === 'date_reviewed') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            }
+                            setValue(formKey, userData[key]);
                         }
-                        setValue(formKey, userData[key]);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
     const { mutate } = useMutation(async (data: DrugScreeningResultsInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_drug_screening_results', { ...data, user_id: user_id }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_drug_screening_results/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_drug_screening_results', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        DrugScreeningResultsResponse.parse(responseData);
-        console.log(responseData)
-        return responseData;
+        const userData = responseData.data;
+        DrugScreeningResultsResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Drug screening results added successfully!");
-            console.log("DrugScreeningResults data added successfully.", responseData);
-
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Drug screening results ${method} successfully!`);
+            console.log(`DrugScreeningResults data ${method} successfully.`, userData);
             navigate('/dashboard');
         },
         onError: () => {
-            alert("Error while adding DrugScreeningResults data.");
+            alert("Error while adding/updating DrugScreeningResults data.");
         }
     });
 

@@ -4,7 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
 
 const diagnosesSchema = z.object({
@@ -28,6 +28,8 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 
 export default function PsychiatricHistory() {
 
+    const { submissionId } = useParams();
+
     const formatDate = (date: any) => {
         return date.toISOString().split('T')[0];
     };
@@ -36,7 +38,7 @@ export default function PsychiatricHistory() {
     const user_id = user ? user.id : "";
 
     const navigate = useNavigate();
-    
+
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
@@ -67,40 +69,51 @@ export default function PsychiatricHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get(`http://127.0.0.1:5000/api/get_psychiatric_history/${user_id}`)
-                const userData = response.data[response.data.length - 1];
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof PsychiatricHistoryInputs;
-                        if(key === 'date_of_diagnoses') {
-                            setValue(formKey, formatDate(new Date(userData[key])));
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_psychiatric_history/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof PsychiatricHistoryInputs;
+                            if (key === 'date_of_diagnoses') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            }
+                            setValue(formKey, userData[key]);
                         }
-                        setValue(formKey, userData[key]);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
     const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: user_id }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_psychiatric_history/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        PsychiatricHistoryResponseSchema.parse(responseData);
-
-        return responseData;
+        const userData = responseData.data;
+        PsychiatricHistoryResponseSchema.parse(userData);
+        console.log(userData)
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Psychiatric history added successfully");
-            console.log("PsychiatricHistory data added successfully", responseData);
-
-            navigate('/dashboard');
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Psychiatric History ${method} successfully!`);
+            console.log(`PsychiatricHistory data ${method} successfully.`, userData);
+            navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding PsychiatricHistory data.");
+            alert("Error while adding/updating PsychiatricHistory data.");
         }
     });
 
