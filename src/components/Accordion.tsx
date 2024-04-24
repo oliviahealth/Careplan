@@ -5,9 +5,10 @@ interface AccordionProps {
   title: string;
   children: React.ReactNode;
   completed?: boolean;
+  onClick?: () => void;
 }
 
-const Accordion: React.FC<AccordionProps> = ({ title, completed, children }) => {
+const Accordion: React.FC<AccordionProps> = ({ title, completed, children, onClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState<number | 'auto'>(0);
@@ -28,7 +29,10 @@ const Accordion: React.FC<AccordionProps> = ({ title, completed, children }) => 
   return (
     <div>
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+            setIsOpen(!isOpen);
+            onClick && onClick(); // Call onClick prop if provided
+          }}
         className="w-full h-fit py-3 px-6 rounded-2xl bg-neutral-100 flex justify-between items-center"
       >
         {title}

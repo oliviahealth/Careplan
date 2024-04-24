@@ -566,9 +566,13 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
+  const handleAccordionClick = () => {
+    console.log(`Accordion clicked: ${name}`);
+  };
+
   return (
     <div>
-      <Accordion title={name} completed={completed}>
+      <Accordion title={name} completed={completed} onClick={handleAccordionClick}>
         {name === "Maternal Demographics" && formData && renderFields(fieldNames.maternalDemographics)}
         {name === "Maternal Medical History" && formData && renderFields(fieldNames.maternalMedicalHistory)}
         {name === "Psychiatric History" && formData && renderFields(fieldNames.psychiatricHistory)}
