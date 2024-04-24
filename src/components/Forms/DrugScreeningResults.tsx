@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
 const DrugTest = z.object({
@@ -36,6 +36,14 @@ export default function DrugScreeningResults() {
 
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
+
+    const [showDateReviewed, setShowDateReviewed] = useState(false);
+    const handleShowDateReviewed = (index: number, value: string) => {
+        setShowDateReviewed(value === 'Yes');
+        if (value === 'No') {
+            setValue(`tests.${index}.date_reviewed`, null);
+        }
+    }
 
     const formatDate = (date: any) => {
         return date.toISOString().split('T')[0];
@@ -90,8 +98,10 @@ export default function DrugScreeningResults() {
                             const formKey = key as keyof DrugScreeningResultsInputs;
                             if (key === 'date_reviewed') {
                                 setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
                             }
-                            setValue(formKey, userData[key]);
+                            setShowDateReviewed(userData.tests[0]?.provider_reviewed === 'Yes');
                         }
                     });
                 } catch (error) {
@@ -183,18 +193,23 @@ export default function DrugScreeningResults() {
                         <p className="font-medium">Provider Reviewed with Patient</p>
                         {["Yes", "No"].map((status) => (
                             <label key={status} className="flex items-center">
-                                <input {...register(`tests.${index}.provider_reviewed`)} className="form-radio" type="radio" value={status} />
+                                <input {...register(`tests.${index}.provider_reviewed`)} className="form-radio" type="radio" value={status} onChange={(e) => handleShowDateReviewed(index, e.target.value)} />
                                 <span className="ml-2">{status}</span>
                             </label>))}
                         {errors.tests && errors.tests[index]?.provider_reviewed && (
                             <span className="label-text-alt text-red-500">{errors.tests[index]?.provider_reviewed?.message}</span>
                         )}
 
-                        <p className="font-medium">Date Reviewed</p>
-                        <input {...register(`tests.${index}.date_reviewed`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-                        {errors.tests && errors.tests[index]?.date_reviewed && (
-                            <span className="label-text-alt text-red-500">{errors.tests[index]?.date_reviewed?.message}</span>
+                        {showDateReviewed && (
+                            <>
+                                <p className="font-medium">Date Reviewed</p>
+                                <input {...register(`tests.${index}.date_reviewed`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                                {errors.tests && errors.tests[index]?.date_reviewed && (
+                                    <span className="label-text-alt text-red-500">{errors.tests[index]?.date_reviewed?.message}</span>
+                                )}
+                            </>
                         )}
+
                     </div>))}
 
                 <div className="flex justify-center">

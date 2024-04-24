@@ -118,7 +118,7 @@ export default function FamilyAndSupports() {
             navigate("/dashboard");
         },
         onError: () => {
-            alert("Error while adding/updating MaternalDemographics data.");
+            alert("Error while adding/updating FamilyAndSupports data.");
         }
     })
 

@@ -20,35 +20,31 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const [completed, setCompleted] = useState<boolean>(true);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
+  const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
 
   const fetchSubmissions = async () => {
     try {
       const response = await axios.get(
         `http://127.0.0.1:5000/api/get_${apiUrl}/${userID}`
       );
-      setSubmissions(response.data);
-      if (response.data.length > 0) {
-        setFormData(response.data[response.data.length - 1]);
-        setSelectedSubmissionID(response.data[response.data.length - 1].id);
+      const allSubmissions = response.data;
+      setSubmissions(allSubmissions);
+      
+      if (allSubmissions.length > 0) {
+        setFormData(allSubmissions[allSubmissions.length - 1]);
+        setSelectedSubmissionID(allSubmissions[allSubmissions.length - 1].id);
       }
+      setSubmissionsFetched(true);
     } catch (error) {
       console.error("Error fetching submissions:", error);
     }
   };
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, [userID]);
-
   const handleSubmissionClick = async (submissionID: string) => {
-    try {
-      const response = await axios.get(
-        `http://127.0.0.1:5000/api/get_${apiUrl}/${userID}/${submissionID}`
-      );
-      setFormData(response.data);
+    const selectedSubmission = submissions.find(submission => submission.id === submissionID);
+    if (selectedSubmission) {
+      setFormData(selectedSubmission);
       setSelectedSubmissionID(submissionID);
-    } catch (error) {
-      console.error("Error fetching submission data:", error);
     }
   };
 
@@ -568,6 +564,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const handleAccordionClick = () => {
     console.log(`Accordion clicked: ${name}`);
+    if (!submissionsFetched) {
+      fetchSubmissions();
+    }
   };
 
   return (
