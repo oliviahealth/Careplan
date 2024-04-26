@@ -18,6 +18,7 @@ import SubstanceUseHistory from './components/Forms/SubstanceUseHistory.tsx';
 import MedicalServicesForSubstanceUse from './components/Forms/MedicalServicesForSubstanceUse.tsx';
 import FamilyAndSupports from './components/Forms/FamilyAndSupports.tsx';
 import DrugScreeningResults from './components/Forms/DrugScreeningResults.tsx';
+import ReferralsAndServices from './components/Forms/ReferralsAndServices.tsx';
 
 import useAppStore from './store/useAppStore.ts'; 
 
@@ -44,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/drug-screening-results/:submissionId?' element={<DrugScreeningResults />} />
             <Route path='/family-and-supports/:submissionId?' element={<FamilyAndSupports />} />
             <Route path='/infant-information/:submissionId?' element={<InfantInformation />} />
+            <Route path='/referrals-and-services/:submissionId?' element={<ReferralsAndServices />} />
           </Route>
         </Routes>
       </BrowserRouter>

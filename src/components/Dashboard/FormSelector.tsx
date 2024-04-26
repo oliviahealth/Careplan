@@ -29,7 +29,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       );
       const allSubmissions = response.data;
       setSubmissions(allSubmissions);
-      
+
       if (allSubmissions.length > 0) {
         setFormData(allSubmissions[allSubmissions.length - 1]);
         setSelectedSubmissionID(allSubmissions[allSubmissions.length - 1].id);
@@ -257,42 +257,36 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       home_visitation_program: "Home Visitation Program",
       housing_assistance: "Housing Assistance",
       healthy_start_program: "Healthy Start Program",
-      support_services_other1: "Support Services Other 1",
-      support_services_other2: "Support Services Other 2",
+      support_services_other: "Support Services Other",
       breastfeeding_support: "Breastfeeding Support",
       local_food_pantries: "Local Food Pantries",
       snap: "SNAP",
       women_infants_children: "Women, Infants, and Children",
-      food_nutrition_other1: "Food Nutrition Other 1",
-      food_nutrition_other2: "Food Nutrition Other 2",
+      food_nutrition_other: "Food Nutrition Other",
       health_insurance_enrollment: "Health Insurance Enrollment",
       prenatal_healthcare: "Prenatal Healthcare",
       family_planning: "Family Planning",
       primary_care: "Primary Care",
       mental_health_counseling: "Mental Health Counseling",
       smoking_cessation: "Smoking Cessation",
-      healthcare_other1: "Healthcare Other 1",
-      healthcare_other2: "Healthcare Other 2",
+      healthcare_other: "Healthcare Other",
       residential: "Residential",
       outpatient: "Outpatient",
       caring_for_two_program: "Caring for Two Program",
       the_cradles_program: "The Cradles Program",
       recovery_support_services: "Recovery Support Services",
       medication_assisted_treatment: "Medication Assisted Treatment",
-      substance_use_treatment_other1: "Substance Use Treatment Other 1",
-      substance_use_treatment_other2: "Substance Use Treatment Other 2",
+      substance_use_treatment_other: "Substance Use Treatment Other",
       early_childhood_intervention: "Early Childhood Intervention",
       early_head_start: "Early Head Start",
       NCI_childcare_subsidy: "NCI Childcare Subsidy",
       pediatrician_primary_care: "Pediatrician Primary Care",
       safe_sleep_education: "Safe Sleep Education",
-      child_related_other1: "Child Related Other 1",
-      child_related_other2: "Child Related Other 2",
+      child_related_other: "Child Related Other ",
       child_protective_service: "Child Protective Service",
       legal_aid: "Legal Aid",
       specialty_court: "Specialty Court",
-      legal_assistance_other1: "Legal Assistance Other 1",
-      legal_assistance_other2: "Legal Assistance Other 2",
+      legal_assistance_other: "Legal Assistance Other",
       additional_notes: "Additional Notes",
     },
     relapsePreventionPlan: {
@@ -462,7 +456,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsServices = (data: any) => {
+  const ReferralsAndServices = (data: any) => {
     const namesMap: { [key: string]: string } = {
       status: "Status",
       organization: "Organization",
@@ -480,6 +474,19 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         ))}
       </div>
     );
+  };
+
+  const ReferralsAndServicesOther = (data: any) => {
+    return data.map((x: any, index: any) => {
+      return (
+        <div key={index}>
+          <div> Name: {x.name} </div>
+          <div> Status: {x.service_status} </div>
+          <div> Organization: {x.organization} </div>
+          <div> Organization Contact: {x.organization_contact_information} </div>
+        </div>
+      );
+    });
   };
 
   const RelapsePreventionPlanArrays = (data: any) => {
@@ -514,44 +521,48 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <React.Fragment key={key}>
             <div className="flex flex-row gap-1">
               <div className="font-semibold">{fieldName}:</div>
-              {fieldNames.maternalMedicalHistory[key] &&
-                key === "current_medication_list" ? (
-                MaternalMedicalHistoryMedicationList(
-                  (formData as any)?.[key] || [])
+              {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
+                MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
               ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
                 PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
-              ) : fieldNames.medicalServicesForSubstanceUse[key] &&
-                key === "medications" ? (
-                MedicalServicesForSubstanceUseMedications(
-                  (formData as any)?.[key] || [])
+              ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
+                MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
               ) : fieldNames.substanceUseHistory[key] && key !== "notes" ? (
                 SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
               ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
                 DrugScreeningResultsTests((formData as any)?.[key] || [])
-              ) : fieldNames.familyAndSupports[key] &&
-                key === "people_living_in_home" ? (
+              ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
                 FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-              ) : fieldNames.familyAndSupports[key] &&
-                key === "clients_children_not_living_in_home" ? (
+              ) : fieldNames.familyAndSupports[key] && key === "clients_children_not_living_in_home" ? (
                 FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-              ) : fieldNames.infantInformation[key] &&
-                key === "infant_care_needs_items" ? (
+              ) : fieldNames.infantInformation[key] && key === "infant_care_needs_items" ? (
                 InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
-              ) : fieldNames.infantInformation[key] &&
-                key === "infant_medications" ? (
+              ) : fieldNames.infantInformation[key] && key === "infant_medications" ? (
                 InfantInformationMedications((formData as any)?.[key] || [])
               ) : fieldNames.referralsAndServices[key] &&
-                key !== "additional_notes" ? (
-                FamilyAndSupportsServices((formData as any)?.[key] || [])
+                !["additional_notes",
+                  "support_services_other",
+                  "food_nutrition_other",
+                  "healthcare_other",
+                  "substance_use_treatment_other",
+                  "child_related_other",
+                  "legal_assistance_other"].includes(key) ? (
+                ReferralsAndServices((formData as any)?.[key] || [])
+              ) : fieldNames.referralsAndServices[key] &&
+                ["support_services_other",
+                  "food_nutrition_other",
+                  "healthcare_other",
+                  "substance_use_treatment_other",
+                  "child_related_other",
+                  "legal_assistance_other"].includes(key) ? (
+                ReferralsAndServicesOther((formData as any)?.[key] || [])
               ) : (fieldNames.relapsePreventionPlan[key] &&
-                key === "three_things_that_trigger_desire_to_use") ||
+                key === "three_things_that_trigger_desire_to_use" ||
                 key === "three_skills_you_enjoy" ||
-                key === "three_people_to_talk_to" ? (
+                key === "three_people_to_talk_to") ? (
                 RelapsePreventionPlanArrays((formData as any)?.[key] || [])
-              ) : fieldNames.relapsePreventionPlan[key] &&
-                key === "safe_caregivers" ? (
-                RelapsePreventionPlanSafeCaregivers(
-                  (formData as any)?.[key] || [])
+              ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
+                RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
               ) : (
                 <div>{(formData as any)?.[key]}</div>
               )}
