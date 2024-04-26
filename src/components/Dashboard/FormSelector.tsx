@@ -556,11 +556,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   "child_related_other",
                   "legal_assistance_other"].includes(key) ? (
                 ReferralsAndServicesOther((formData as any)?.[key] || [])
-              ) : (fieldNames.relapsePreventionPlan[key] &&
-                key === "three_things_that_trigger_desire_to_use" ||
-                key === "three_skills_you_enjoy" ||
-                key === "three_people_to_talk_to") ? (
-                RelapsePreventionPlanArrays((formData as any)?.[key] || [])
+              // ) : (fieldNames.relapsePreventionPlan[key] &&
+              //   key === "three_things_that_trigger_desire_to_use" ||
+              //   key === "three_skills_you_enjoy" ||
+              //   key === "three_people_to_talk_to") ? (
+              //   RelapsePreventionPlanArrays((formData as any)?.[key] || [])
               ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
                 RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
               ) : (

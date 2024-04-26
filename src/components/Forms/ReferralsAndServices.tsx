@@ -292,6 +292,9 @@ export default function ReferralsAndServices() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
 
+                <p className="font-semibold text-red-700">Complete with: Recovery Coach or Social Worker</p>
+                <div className="w-full h-px bg-gray-300"></div>
+
                 <p className="font-medium text-xl pt-6">SUPPORT SERVICES</p>
                 {generateFormFields(Object.keys(displayNames).slice(0, 8), errors)}
 
@@ -550,7 +553,7 @@ export default function ReferralsAndServices() {
                                     <span className="ml-2">{status}</span>
                                 </label>
                             ))}
-                        </div>                        
+                        </div>
                         {errors.legal_assistance_other && errors.legal_assistance_other[index]?.service_status && (
                             <span className="label-text-alt text-red-500">{errors.legal_assistance_other[index]?.service_status?.message}</span>)}
 
