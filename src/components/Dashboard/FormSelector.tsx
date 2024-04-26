@@ -160,8 +160,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       postpartum_visit_date: "Postpartum Visit Date",
       total_num_pregnancies: "Total Number of Pregnancies",
       total_num_live_births: "Number of Live Births",
-      total_num_children_with_mother:
-        "Number of Children Currently Living with Mother",
+      total_num_children_with_mother: "Number of Children Currently Living with Mother",
       prior_complications: "Complications During Prior Pregnancies",
       med_problems_diagnoses: "Medical Problems Requiring Ongoing Care",
       current_medication_list: "Current Medication List",
@@ -180,8 +179,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       used_addiction_medicine_services: "Addiction Medicine Services",
       date_used_medicine_service: "Date of Last Medicine Service",
       addiction_medicine_clinic: "Addiction Medicine Clinic",
-      addiction_medicine_clinic_phone:
-        "Addiction Medicine Clinic Contact Information",
+      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information",
     },
     substanceUseHistory: {
       alcohol: "Alcohol",
@@ -192,8 +190,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       methamphetamine: "Methamphetamine",
       prescription_drugs: "Prescription Drugs",
       tobacco: "Tobacco",
-      other1: "Other",
-      other2: "Other",
+      other_drugs: "Other",
       notes: "Notes",
     },
     drugScreeningResults: {
@@ -201,12 +198,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     },
     familyAndSupports: {
       people_living_in_home: "List of People Living in the Home",
-      clients_children_not_living_in_home:
-        "List of Clients Children NOT Living in the Home",
+      clients_children_not_living_in_home: "List of Clients Children NOT Living in the Home",
       notes: "Notes",
       current_support_system: "Current Support System",
-      strength_of_client_and_support_system:
-        "Strengths of Client and Support System",
+      strength_of_client_and_support_system: "Strengths of Client and Support System",
       goals: "Goals",
     },
     infantInformation: {
@@ -219,17 +214,13 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       NICU_length_of_stay: "NICU Length of Stay",
       pediatrician_name: "Pediatrician Name",
       pediatrician_contact_info: "Pediatrician Contact Number",
-      infant_urine_drug_screening_at_birth:
-        "Infant Urine Drug Screening at Birth",
-      infant_urine_drug_screening_at_birth_specify:
-        "Specify Infant Urine Drug Screening at Birth",
+      infant_urine_drug_screening_at_birth: "Infant Urine Drug Screening at Birth",
+      infant_urine_drug_screening_at_birth_specify: "Specify Infant Urine Drug Screening at Birth",
       meconium_results: "Meconium Results",
       meconium_results_specify: "Specify Meconium Results",
       neonatal_opiod_withdraw: "Neonatal Opiod Withdraw",
-      neonatal_opiod_withdraw_treatment_method:
-        "Neonatal Opiod Withdraw Treatment Method",
-      DX_problems_additional_information:
-        "DX/Problems and Additional Information",
+      neonatal_opiod_withdraw_treatment_method: "Neonatal Opiod Withdraw Treatment Method",
+      DX_problems_additional_information: "DX/Problems and Additional Information",
       infant_care_needs_items: "Infant Care Needs",
       where_will_baby_sleep: "Where Will Baby Sleep",
       infant_care_needs_additional_notes: "Infant Care Needs Additional Notes",
@@ -243,16 +234,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       father_zip_code: "Father's Zip Code",
       father_primary_phone_numbers: "Father's Primary Phone Numbers",
       father_involved_in_babys_life: "Father Involved in Baby's Life",
-      father_involved_in_babys_life_comments:
-        "Father Involved in Baby's Life Comments",
+      father_involved_in_babys_life_comments: "Father Involved in Baby's Life Comments",
       father_notes: "Father Notes",
     },
     referralsAndServices: {
       parenting_classes: "Parenting Classes",
       transportation_services: "Transportation Services",
       ssi_disability: "SSI Disability",
-      temporary_assistance_for_needy_families:
-        "Temporary Assistance for Needy Families",
+      temporary_assistance_for_needy_families: "Temporary Assistance for Needy Families",
       personal_safety: "Personal Safety",
       home_visitation_program: "Home Visitation Program",
       housing_assistance: "Housing Assistance",
@@ -290,8 +279,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       additional_notes: "Additional Notes",
     },
     relapsePreventionPlan: {
-      three_things_that_trigger_desire_to_use:
-        "Three things that trigger your desire to use",
+      three_things_that_trigger_desire_to_use: "Three things that trigger your desire to use",
       three_skills_you_enjoy: "Three skills you enjoy",
       three_people_to_talk_to: "Three people to talk to",
       safe_caregivers: "Safe Caregivers",
@@ -357,6 +345,19 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         ))}
       </div>
     );
+  };
+
+  const SubstanceUseHistoryOtherDrugs = (data: any) => {
+    return data.map((x: any, index: any) => {
+      return (
+        <div key={index}>
+          <div> Name: {x.drug_used} </div>
+          <div> Used During Pregnancy?: {x.used_during_pregnancy} </div>
+          <div> Date Last Used: {x.date_last_used} </div>
+          <div> Notes: {x.notes} </div>
+        </div>
+      );
+    });
   };
 
   const DrugScreeningResultsTests = (data: any) => {
@@ -489,19 +490,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const RelapsePreventionPlanArrays = (data: any) => {
-    return (
-      <div>
-        {Object.keys(data).map((item, index) => (
-          <span key={index}>
-            {data[item]}
-            {index === Object.keys(data).length - 1 ? "" : ", "}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
   const RelapsePreventionPlanSafeCaregivers = (data: any) => {
     return data.map((x: any, index: any) => {
       return (
@@ -527,8 +515,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                 PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
               ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
                 MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-              ) : fieldNames.substanceUseHistory[key] && key !== "notes" ? (
+              ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
                 SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
+              ) : fieldNames.substanceUseHistory[key] && key === "other_drugs" ? (
+                SubstanceUseHistoryOtherDrugs((formData as any)?.[key] || [])
               ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
                 DrugScreeningResultsTests((formData as any)?.[key] || [])
               ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
@@ -556,11 +546,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                   "child_related_other",
                   "legal_assistance_other"].includes(key) ? (
                 ReferralsAndServicesOther((formData as any)?.[key] || [])
-              // ) : (fieldNames.relapsePreventionPlan[key] &&
-              //   key === "three_things_that_trigger_desire_to_use" ||
-              //   key === "three_skills_you_enjoy" ||
-              //   key === "three_people_to_talk_to") ? (
-              //   RelapsePreventionPlanArrays((formData as any)?.[key] || [])
               ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
                 RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
               ) : (
