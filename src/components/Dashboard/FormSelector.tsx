@@ -18,11 +18,13 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   const [completed, setCompleted] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
   const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
 
   const fetchSubmissions = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `http://127.0.0.1:5000/api/get_${apiUrl}/${userID}`
@@ -38,6 +40,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     } catch (error) {
       console.error("Error fetching submissions:", error);
     }
+    setIsLoading(false);
   };
 
   const handleSubmissionClick = async (submissionID: string) => {
@@ -567,7 +570,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   return (
     <div>
-      <Accordion title={name} completed={completed} onClick={handleAccordionClick}>
+      <Accordion title={name} completed={completed} isLoading={isLoading} onClick={handleAccordionClick}>
         {name === "Maternal Demographics" && formData && renderFields(fieldNames.maternalDemographics)}
         {name === "Maternal Medical History" && formData && renderFields(fieldNames.maternalMedicalHistory)}
         {name === "Psychiatric History" && formData && renderFields(fieldNames.psychiatricHistory)}
