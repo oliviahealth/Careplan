@@ -562,7 +562,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   };
 
   const handleAccordionClick = () => {
-    console.log(`Accordion clicked: ${name}`);
     if (!submissionsFetched) {
       fetchSubmissions();
     }
