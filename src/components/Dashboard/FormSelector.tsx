@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { /*useEffect,*/ useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Accordion from "../Accordion";
@@ -17,11 +17,19 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   userID,
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
-  const [completed, setCompleted] = useState<boolean>(true);
+  // const [completed, setCompleted] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
   const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
+  const [submissionsExist, setSubmissionsExist] = useState<{ [key: string]: boolean }>({});
+
+  const updateSubmissionsExist = (key: string, value: boolean) => {
+    setSubmissionsExist(prevState => ({
+      ...prevState,
+      [key]: value
+    }));
+  };
 
   const fetchSubmissions = async () => {
     setIsLoading(true);
@@ -35,6 +43,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       if (allSubmissions.length > 0) {
         setFormData(allSubmissions[allSubmissions.length - 1]);
         setSelectedSubmissionID(allSubmissions[allSubmissions.length - 1].id);
+        updateSubmissionsExist(apiUrl, true);
       }
       setSubmissionsFetched(true);
     } catch (error) {
@@ -96,7 +105,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         </select>
         {selectedSubmissionID && (
           <>
-            <Link to={`${path}/${selectedSubmissionID}`} className="button-filled font-semibold">
+            <Link to={`${path}/${selectedSubmissionID}`} className="button-filled font-semibold mr-2">
               Edit
             </Link>
             <button
@@ -111,15 +120,15 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  useEffect(() => {
-    let allFieldsCompleted = true;
-    Object.entries(formData).forEach(([_key, value]) => {
-      if (value === "" || value === null) {
-        allFieldsCompleted = false;
-      }
-    });
-    setCompleted(allFieldsCompleted);
-  }, [formData]);
+  // useEffect(() => {
+  //   let allFieldsCompleted = true;
+  //   Object.entries(formData).forEach(([_key, value]) => {
+  //     if (value === "" || value === null) {
+  //       allFieldsCompleted = false;
+  //     }
+  //   });
+  //   setCompleted(allFieldsCompleted);
+  // }, [formData]);
 
   const fieldNames: {
     maternalDemographics: { [key: string]: string };
@@ -367,7 +376,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     return data.map((x: any, index: any) => {
       return (
         <div key={index}>
-          <div> Test: {x.test_ordered} </div>
+          <div> Test Description: {x.test_ordered} </div>
           <div> Date of Test: {x.date_collected} </div>
           <div> Provider name: {x.provider} </div>
           <div> Provider Location: {x.provider_location} </div>
@@ -569,20 +578,25 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   return (
     <div>
-      <Accordion title={name} completed={completed} isLoading={isLoading} onClick={handleAccordionClick}>
-        {name === "Maternal Demographics" && formData && renderFields(fieldNames.maternalDemographics)}
-        {name === "Maternal Medical History" && formData && renderFields(fieldNames.maternalMedicalHistory)}
-        {name === "Psychiatric History" && formData && renderFields(fieldNames.psychiatricHistory)}
-        {name === "Substance Use History" && formData && renderFields(fieldNames.substanceUseHistory)}
-        {name === "Medical Services For Substance Use" && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
-        {name === "Drug Screening Results" && formData && renderFields(fieldNames.drugScreeningResults)}
-        {name === "Family & Supports" && formData && renderFields(fieldNames.familyAndSupports)}
-        {name === "Infant Information" && formData && renderFields(fieldNames.infantInformation)}
-        {name === "Referrals and Services" && formData && renderFields(fieldNames.referralsAndServices)}
-        {name === "Relapse Prevention Plan" && formData && renderFields(fieldNames.relapsePreventionPlan)}
+      <Accordion title={name} /*completed={completed}*/ isLoading={isLoading} onClick={handleAccordionClick}>
+        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalDemographics)}
+        {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalMedicalHistory)}
+        {name === "Psychiatric History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.psychiatricHistory)}
+        {name === "Substance Use History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.substanceUseHistory)}
+        {name === "Medical Services For Substance Use" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.medicalServicesForSubstanceUse)}
+        {name === "Drug Screening Results" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.drugScreeningResults)}
+        {name === "Family & Supports" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.familyAndSupports)}
+        {name === "Infant Information" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.infantInformation)}
+        {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
+        {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
 
         <div className="flex justify-between mt-6">
-          <div className="flex">{renderSubmissions()}</div>
+          {submissionsExist[apiUrl] && (
+            <div className="flex">{renderSubmissions()}</div>
+          )}
+          {!submissionsExist[apiUrl] && (
+            <div className="flex">There are no submissions for this form. Please fill out a new submission.</div>
+          )}
           <div className="flex">
             <Link to={path} className="button-filled font-semibold">
               New Submission
