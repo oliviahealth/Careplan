@@ -37,9 +37,11 @@ export default function DrugScreeningResults() {
     const { user } = useAppStore();
     const user_id = user ? user.id : "";
 
-    const [showDateReviewed, setShowDateReviewed] = useState(false);
+    const [showDateReviewed, setShowDateReviewed] = useState<boolean[]>([]);
     const handleShowDateReviewed = (index: number, value: string) => {
-        setShowDateReviewed(value === 'Yes');
+        const newShowDateReviewed = [...showDateReviewed];
+        newShowDateReviewed[index] = value === 'Yes';
+        setShowDateReviewed(newShowDateReviewed);
         if (value === 'No') {
             setValue(`tests.${index}.date_reviewed`, null);
         }
@@ -101,7 +103,12 @@ export default function DrugScreeningResults() {
                             } else {
                                 setValue(formKey, userData[key]);
                             }
-                            setShowDateReviewed(userData.tests[0]?.provider_reviewed === 'Yes');
+                            if (key === 'tests') {
+                                if (key === 'tests') {
+                                    const newShowDateReviewed = userData[key].map((test: any) => test.provider_reviewed === 'Yes');
+                                    setShowDateReviewed(newShowDateReviewed);
+                                }
+                            }
                         }
                     });
                 } catch (error) {
@@ -200,7 +207,7 @@ export default function DrugScreeningResults() {
                             <span className="label-text-alt text-red-500">{errors.tests[index]?.provider_reviewed?.message}</span>
                         )}
 
-                        {showDateReviewed && (
+                        {showDateReviewed[index] && (
                             <>
                                 <p className="font-medium">Date Reviewed</p>
                                 <input {...register(`tests.${index}.date_reviewed`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
