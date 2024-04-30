@@ -18,21 +18,16 @@ const Accordion: React.FC<AccordionProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState<number | "auto">(0);
+  const [maxHeight, setMaxHeight] = useState("0px");
 
   useEffect(() => {
-    const handleContentHeight = () => {
-      if (contentRef.current) {
-        const newHeight = isOpen ? contentRef.current.scrollHeight : 0;
-        setContentHeight(newHeight);
-      }
-    };
-
-    handleContentHeight();
-
-    window.addEventListener("resize", handleContentHeight);
-    return () => window.removeEventListener("resize", handleContentHeight);
-  }, [isOpen, children]);
+    if (isOpen) {
+      setMaxHeight(`${contentRef.current?.scrollHeight}px`);
+    } else {
+      setMaxHeight("0px");
+    }
+    console.log(maxHeight);
+  }, [isOpen, children]); 
 
   return (
     <>
@@ -63,7 +58,7 @@ const Accordion: React.FC<AccordionProps> = ({
         className="px-6 overflow-hidden transition-all duration-300 ease-in-out"
         ref={contentRef}
         style={{
-          height: `${contentHeight}px`,
+          maxHeight: `${maxHeight}`,
         }}
       >
         {isLoading ? (
