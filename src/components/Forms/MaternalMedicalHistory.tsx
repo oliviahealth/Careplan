@@ -229,7 +229,10 @@ export default function MaternalMedicalHistory() {
                 <p className="font-medium text-xl">Current Medication List</p>
                 {fields.map((field, index) => (
                     <div key={field.id} className="py-6">
-                        <p className="font-medium pt-6">Medication {index + 1}</p>
+                        <div className="flex justify-between items-center">
+                            <p className="font-medium pb-2 pt-8">Medication {index + 1}</p>
+                                <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medicine</button>
+                        </div>
                         <input {...register(`current_medication_list.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.current_medication_list && errors.current_medication_list[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.name?.message}</span>
@@ -251,10 +254,6 @@ export default function MaternalMedicalHistory() {
                         {errors.current_medication_list && errors.current_medication_list[index]?.notes && (
                             <span className="label-text-alt text-red-500">{errors.current_medication_list[index]?.notes?.message}</span>
                         )}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">

@@ -301,7 +301,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Support Services</p>
                 {supportServicesOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center pb-4">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeSupportServicesOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`support_services_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.support_services_other && errors.support_services_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.support_services_other[index]?.name?.message}</span>)}
@@ -323,19 +326,19 @@ export default function ReferralsAndServices() {
                         {errors.support_services_other && errors.support_services_other[index]?.service_status && (
                             <span className="label-text-alt text-red-500">{errors.support_services_other[index]?.service_status?.message}</span>)}
 
-                        <p className="font-medium pt-6">Organization {index + 1}</p>
+                        <p className="font-medium py-6">Organization {index + 1}</p>
                         <input {...register(`support_services_other.${index}.organization`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.support_services_other && errors.support_services_other[index]?.organization && (
                             <span className="label-text-alt text-red-500">{errors.support_services_other[index]?.organization?.message}</span>)}
 
-                        <p className="font-medium pt-6">Organization Contact Information {index + 1}</p>
+                        <p className="font-medium p-6">Organization Contact Information {index + 1}</p>
                         <input {...register(`support_services_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.support_services_other && errors.support_services_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.support_services_other[index]?.organization_contact_information?.message}</span>)}
 
-                        <div className="flex justify-end">
+                        {/* <div className="flex justify-center">
                             <button type="button" onClick={() => removeSupportServicesOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={supportServicesOtherFields.length === 0}>- Remove Service</button>
-                        </div>
+                        </div> */}
                     </div>))}
 
                 <div className="flex justify-center">
@@ -348,7 +351,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Food/Nutrition Services</p>
                 {foodNutritionOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeFoodNutritionOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`food_nutrition_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.food_nutrition_other && errors.food_nutrition_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.food_nutrition_other[index]?.name?.message}</span>)}
@@ -379,10 +385,6 @@ export default function ReferralsAndServices() {
                         <input {...register(`food_nutrition_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.food_nutrition_other && errors.food_nutrition_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.food_nutrition_other[index]?.organization_contact_information?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeFoodNutritionOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={foodNutritionOtherFields.length === 0}>- Remove Service</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
@@ -395,7 +397,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Healthcare Services</p>
                 {healthcareOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeHealthcareOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`healthcare_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.healthcare_other && errors.healthcare_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.healthcare_other[index]?.name?.message}</span>)}
@@ -426,10 +431,6 @@ export default function ReferralsAndServices() {
                         <input {...register(`healthcare_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.healthcare_other && errors.healthcare_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.healthcare_other[index]?.organization_contact_information?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeHealthcareOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={healthcareOtherFields.length === 0}>- Remove Service</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
@@ -442,7 +443,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Substance Use Treatment Services</p>
                 {substanceUseTreatmentOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeSubstanceUseTreatmentOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`substance_use_treatment_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.substance_use_treatment_other && errors.substance_use_treatment_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.substance_use_treatment_other[index]?.name?.message}</span>)}
@@ -451,15 +455,9 @@ export default function ReferralsAndServices() {
                         <div className="flex flex-col space y-2">
                             {["Discussed", "Needed", "Referred", "Participating", "Completed"].map((status) => (
                                 <label key={status} className="inline-flex items-center pt-2">
-                                    <input
-                                        {...register(`substance_use_treatment_other.${index}.service_status`)}
-                                        type="radio"
-                                        value={status}
-                                        className="form-radio"
-                                    />
+                                    <input {...register(`substance_use_treatment_other.${index}.service_status`)} type="radio" value={status} className="form-radio" />
                                     <span className="ml-2">{status}</span>
-                                </label>
-                            ))}
+                                </label>))}
                         </div>
                         {errors.substance_use_treatment_other && errors.substance_use_treatment_other[index]?.service_status && (
                             <span className="label-text-alt text-red-500">{errors.substance_use_treatment_other[index]?.service_status?.message}</span>)}
@@ -474,9 +472,6 @@ export default function ReferralsAndServices() {
                         {errors.substance_use_treatment_other && errors.substance_use_treatment_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.substance_use_treatment_other[index]?.organization_contact_information?.message}</span>)}
 
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeSubstanceUseTreatmentOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={substanceUseTreatmentOtherFields.length === 0}>- Remove Service</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
@@ -489,7 +484,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Child Related Services</p>
                 {childRelatedOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeChildRelatedOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`child_related_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.child_related_other && errors.child_related_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.child_related_other[index]?.name?.message}</span>)}
@@ -519,10 +517,6 @@ export default function ReferralsAndServices() {
                         <input {...register(`child_related_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.child_related_other && errors.child_related_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.child_related_other[index]?.organization_contact_information?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeChildRelatedOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={childRelatedOtherFields.length === 0}>- Remove Service</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
@@ -535,7 +529,10 @@ export default function ReferralsAndServices() {
                 <p className="font-medium text-xl pt-6">Additional Legal Assistance Services</p>
                 {legalAssistanceOtherFields.map((field, index) => (
                     <div key={field.id}>
-                        <p className="font-medium pt-6">Name {index + 1}</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            <button type="button" onClick={() => removeLegalAssistanceOther(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Service</button>
+                        </div>
                         <input {...register(`legal_assistance_other.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.legal_assistance_other && errors.legal_assistance_other[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.legal_assistance_other[index]?.name?.message}</span>)}
@@ -566,10 +563,6 @@ export default function ReferralsAndServices() {
                         <input {...register(`legal_assistance_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.legal_assistance_other && errors.legal_assistance_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.legal_assistance_other[index]?.organization_contact_information?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeLegalAssistanceOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={legalAssistanceOtherFields.length === 0}>- Remove Service</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">

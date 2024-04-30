@@ -162,7 +162,10 @@ export default function MedicalServicesForSubstanceUse() {
                 {fields.map((_fields, index) => (
                     <div key={index} className="py-6 space-y-6">
 
-                        <p className="font-medium">Medication</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Medication {index + 1}</p>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medication</button>
+                        </div>
                         <input {...register(`medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.medications && errors.medications[index]?.medication && (
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.medication?.message}</span>
@@ -174,10 +177,10 @@ export default function MedicalServicesForSubstanceUse() {
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
                         )}
 
-                        <div className="flex justify-end">
+                        {/* <div className="flex justify-end">
                             <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
 
-                        </div>
+                        </div> */}
                     </div>))}
 
 

@@ -469,7 +469,11 @@ export default function InfantInformation() {
                 <p className="font-medium text-xl">Infant's Medications</p>
                 {infantMedsFields.map((item, index) => (
                     <div key={item.id} className="space-y-6 pt-6">
-                        <p className="font-medium">Medication</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            {index !== 0 && (
+                                <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medication</button>)}
+                        </div>
                         <input {...register(`infant_medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.infant_medications && errors.infant_medications[index]?.medication && (
                             <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.medication?.message}</span>)}
@@ -490,9 +494,8 @@ export default function InfantInformation() {
                             <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.notes?.message}</span>)}
                     </div>))}
 
-                <div className="flex justify-between pt-6">
+                <div className="flex justify-center">
                     <button type="button" onClick={() => appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
-                    <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Medication</button>
                 </div>
 
                 <p className="font-medium">Infant Medication Notes</p>
