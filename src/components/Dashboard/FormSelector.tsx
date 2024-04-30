@@ -101,7 +101,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             </Link>
             <button
               onClick={() => handleDeleteSubmission(selectedSubmissionID)}
-              className="border border-neutral-300 hover:border-neutral-400 rounded-lg shadow-sm px-2 py-2 text-white bg-red-700 hover:bg-red-800"
+              className="button-filled bg-red-700 hover:bg-red-800"
             >
               Delete
             </button>

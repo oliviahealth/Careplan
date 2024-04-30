@@ -63,7 +63,7 @@ const Accordion: React.FC<AccordionProps> = ({
         className="px-6 overflow-hidden transition-all duration-300 ease-in-out"
         ref={contentRef}
         style={{
-          height: contentHeight === "auto" ? "auto" : `${contentHeight}px`,
+          height: `${contentHeight}px`,
         }}
       >
         {isLoading ? (
