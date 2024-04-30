@@ -209,7 +209,10 @@ export default function SubstanceUseHistory() {
 
                     {fields.map((field, index) => (
                         <div key={field.id} className="space-y-4">
-                            <p className="font-medium">Substance</p>
+                            <div className="flex justify-between items-center">
+                            <p className="font-medium py-6">Substance {index + 1}</p>
+                            <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
+                        </div>
                             <input {...register(`other_drugs.${index}.drug_used`)} placeholder="Substance Name" className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                             {errors.other_drugs && errors.other_drugs[index]?.drug_used && (
                                 <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.drug_used?.message}</span>
@@ -237,13 +240,11 @@ export default function SubstanceUseHistory() {
                             <p className="font-medium">Notes</p>
                             <textarea {...register(`other_drugs.${index}.notes`)} placeholder="Notes" className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                             {errors.other_drugs && errors.other_drugs[index]?.notes && (
-                                <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.notes?.message}</span>
-                            )}
-                        </div>
-                    ))}
-                    <div className="flex justify-between">
+                                <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.notes?.message}</span>)}
+                        </div>))}
+
+                    <div className="flex justify-center">
                         <button type="button" onClick={() => fields.length < 2 && append({ drug_used: '', used_during_pregnancy: '', date_last_used: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Substance</button>
-                        <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
                     </div>
                 </div>
 

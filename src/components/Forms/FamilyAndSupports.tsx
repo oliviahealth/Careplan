@@ -131,7 +131,10 @@ export default function FamilyAndSupports() {
                 <p className="font-medium text-xl">Current Living Arrangement</p>
                 {householdMemberFields.map((field, index) => (
                     <div key={field.id} className="space-y-6 py-6">
-                        <p className="font-medium">Household Member Name</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Household Member Name {index + 1}</p>
+                            <button type="button" onClick={() => removeMember(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Member</button>
+                        </div>
                         <input {...register(`people_living_in_home.${index}.person`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.people_living_in_home && errors.people_living_in_home[index]?.person && (
                             <span className="label-text-alt text-red-500">{errors.people_living_in_home[index]?.person?.message}</span>)}
@@ -145,11 +148,6 @@ export default function FamilyAndSupports() {
                         <input {...register(`people_living_in_home.${index}.relation`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.people_living_in_home && errors.people_living_in_home[index]?.relation && (
                             <span className="label-text-alt text-red-500">{errors.people_living_in_home[index]?.relation?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeMember(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Member</button>
-
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">
@@ -159,7 +157,10 @@ export default function FamilyAndSupports() {
                 <p className="font-medium text-xl">Client's Children NOT Living in the home</p>
                 {childrenFields.map((field, index) => (
                     <div key={field.id} className="space-y-6 py-6">
-                        <p className="font-medium">Child</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Child {index + 1}</p>
+                            <button type="button" onClick={() => removeChild(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Child</button>
+                        </div>
                         <input {...register(`clients_children_not_living_in_home.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.clients_children_not_living_in_home && errors.clients_children_not_living_in_home[index]?.name && (
                             <span className="label-text-alt text-red-500">{errors.clients_children_not_living_in_home[index]?.name?.message}</span>)}
@@ -178,10 +179,6 @@ export default function FamilyAndSupports() {
                         <input {...register(`clients_children_not_living_in_home.${index}.caregiver_number`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.clients_children_not_living_in_home && errors.clients_children_not_living_in_home[index]?.caregiver_number && (
                             <span className="label-text-alt text-red-500">{errors.clients_children_not_living_in_home[index]?.caregiver_number?.message}</span>)}
-
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => removeChild(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Child</button>
-                        </div>
                     </div>))}
 
                 <div className="flex justify-center">

@@ -150,14 +150,17 @@ export default function DrugScreeningResults() {
         <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
 
             <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <p className="font-semibold text-red-700">Complete with Provider Ordering UDS or Recovery Coach</p>
+                <div className="w-full h-px bg-gray-300"></div>
                 {fields.map((field, index) => (
 
                     <div key={field.id} className="py-6 space-y-6">
 
-                        <p className="font-semibold text-red-700">Complete with Provider Ordering UDS or Recovery Coach</p>
-                        <div className="w-full h-px bg-gray-300"></div>
 
-                        <p className="font-medium">Test Ordered</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Test Ordered {index + 1}</p>
+                            <button type="button" onClick={() => removeLastDrugTest()} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Test</button>
+                        </div>
                         <input {...register(`tests.${index}.test_ordered`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.tests && errors.tests[index]?.test_ordered && (
                             <span className="label-text-alt text-red-500">{errors.tests[index]?.test_ordered?.message}</span>
@@ -214,14 +217,11 @@ export default function DrugScreeningResults() {
                                 {errors.tests && errors.tests[index]?.date_reviewed && (
                                     <span className="label-text-alt text-red-500">{errors.tests[index]?.date_reviewed?.message}</span>
                                 )}
-                            </>
-                        )}
-
+                            </>)}
                     </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDrugTest} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Test</button>
-                    <button type="button" onClick={removeLastDrugTest} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Last Test</button>
                 </div>
 
                 <div className="flex justify-center pt-6">

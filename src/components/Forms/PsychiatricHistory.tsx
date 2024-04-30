@@ -127,8 +127,10 @@ export default function PsychiatricHistory() {
                 {fields.map((field, index) => (
 
                     <div key={field.id} className="py-6">
-
-                        <p className="font-medium pt-6">Diagnosis</p>
+                        <div className="flex justify-between items-center">
+                            <p className="font-medium pb-2 pt-8">Diagnosis {index + 1}</p>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Diagnosis</button>
+                        </div>
                         <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.diagnosis?.message}</span>
@@ -163,12 +165,7 @@ export default function PsychiatricHistory() {
                         {errors.diagnoses && errors.diagnoses[index]?.taking_medication && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
                         )}
-
-                        <div className='flex justify-end'>
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
-                        </div>
-                    </div>
-                ))}
+                    </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>

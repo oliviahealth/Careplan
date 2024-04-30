@@ -135,8 +135,13 @@ export default function RelapsePreventionPlan() {
                 <p className="font-medium">In the case of a relapse, the patient's safe caregivers will be:</p>
 
                 {fields.map((field, index) => (
-                    <div key={field.id} className="space-y-6">
-                        <p className="font-medium pb-4 pt-6">Safe Caregiver {index + 1}</p>
+                    <div key={field.id} className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <p className="font-medium pb-2 pt-8">Safe Caregiver {index + 1}</p>
+                            {index !== 0 && (
+                                <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Caregiver</button>)}
+                        </div>
+
 
                         <p className="font-medium">Name</p>
                         <input {...register(`safe_caregivers.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
@@ -153,9 +158,7 @@ export default function RelapsePreventionPlan() {
                         {errors.safe_caregivers && errors.safe_caregivers[index]?.relationship && (
                             <span className="label-text-alt text-red-500">{errors.safe_caregivers[index]?.relationship?.message}</span>)}
 
-                        <div className="flex justify-end">
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 1}>- Remove Caregiver</button>
-                        </div>
+                        
                     </div>))}
 
                 <div className="flex justify-center">
