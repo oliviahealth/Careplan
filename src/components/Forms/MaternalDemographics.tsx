@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { states } from "../../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
-
+import useAppStore from '../../store/useAppStore';
 
 const livingArrangementsEnum = z.enum([
   "Rent/Own a Home",
@@ -59,48 +59,68 @@ const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.exte
 });
 
 export default function MaternalDemographics() {
+
+  const { submissionId } = useParams();
+
+  const { user } = useAppStore();
+  const user_id = user ? user.id : "";
+
   const navigate = useNavigate();
-<<<<<<< HEAD:src/components/MaternalDemographics.tsx
+
+  const formatDate = (date: any) => {
+    return date.toISOString().split('T')[0];
+  };
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:5000/api/get_maternal_demographics/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-        const userData = response.data;
-        Object.keys(userData).forEach(key => {
-          if (key !== 'id' && key !== 'user_id') {
-            const formKey = key as keyof MaternalDemographicsInputsType;
-            setValue(formKey, userData[key]);
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+      if (submissionId) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_demographics/${user_id}/${submissionId}`)
+          const userData = response.data;
+          Object.keys(userData).forEach(key => {
+            if (key !== 'id' && key !== 'user_id') {
+              const formKey = key as keyof MaternalDemographicsInputsType;
+              if (key === 'date_of_birth' || key === 'effective_date') {
+                setValue(formKey, formatDate(new Date(userData[key])));
+              } else {
+                setValue(formKey, userData[key]);
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
       }
     };
     fetchUserData();
-  }, []);
-=======
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
->>>>>>> main:src/components/Forms/MaternalDemographics.tsx
+  }, [submissionId]);
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
-    const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+    let responseData;
+    let method;
+    if (submissionId) {
+      responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`, { ...data, user_id: user_id })
+      method = "updated";
+    } else {
+      responseData = await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: user_id });
+      method = "added";
+    }
 
-    MaternalDemographicsResponseSchema.parse(responseData);
-
-    return responseData;
+    const userData = responseData.data;
+    MaternalDemographicsResponseSchema.parse(userData);
+    console.log(userData);
+    return { userData, method };
   }, {
-    onSuccess: (responseData) => {
-      alert("Maternal demographics data added successfully!");
-      console.log("MaternalDemographics data added successfully", responseData);
-
+    onSuccess: (data) => {
+      const { userData, method } = data;
+      alert(`Maternal Demographics ${method} successfully!`);
+      console.log(`MaternalDemographics data ${method} successfully.`, userData);
       navigate("/dashboard");
     },
     onError: () => {
-      alert("Error while adding MaternalDemographics data.");
+      alert("Error while adding/updating MaternalDemographics data.");
     }
   });
 

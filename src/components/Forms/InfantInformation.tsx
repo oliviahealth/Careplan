@@ -1,33 +1,34 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
+import useAppStore from "../../store/useAppStore";
 
 const InfantCareNeeds = z.object({
     breast_pump: z.string().min(1, 'Breast pump information required'),
-    breast_pump_notes: z.string().min(1, 'Breast pump notes required'),
+    breast_pump_notes: z.string().nullable(),
     breastfeeding_support: z.string().min(1, 'Breastfeeding support information required'),
-    breastfeeding_support_notes: z.string().min(1, 'Breastfeeding support notes required'),
+    breastfeeding_support_notes: z.string().nullable(),
     car_seat: z.string().min(1, 'Car seat information required'),
-    car_seat_notes: z.string().min(1, 'Car seat notes required'),
+    car_seat_notes: z.string().nullable(),
     childcare: z.string().min(1, 'Childcare information required'),
-    childcare_notes: z.string().min(1, 'Childcare notes required'),
+    childcare_notes: z.string().nullable(),
     clothing: z.string().min(1, 'Clothing information required'),
-    clothing_notes: z.string().min(1, 'Clothing notes required'),
+    clothing_notes: z.string().nullable(),
     crib: z.string().min(1, 'Crib information required'),
-    crib_notes: z.string().min(1, 'Crib notes required'),
+    crib_notes: z.string().nullable(),
     diapers: z.string().min(1, 'Diapers information required'),
-    diapers_notes: z.string().min(1, 'Diapers notes required'),
+    diapers_notes: z.string().nullable(),
     infant_formula: z.string().min(1, 'Infant formula information required'),
-    infant_formula_notes: z.string().min(1, 'Infant formula notes required'),
+    infant_formula_notes: z.string().nullable(),
     infant_stroller: z.string().min(1, 'Infant stroller information required'),
-    infant_stroller_notes: z.string().min(1, 'Infant stroller notes required'),
-    other: z.string().min(1, 'Other information required'),
-    other_name: z.string().min(1, 'Other name required'),
-    other_notes: z.string().min(1, 'Other notes required')
+    infant_stroller_notes: z.string().nullable(),
+    other: z.string().nullable(),
+    other_name: z.string().nullable(),
+    other_notes: z.string().nullable()
 });
 
 const InfantMeds = z.object({
@@ -44,22 +45,22 @@ const InfantInformationInputs = z.object({
     birth_weight: z.string().min(1, 'Birth weight required'),
     gestational_age_at_birth: z.string().min(1, 'Gestional age at birth required'),
     NICU_stay: z.string().min(1, 'NICU stay information required'),
-    NICU_length_of_stay: z.string(),
+    NICU_length_of_stay: z.string().nullable(),
     pediatrician_name: z.string().min(1, 'Pediatrician name required'),
     pediatrician_contact_info: z.string().min(1, 'Pediatrician phone number required'),
     infant_urine_drug_screening_at_birth: z.string().min(1, 'Infant urine drug screening at birth info required'),
-    infant_urine_drug_screening_at_birth_specify: z.string().min(1, 'Infant urine drug screening at birth specification required'),
+    infant_urine_drug_screening_at_birth_specify: z.string().nullable(),
     meconium_results: z.string().min(1, 'Meconium results required'),
-    meconium_results_specify: z.string().min(1, 'Meconium results specification required'),
+    meconium_results_specify: z.string().nullable(),
     neonatal_opiod_withdraw: z.string().min(1, 'Neonatal opiod withdraw info required'),
-    neonatal_opiod_withdraw_treatment_method: z.string().min(1, 'Neonatal opiod withdraw treatment method required'),
+    neonatal_opiod_withdraw_treatment_method: z.string().nullable(),
     DX_problems_additional_information: z.string().min(1, 'DX Problems/Additional Information required'),
     infant_care_needs_items: z.array(InfantCareNeeds),
     where_will_baby_sleep: z.string().min(1, 'Baby sleeping information required'),
-    where_will_baby_sleep_specify: z.string().min(1, 'Baby sleeping specification required'),
-    infant_care_needs_additional_notes: z.string().min(1, 'Infant care additional notes required'),
+    where_will_baby_sleep_specify: z.string().nullable(),
+    infant_care_needs_additional_notes: z.string().nullable(),
     infant_medications: z.array(InfantMeds),
-    infant_medication_notes: z.string().min(1, 'Infant medication notes required'),
+    infant_medication_notes: z.string().nullable(),
     father_name: z.string().min(1, 'Father name required'),
     father_date_of_birth: z.string().min(1, 'Father date of birth required'),
     father_street_address: z.string().min(1, 'Father street address required'),
@@ -68,8 +69,8 @@ const InfantInformationInputs = z.object({
     father_zip_code: z.string().min(1, 'Father zip code required'),
     father_primary_phone_numbers: z.string().min(1, 'Father phone number required'),
     father_involved_in_babys_life: z.string().min(1, "Father involvement in baby's life required"),
-    father_involved_in_babys_life_comments: z.string().min(1, "Father involvement in baby's life comments required"),
-    father_notes: z.string().min(1, "Father notes required"),
+    father_involved_in_babys_life_comments: z.string().nullable(),
+    father_notes: z.string().nullable(),
 });
 type InfantInformationInputs = z.infer<typeof InfantInformationInputs>;
 
@@ -80,15 +81,23 @@ const InfantInformationResponse = InfantInformationInputs.extend({
 
 export default function InfantInformation() {
 
+    const { submissionId } = useParams();
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+
     const [showNICUStay, setShowNICUStay] = useState(false);
     const handleShowNICUStay = (value: string) => {
         setShowNICUStay(value === 'Yes');
         if (value === 'No') {
-            setValue('NICU_length_of_stay', 'N/A');
+            setValue('NICU_length_of_stay', null);
         }
     };
 
     const navigate = useNavigate();
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<InfantInformationInputs>({
         resolver: zodResolver(InfantInformationInputs),
@@ -138,41 +147,56 @@ export default function InfantInformation() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_infant_information/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof InfantInformationInputs;
-                        setValue(formKey, userData[key]);
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof InfantInformationInputs;
+                            if (key === 'date_of_birth' || key === 'father_date_of_birth') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }
+                        }
+                    });
+                    setShowNICUStay(userData.NICU_stay === 'Yes');
+                    if (userData.NICU_stay === 'No') {
+                        setValue('NICU_length_of_stay', null)
                     }
-                });
-                setShowNICUStay(userData.NICU_stay === 'Yes');
-                if (userData.NICU_stay === 'No') {
-                    setValue('NICU_length_of_stay', 'N/A')
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
                 }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
             }
         };
         fetchUserData();
     }, []);
 
     const { mutate } = useMutation(async (data: InfantInformationInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_infant_information/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_infant_information', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        InfantInformationResponse.parse(responseData);
-
-        return responseData;
+        const userData = responseData.data;
+        InfantInformationResponse.parse(userData);
+        console.log(userData);
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Infant Information added successfully!");
-            console.log("InfantInformation data added successfully.", responseData);
-
-            navigate('/dashboard');
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Infant Information ${method} successfully!`);
+            console.log(`InfantInformation data ${method} successfully.`, userData);
+            navigate("/dashboard");
         },
         onError: () => {
-            alert("Error while adding InfantInformation data.");
+            alert("Error while adding/updating MaternalDemographics data.");
         }
     });
 
@@ -445,7 +469,11 @@ export default function InfantInformation() {
                 <p className="font-medium text-xl">Infant's Medications</p>
                 {infantMedsFields.map((item, index) => (
                     <div key={item.id} className="space-y-6 pt-6">
-                        <p className="font-medium">Medication</p>
+                        <div className="flex justify-between items-center py-6">
+                            <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
+                            {index !== 0 && (
+                                <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medication</button>)}
+                        </div>
                         <input {...register(`infant_medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.infant_medications && errors.infant_medications[index]?.medication && (
                             <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.medication?.message}</span>)}
@@ -466,13 +494,12 @@ export default function InfantInformation() {
                             <span className="label-text-alt text-red-500">{errors.infant_medications[index]?.notes?.message}</span>)}
                     </div>))}
 
-                <div className="flex justify-between pt-6">
+                <div className="flex justify-center">
                     <button type="button" onClick={() => appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
-                    <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Medication</button>
                 </div>
 
                 <p className="font-medium">Infant Medication Notes</p>
-                <input {...register("infant_medication_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("infant_medication_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.infant_medication_notes && <span className="label-text-alt text-red-500">{errors.infant_medication_notes.message}</span>}
 
                 <p className="font-medium text-xl">Infant's Father Demographics</p>
@@ -518,7 +545,7 @@ export default function InfantInformation() {
                 {errors.father_involved_in_babys_life_comments && <span className="label-text-alt text-red-500">{errors.father_involved_in_babys_life_comments.message}</span>}
 
                 <p className="font-medium">Additional Notes</p>
-                <input {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                <textarea {...register("father_notes")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                 {errors.father_notes && <span className="label-text-alt text-red-500">{errors.father_notes.message}</span>}
 
                 <div className="flex justify-center py-6">

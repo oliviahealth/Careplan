@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { /*useEffect,*/ useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Accordion from "../Accordion";
 
 interface FormSelectorProps {
   name: string;
@@ -16,86 +17,118 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   userID,
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
-  const [completed, setCompleted] = useState<boolean>(true);
+  // const [completed, setCompleted] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
+  const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
+  const [submissionsExist, setSubmissionsExist] = useState<{ [key: string]: boolean }>({});
 
-  const fetchSubmissions = async () => {
-    try {
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_${apiUrl}/${userID}`);
-      setSubmissions(response.data);
-      if (response.data.length > 0) {
-        setFormData(response.data[response.data.length - 1]);
-        setSelectedSubmissionID(response.data[response.data.length - 1].id)
-      }
-    } catch (error) {
-      console.error('Error fetching submissions:', error);
-    }
+  const updateSubmissionsExist = (key: string, value: boolean) => {
+    setSubmissionsExist(prevState => ({
+      ...prevState,
+      [key]: value
+    }));
   };
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, [userID]);
+  const fetchSubmissions = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:5000/api/get_${apiUrl}/${userID}`
+      );
+      const allSubmissions = response.data;
+      setSubmissions(allSubmissions);
+
+      if (allSubmissions.length > 0) {
+        setFormData(allSubmissions[allSubmissions.length - 1]);
+        setSelectedSubmissionID(allSubmissions[allSubmissions.length - 1].id);
+        updateSubmissionsExist(apiUrl, true);
+      }
+      setSubmissionsFetched(true);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+    }
+    setIsLoading(false);
+  };
 
   const handleSubmissionClick = async (submissionID: string) => {
-    try {
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_${apiUrl}/${userID}/${submissionID}`);
-      setFormData(response.data);
+    const selectedSubmission = submissions.find(submission => submission.id === submissionID);
+    if (selectedSubmission) {
+      setFormData(selectedSubmission);
       setSelectedSubmissionID(submissionID);
-    } catch (error) {
-      console.error('Error fetching submission data:', error);
     }
   };
 
   const handleDeleteSubmission = async (submissionID: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete this submission?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this submission?"
+    );
 
     if (confirmed) {
       try {
-        await axios.delete(`http://127.0.0.1:5000/api/delete_${apiUrl}/${submissionID}`);
+        await axios.delete(
+          `http://127.0.0.1:5000/api/delete_${apiUrl}/${submissionID}`
+        );
         fetchSubmissions();
         setFormData({});
       } catch (error) {
-        console.error('Error deleting submission:', error);
+        console.error("Error deleting submission:", error);
       }
     }
   };
 
   const renderSubmissions = () => {
+
+    const sortedSubmissions = [...submissions].sort((a: any, b: any) => {
+      a = new Date(a.timestamp);
+      b = new Date(b.timestamp)
+      return a.getTime() - b.getTime();
+    });
+
     return (
       <div className="relative flex">
         <select
-          value={selectedSubmissionID || ''}
+          value={selectedSubmissionID || ""}
           onChange={(e) => handleSubmissionClick(e.target.value)}
-          className="block bg-white border border-gray-300 hover:border-gray-400 mr-2 px-4 py-2 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="block bg-white border border-neutral-300 hover:border-neutral-400 mr-2 px-4 py-2 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
-          {submissions.map((submission: any) => (
+          {sortedSubmissions.map((submission: any) => (
             <option key={submission.id} value={submission.id}>
-              Submission {submission.timestamp}
+              Submission{" "}
+              {new Date(submission.timestamp).toLocaleString("en-US", {
+                timeZone: "America/Chicago",
+              })}{" "}
+              CST
             </option>
           ))}
         </select>
         {selectedSubmissionID && (
-          <button
-            onClick={() => handleDeleteSubmission(selectedSubmissionID)}
-            className="border border-gray-300 hover:border-gray-400 rounded-lg shadow-sm px-2 py-2 text-white bg-red-700 hover:bg-red-800"
-          >
-            Delete
-          </button>
+          <>
+            <Link to={`${path}/${selectedSubmissionID}`} className="button-filled font-semibold mr-2">
+              Edit
+            </Link>
+            <button
+              onClick={() => handleDeleteSubmission(selectedSubmissionID)}
+              className="button-filled bg-red-700 hover:bg-red-800"
+            >
+              Delete
+            </button>
+          </>
         )}
       </div>
     );
   };
 
-  useEffect(() => {
-    let allFieldsCompleted = true;
-    Object.entries(formData).forEach(([_key, value]) => {
-      if (value === "" || value === null) {
-        allFieldsCompleted = false;
-      }
-    });
-    setCompleted(allFieldsCompleted);
-  }, [formData]);
+  // useEffect(() => {
+  //   let allFieldsCompleted = true;
+  //   Object.entries(formData).forEach(([_key, value]) => {
+  //     if (value === "" || value === null) {
+  //       allFieldsCompleted = false;
+  //     }
+  //   });
+  //   setCompleted(allFieldsCompleted);
+  // }, [formData]);
 
   const fieldNames: {
     maternalDemographics: { [key: string]: string };
@@ -144,12 +177,10 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       med_problems_diagnoses: "Medical Problems Requiring Ongoing Care",
       current_medication_list: "Current Medication List",
       notes: "Notes",
-      obgyn: "OB/GYN or Primary Care Provider"
     },
     psychiatricHistory: {
       diagnoses: "Diagnoses",
       notes: "Notes",
-      obgyn: "OB/GYN"
     },
     medicalServicesForSubstanceUse: {
       mat_engaged: "Medication Assisted Treatment (MAT) Engaged",
@@ -161,7 +192,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       date_used_medicine_service: "Date of Last Medicine Service",
       addiction_medicine_clinic: "Addiction Medicine Clinic",
       addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information",
-      mat_provider: "MAT Provider"
     },
     substanceUseHistory: {
       alcohol: "Alcohol",
@@ -172,14 +202,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       methamphetamine: "Methamphetamine",
       prescription_drugs: "Prescription Drugs",
       tobacco: "Tobacco",
-      other1: "Other",
-      other2: "Other",
+      other_drugs: "Other",
       notes: "Notes",
-      treatment_case_manager: "Treatment Case Manager"
     },
     drugScreeningResults: {
       tests: "Tests",
-      provider_ordering_UDS: "Provider Ordering UDS"
     },
     familyAndSupports: {
       people_living_in_home: "List of People Living in the Home",
@@ -188,7 +215,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       current_support_system: "Current Support System",
       strength_of_client_and_support_system: "Strengths of Client and Support System",
       goals: "Goals",
-      recovery_coach: "Recovery Coach"
     },
     infantInformation: {
       child_name: "Child's Name",
@@ -221,7 +247,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       father_primary_phone_numbers: "Father's Primary Phone Numbers",
       father_involved_in_babys_life: "Father Involved in Baby's Life",
       father_involved_in_babys_life_comments: "Father Involved in Baby's Life Comments",
-      father_notes: "Father Notes"
+      father_notes: "Father Notes",
     },
     referralsAndServices: {
       parenting_classes: "Parenting Classes",
@@ -232,53 +258,47 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       home_visitation_program: "Home Visitation Program",
       housing_assistance: "Housing Assistance",
       healthy_start_program: "Healthy Start Program",
-      support_services_other1: "Support Services Other 1",
-      support_services_other2: "Support Services Other 2",
+      support_services_other: "Support Services Other",
       breastfeeding_support: "Breastfeeding Support",
       local_food_pantries: "Local Food Pantries",
       snap: "SNAP",
       women_infants_children: "Women, Infants, and Children",
-      food_nutrition_other1: "Food Nutrition Other 1",
-      food_nutrition_other2: "Food Nutrition Other 2",
+      food_nutrition_other: "Food Nutrition Other",
       health_insurance_enrollment: "Health Insurance Enrollment",
       prenatal_healthcare: "Prenatal Healthcare",
       family_planning: "Family Planning",
       primary_care: "Primary Care",
       mental_health_counseling: "Mental Health Counseling",
       smoking_cessation: "Smoking Cessation",
-      healthcare_other1: "Healthcare Other 1",
-      healthcare_other2: "Healthcare Other 2",
+      healthcare_other: "Healthcare Other",
       residential: "Residential",
       outpatient: "Outpatient",
       caring_for_two_program: "Caring for Two Program",
       the_cradles_program: "The Cradles Program",
       recovery_support_services: "Recovery Support Services",
       medication_assisted_treatment: "Medication Assisted Treatment",
-      substance_use_treatment_other1: "Substance Use Treatment Other 1",
-      substance_use_treatment_other2: "Substance Use Treatment Other 2",
+      substance_use_treatment_other: "Substance Use Treatment Other",
       early_childhood_intervention: "Early Childhood Intervention",
       early_head_start: "Early Head Start",
       NCI_childcare_subsidy: "NCI Childcare Subsidy",
       pediatrician_primary_care: "Pediatrician Primary Care",
       safe_sleep_education: "Safe Sleep Education",
-      child_related_other1: "Child Related Other 1",
-      child_related_other2: "Child Related Other 2",
+      child_related_other: "Child Related Other ",
       child_protective_service: "Child Protective Service",
       legal_aid: "Legal Aid",
       specialty_court: "Specialty Court",
-      legal_assistance_other1: "Legal Assistance Other 1",
-      legal_assistance_other2: "Legal Assistance Other 2",
-      additional_notes: "Additional Notes"
-    }, relapsePreventionPlan: {
+      legal_assistance_other: "Legal Assistance Other",
+      additional_notes: "Additional Notes",
+    },
+    relapsePreventionPlan: {
       three_things_that_trigger_desire_to_use: "Three things that trigger your desire to use",
       three_skills_you_enjoy: "Three skills you enjoy",
       three_people_to_talk_to: "Three people to talk to",
       safe_caregivers: "Safe Caregivers",
       have_naloxone: "Have Naloxone",
       comments: "Comments",
-      recovery_coach: "Social Worker or Recovery Coach"
-    }
-  }
+    },
+  };
 
   const MaternalMedicalHistoryMedicationList = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -289,9 +309,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Prescriber: {x.prescriber} </div>
           <div> Notes: {x.notes} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const PscyhiatricHistoryDiagnoses = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -303,9 +323,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Date of Diagnosis: {x.date_of_diagnosis} </div>
           <div> Currently taking medication: {x.taking_medication} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const MedicalServicesForSubstanceUseMedications = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -314,35 +334,49 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Medication: {x.medication} </div>
           <div> Dose: {x.dose} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const SubstanceUseHistoryDrugs = (data: any) => {
-
     const namesMap: { [key: string]: string } = {
       ever_used: "Ever Used",
       date_last_used: "Date Last Used",
       notes: "Notes",
-      used_during_pregnancy: "Used During Pregnancy"
+      used_during_pregnancy: "Used During Pregnancy",
     };
 
     return (
       <div>
         {Object.keys(data).map((item, index) => (
           <div key={index}>
-            <div>{namesMap[item] || item}: {data[item]}</div>
+            <div>
+              {namesMap[item] || item}: {data[item]}
+            </div>
           </div>
         ))}
       </div>
     );
   };
 
+  const SubstanceUseHistoryOtherDrugs = (data: any) => {
+    return data.map((x: any, index: any) => {
+      return (
+        <div key={index}>
+          <div> Name: {x.drug_used} </div>
+          <div> Used During Pregnancy?: {x.used_during_pregnancy} </div>
+          <div> Date Last Used: {x.date_last_used} </div>
+          <div> Notes: {x.notes} </div>
+        </div>
+      );
+    });
+  };
+
   const DrugScreeningResultsTests = (data: any) => {
     return data.map((x: any, index: any) => {
       return (
         <div key={index}>
-          <div> Test: {x.test_ordered} </div>
+          <div> Test Description: {x.test_ordered} </div>
           <div> Date of Test: {x.date_collected} </div>
           <div> Provider name: {x.provider} </div>
           <div> Provider Location: {x.provider_location} </div>
@@ -351,9 +385,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Reviewed with Provider: {x.provider_reviewed} </div>
           <div> Date Reviewed: {x.date_reviewed} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const FamilyAndSupportsPeopleInHome = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -363,9 +397,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Date of Birth: {x.date_of_birth} </div>
           <div> Relation: {x.relation} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const FamilyAndSupportsChildrenNotHome = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -376,43 +410,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Caregiver: {x.caregiver} </div>
           <div> Caregiver Contact Number: {x.caregiver_number} </div>
         </div>
-      )
-    })
-  }
-
-  const FamilyAndSupportsCurrentSupportSystem = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Person: {x.person}</div>
-          <div>Relation: {x.relation}</div>
-        </div>
-      )
-    })
-  }
-
-  const FamilyAndSupportsStrengthSupportSystem = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Strength: {x.strength}</div>
-        </div>
-      )
-    })
-  }
-
-  const FamilyAndSupportsGoals = (data: any) => {
-    return data.map((x: any, index: any) => {
-      return (
-        <div key={index}>
-          <div>Goal: {x.goal}</div>
-        </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const InfantInformationInfantCareNeeds = (data: any) => {
-
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
       breast_pump_notes: "Breast Pump Notes",
@@ -434,7 +436,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       infant_stroller_notes: "Infant Stroller Notes",
       other: "Other",
       other_name: "Other Name",
-      other_notes: "Other Notes"
+      other_notes: "Other Notes",
     };
 
     return (
@@ -443,7 +445,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div key={index}>
             {Object.keys(item).map((key: string, idx: number) => (
               <div key={idx}>
-                <div>{namesMap[key] || key}: {item[key]}</div>
+                <div>
+                  {namesMap[key] || key}: {item[key]}
+                </div>
               </div>
             ))}
           </div>
@@ -461,39 +465,42 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Prescriber: {x.prescriber} </div>
           <div> Notes: {x.notes} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
-  const FamilyAndSupportsServices = (data: any) => {
+  const ReferralsAndServices = (data: any) => {
     const namesMap: { [key: string]: string } = {
       status: "Status",
       organization: "Organization",
-      organization_contact_information: "Organization Contact Info"
+      organization_contact_information: "Organization Contact Info",
     };
 
     return (
       <div>
         {Object.keys(data).map((item, index) => (
           <div key={index}>
-            <div>{namesMap[item] || item}: {data[item]}</div>
+            <div>
+              {namesMap[item] || item}: {data[item]}
+            </div>
           </div>
         ))}
       </div>
     );
-  }
+  };
 
-  const RelapsePreventionPlanArrays = (data: any) => {
-    return (
-      <div>
-        {Object.keys(data).map((item, index) => (
-          <span key={index}>
-            {data[item]}{index === Object.keys(data).length - 1 ? "" : ", "}
-          </span>
-        ))}
-      </div>
-    );
-  }
+  const ReferralsAndServicesOther = (data: any) => {
+    return data.map((x: any, index: any) => {
+      return (
+        <div key={index}>
+          <div> Name: {x.name} </div>
+          <div> Status: {x.service_status} </div>
+          <div> Organization: {x.organization} </div>
+          <div> Organization Contact: {x.organization_contact_information} </div>
+        </div>
+      );
+    });
+  };
 
   const RelapsePreventionPlanSafeCaregivers = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -503,99 +510,100 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           <div> Contact Number: {x.contact_number} </div>
           <div> Relationship: {x.relationship} </div>
         </div>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
-        {Object.entries<string>(fields)
-          .map(([key, fieldName]) => (
-            <React.Fragment key={key}>
-              <div className="flex flex-row gap-1">
-                <div className="font-semibold">{fieldName}:</div>
-                {fieldNames.maternalMedicalHistory[key] && key === 'current_medication_list' ? (
-                  MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
-                ) : fieldNames.psychiatricHistory[key] && key === 'diagnoses' ? (
-                  PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
-                ) : fieldNames.medicalServicesForSubstanceUse[key] && key === 'medications' ? (
-                  MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-                ) : fieldNames.substanceUseHistory[key] && key !== 'notes' && key !== 'treatment_case_manager' ? (
-                  SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
-                ) : fieldNames.drugScreeningResults[key] && key === 'tests' ? (
-                  DrugScreeningResultsTests((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'people_living_in_home' ? (
-                  FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'clients_children_not_living_in_home' ? (
-                  FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'current_support_system' ? (
-                  FamilyAndSupportsCurrentSupportSystem((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'strength_of_client_and_support_system' ? (
-                  FamilyAndSupportsStrengthSupportSystem((formData as any)?.[key] || [])
-                ) : fieldNames.familyAndSupports[key] && key === 'goals' ? (
-                  FamilyAndSupportsGoals((formData as any)?.[key] || [])
-                ) : fieldNames.infantInformation[key] && key === 'infant_care_needs_items' ? (
-                  InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
-                ) : fieldNames.infantInformation[key] && key === 'infant_medications' ? (
-                  InfantInformationMedications((formData as any)?.[key] || [])
-                ) : fieldNames.referralsAndServices[key] && key !== 'additional_notes' && key !== 'recovery_coach' ? (
-                  FamilyAndSupportsServices((formData as any)?.[key] || [])
-                ) : fieldNames.relapsePreventionPlan[key] && key === 'three_things_that_trigger_desire_to_use' || key === 'three_skills_you_enjoy' || key === 'three_people_to_talk_to' ? (
-                  RelapsePreventionPlanArrays((formData as any)?.[key] || [])
-                ) : fieldNames.relapsePreventionPlan[key] && key === 'safe_caregivers' ? (
-                  RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
-                ) :
-                  (
-                    <div>{(formData as any)?.[key]}</div>
-                  )}
-              </div>
-            </React.Fragment>
-          ))}
+        {Object.entries<string>(fields).map(([key, fieldName]) => (
+          <React.Fragment key={key}>
+            <div className="flex flex-row gap-1">
+              <div className="font-semibold">{fieldName}:</div>
+              {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
+                MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
+              ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
+                PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+              ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
+                MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
+              ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
+                SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
+              ) : fieldNames.substanceUseHistory[key] && key === "other_drugs" ? (
+                SubstanceUseHistoryOtherDrugs((formData as any)?.[key] || [])
+              ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
+                DrugScreeningResultsTests((formData as any)?.[key] || [])
+              ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
+                FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
+              ) : fieldNames.familyAndSupports[key] && key === "clients_children_not_living_in_home" ? (
+                FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
+              ) : fieldNames.infantInformation[key] && key === "infant_care_needs_items" ? (
+                InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
+              ) : fieldNames.infantInformation[key] && key === "infant_medications" ? (
+                InfantInformationMedications((formData as any)?.[key] || [])
+              ) : fieldNames.referralsAndServices[key] &&
+                !["additional_notes",
+                  "support_services_other",
+                  "food_nutrition_other",
+                  "healthcare_other",
+                  "substance_use_treatment_other",
+                  "child_related_other",
+                  "legal_assistance_other"].includes(key) ? (
+                ReferralsAndServices((formData as any)?.[key] || [])
+              ) : fieldNames.referralsAndServices[key] &&
+                ["support_services_other",
+                  "food_nutrition_other",
+                  "healthcare_other",
+                  "substance_use_treatment_other",
+                  "child_related_other",
+                  "legal_assistance_other"].includes(key) ? (
+                ReferralsAndServicesOther((formData as any)?.[key] || [])
+              ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
+                RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
+              ) : (
+                <div>{(formData as any)?.[key]}</div>
+              )}
+            </div>
+          </React.Fragment>
+        ))}
       </div>
     );
   };
 
+  const handleAccordionClick = () => {
+    if (!submissionsFetched) {
+      fetchSubmissions();
+    }
+  };
+
   return (
     <div>
-      <div className="collapse collapse-arrow">
-        <input type="checkbox" className="peer" />
-        <div className="collapse-title rounded-2xl items-center flex bg-gray-200 justify-between">
-          {name}
-          <div className="flex flex-row text-red-500">
-            {!completed && (
-              <>
-                <img className="w-4 mr-2" src={`./images/action.svg`} />
-                Actions Required
-              </>
-            )}
+      <Accordion title={name} /*completed={completed}*/ isLoading={isLoading} onClick={handleAccordionClick}>
+        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalDemographics)}
+        {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalMedicalHistory)}
+        {name === "Psychiatric History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.psychiatricHistory)}
+        {name === "Substance Use History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.substanceUseHistory)}
+        {name === "Medical Services For Substance Use" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.medicalServicesForSubstanceUse)}
+        {name === "Drug Screening Results" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.drugScreeningResults)}
+        {name === "Family & Supports" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.familyAndSupports)}
+        {name === "Infant Information" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.infantInformation)}
+        {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
+        {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
+
+        <div className="flex justify-between mt-6">
+          {submissionsExist[apiUrl] && (
+            <div className="flex">{renderSubmissions()}</div>
+          )}
+          {!submissionsExist[apiUrl] && (
+            <div className="flex">There are no submissions for this form. Please fill out a new submission.</div>
+          )}
+          <div className="flex">
+            <Link to={path} className="button-filled font-semibold">
+              New Submission
+            </Link>
           </div>
         </div>
-        <div className="collapse-content mt-2 flex flex-col bg-white">
-          {name === 'Maternal Demographics' && formData && renderFields(fieldNames.maternalDemographics)}
-          {name === 'Maternal Medical History' && formData && renderFields(fieldNames.maternalMedicalHistory)}
-          {name === 'Psychiatric History' && formData && renderFields(fieldNames.psychiatricHistory)}
-          {name === 'Medical Services For Substance Use' && formData && renderFields(fieldNames.medicalServicesForSubstanceUse)}
-          {name === 'Substance Use History' && formData && renderFields(fieldNames.substanceUseHistory)}
-          {name === 'Drug Screening Results' && formData && renderFields(fieldNames.drugScreeningResults)}
-          {name === 'Family & Supports' && formData && renderFields(fieldNames.familyAndSupports)}
-          {name === 'Infant Information' && formData && renderFields(fieldNames.infantInformation)}
-          {name === 'Referrals and Services' && formData && renderFields(fieldNames.referralsAndServices)}
-          {name === 'Relapse Prevention Plan' && formData && renderFields(fieldNames.relapsePreventionPlan)}
-
-          <div className="flex justify-between">
-            <div className="flex">
-              {renderSubmissions()}
-            </div>
-            <div className="flex">
-              <Link to={path} className="button-filled font-semibold">
-                Edit
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </div>
+      </Accordion>
     </div>
   );
 };

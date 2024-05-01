@@ -4,7 +4,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import useAppStore from '../../store/useAppStore';
 
 const diagnosesSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
@@ -26,8 +27,18 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
+
+    const { submissionId } = useParams();
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+
     const navigate = useNavigate();
-    
+
     const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
@@ -58,37 +69,51 @@ export default function PsychiatricHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_psychiatric_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof PsychiatricHistoryInputs;
-                        setValue(formKey, userData[key]);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_psychiatric_history/${user_id}/${submissionId}`)
+                    const userData = response.data;
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof PsychiatricHistoryInputs;
+                            if (key === 'date_of_diagnoses') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            }
+                            setValue(formKey, userData[key]);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId]);
 
     const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_psychiatric_history/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_psychiatric_history', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        PsychiatricHistoryResponseSchema.parse(responseData);
-
-        return responseData;
+        const userData = responseData.data;
+        PsychiatricHistoryResponseSchema.parse(userData);
+        console.log(userData)
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Psychiatric history added successfully");
-            console.log("PsychiatricHistory data added successfully", responseData);
-
-            navigate('/dashboard');
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Psychiatric History ${method} successfully!`);
+            console.log(`PsychiatricHistory data ${method} successfully.`, userData);
+            navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding PsychiatricHistory data.");
+            alert("Error while adding/updating PsychiatricHistory data.");
         }
     });
 
@@ -102,8 +127,10 @@ export default function PsychiatricHistory() {
                 {fields.map((field, index) => (
 
                     <div key={field.id} className="py-6">
-
-                        <p className="font-medium pt-6">Diagnosis</p>
+                        <div className="flex justify-between items-center">
+                            <p className="font-medium pb-2 pt-8">Diagnosis {index + 1}</p>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Diagnosis</button>
+                        </div>
                         <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.diagnosis?.message}</span>
@@ -121,7 +148,7 @@ export default function PsychiatricHistory() {
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
                         )}
 
-                        <p className="font-medium">Date of Diagnosis</p>
+                        <p className="font-medium pt-6">Date of Diagnosis</p>
                         <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>
@@ -138,12 +165,7 @@ export default function PsychiatricHistory() {
                         {errors.diagnoses && errors.diagnoses[index]?.taking_medication && (
                             <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
                         )}
-
-                        <div className='flex justify-end'>
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Diagnosis</button>
-                        </div>
-                    </div>
-                ))}
+                    </div>))}
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>

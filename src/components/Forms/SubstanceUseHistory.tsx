@@ -2,22 +2,23 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useState } from 'react'
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
+import useAppStore from "../../store/useAppStore";
 
 const DrugInfo = z.object({
     ever_used: z.string().min(1, 'Field required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
-    date_last_used: z.string(),
-    notes: z.string().min(1, 'Notes required')
+    date_last_used: z.string().nullable(),
+    notes: z.string().nullable()
 })
 
 const AdditionalDrugs = z.object({
     drug_used: z.string().min(1, 'Substance name required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
     date_last_used: z.string().min(1, 'Date required'),
-    notes: z.string().min(1, 'Notes required')
+    notes: z.string().nullable()
 });
 type AdditionalDrugs = z.infer<typeof AdditionalDrugs>
 
@@ -32,7 +33,7 @@ const SubstanceUseHistoryInputs = z.object({
     prescription_drugs: DrugInfo,
     tobacco: DrugInfo,
     other_drugs: z.array(AdditionalDrugs),
-    notes: z.string().min(1, 'Additional Notes Required')
+    notes: z.string().nullable()
 })
 export type SubstanceUseHistoryInputs = z.infer<typeof SubstanceUseHistoryInputs>
 
@@ -43,7 +44,16 @@ const SubstanceUseHistoryReponse = SubstanceUseHistoryInputs.extend({
 
 export default function SubstanceUseHistory() {
 
+    const { submissionId } = useParams();
+
+    const { user } = useAppStore();
+    const user_id = user ? user.id : "";
+
     const navigate = useNavigate();
+
+    const formatDate = (date: any) => {
+        return date.toISOString().split('T')[0];
+    };
 
     type DrugVisibilityState = {
         [key: string]: boolean;
@@ -60,11 +70,14 @@ export default function SubstanceUseHistory() {
         prescription_drugs: false,
         tobacco: false,
     });
-    const handleDrugDate = (drug: string, value: string) => {
+    const handleDrugDate = (drug: keyof DrugVisibilityState, value: string) => {
         setShowDrugDate(prevState => ({
             ...prevState,
             [drug]: value === 'Yes',
         }));
+        if (value === 'No') {
+            setValue(`${drug}.date_last_used` as keyof SubstanceUseHistoryInputs, null);
+        }
     };
 
 
@@ -83,24 +96,29 @@ export default function SubstanceUseHistory() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get_substance_use_history/d2bd4688-5527-4bbb-b1a8-af1399d00b12')
-                const userData = response.data;
+            if (submissionId) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_substance_use_history/${user_id}/${submissionId}`)
+                    const userData = response.data;
 
-                Object.keys(userData).forEach(key => {
-                    if (key !== 'id' && key !== 'user_id') {
-                        const formKey = key as keyof SubstanceUseHistoryInputs;
-                        setValue(formKey, userData[key]);
+                    Object.keys(userData).forEach(key => {
+                        if (key !== 'id' && key !== 'user_id') {
+                            const formKey = key as keyof SubstanceUseHistoryInputs;
+                            if (key === 'date_last_used') {
+                                setValue(formKey, formatDate(new Date(userData[key])));
+                            } else {
+                                setValue(formKey, userData[key]);
+                            }
 
-                        setShowDrugDate(prevState => ({
-                            ...prevState,
-                            [key]: userData[key]?.ever_used === 'Yes',
-                        }));
-                    }
-                });
-                console.log('working', userData)
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+                            setShowDrugDate(prevState => ({
+                                ...prevState,
+                                [key]: userData[key]?.ever_used === 'Yes',
+                            }));
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                }
             }
         };
         fetchUserData();
@@ -108,19 +126,29 @@ export default function SubstanceUseHistory() {
 
 
     const { mutate } = useMutation(async (data: SubstanceUseHistoryInputs) => {
+        let responseData;
+        let method;
+        if (submissionId) {
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_substance_use_history/${submissionId}`, { ...data, user_id: user_id })
+            method = "updated";
+        } else {
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: user_id });
+            method = "added";
+        }
 
-        const { data: responseData } = (await axios.post('http://127.0.0.1:5000/api/add_substance_use_history', { ...data, user_id: "d2bd4688-5527-4bbb-b1a8-af1399d00b12" }));
-        SubstanceUseHistoryReponse.parse(responseData);
-        return responseData;
+        const userData = responseData.data
+        SubstanceUseHistoryReponse.parse(userData);
+        console.log(userData)
+        return { userData, method };
     }, {
-        onSuccess: (responseData) => {
-            alert("Substance Use History added successfully!");
-            console.log("SubstanceUseHistory data added successfully", responseData);
-
-            navigate("/dashboard");
+        onSuccess: (data) => {
+            const { userData, method } = data;
+            alert(`Substance Use History ${method} successfully!`);
+            console.log(`SubstanceUseHistory data ${method} successfully.`, userData);
+            navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding SubstanceUseHistory data.");
+            alert("Error while adding/updating SubstanceUseHistory data.");
         }
     });
 
@@ -181,7 +209,10 @@ export default function SubstanceUseHistory() {
 
                     {fields.map((field, index) => (
                         <div key={field.id} className="space-y-4">
-                            <p className="font-medium">Substance</p>
+                            <div className="flex justify-between items-center">
+                            <p className="font-medium py-6">Substance {index + 1}</p>
+                            <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
+                        </div>
                             <input {...register(`other_drugs.${index}.drug_used`)} placeholder="Substance Name" className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                             {errors.other_drugs && errors.other_drugs[index]?.drug_used && (
                                 <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.drug_used?.message}</span>
@@ -209,13 +240,11 @@ export default function SubstanceUseHistory() {
                             <p className="font-medium">Notes</p>
                             <textarea {...register(`other_drugs.${index}.notes`)} placeholder="Notes" className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                             {errors.other_drugs && errors.other_drugs[index]?.notes && (
-                                <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.notes?.message}</span>
-                            )}
-                        </div>
-                    ))}
-                    <div className="flex justify-between">
+                                <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.notes?.message}</span>)}
+                        </div>))}
+
+                    <div className="flex justify-center">
                         <button type="button" onClick={() => fields.length < 2 && append({ drug_used: '', used_during_pregnancy: '', date_last_used: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Substance</button>
-                        <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
                     </div>
                 </div>
 
