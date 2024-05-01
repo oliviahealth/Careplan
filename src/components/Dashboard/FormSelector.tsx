@@ -87,12 +87,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
 
     return (
-      <div className="relative flex">
-        <select
+      <div className="relative flex space-x-2 items-center">
+        {selectedSubmissionID && (
+          <>
+          <select
           value={selectedSubmissionID || ""}
           onChange={(e) => handleSubmissionClick(e.target.value)}
-          className="block bg-white border border-neutral-300 hover:border-neutral-400 mr-2 px-4 py-2 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-        >
+          className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
           {sortedSubmissions.map((submission: any) => (
             <option key={submission.id} value={submission.id}>
               Submission{" "}
@@ -103,16 +105,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             </option>
           ))}
         </select>
-        {selectedSubmissionID && (
-          <>
-            <Link to={`${path}/${selectedSubmissionID}`} className="button-filled font-semibold mr-2">
-              Edit
+            <Link to={`${path}/${selectedSubmissionID}`}>
+              <img className="w-8 h-8" src="./images/edit.svg"></img>
             </Link>
-            <button
-              onClick={() => handleDeleteSubmission(selectedSubmissionID)}
-              className="button-filled bg-red-700 hover:bg-red-800"
-            >
-              Delete
+            <button onClick={() => handleDeleteSubmission(selectedSubmissionID)}>
+              <img className="w-8 h-8" src="./images/delete.svg"></img>
             </button>
           </>
         )}
