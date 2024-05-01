@@ -163,7 +163,7 @@ export default function SubstanceUseHistory() {
                     <div key={drug} className="pt-10">
                         <div className="flex flex-nowrap space-x-4">
                             <div className="flex flex-col space-y-2 flex-grow">
-                                <p className="font-medium">Have they used {drug.charAt(0).toUpperCase() + drug.slice(1)}?</p>
+                                <p className="font-medium">Have they used {drug === 'prescription_drugs' ? 'Prescription Drugs' : drug.charAt(0).toUpperCase() + drug.slice(1)}?</p>
                                 {['Yes', 'No'].map((status) => (
                                     <label key={status} className="inline-flex items-center">
                                         <input {...register(`${drug}.ever_used`)} className="mr-2" type="radio" value={status} onChange={(e) => handleDrugDate(drug, e.target.value)} />
@@ -210,9 +210,9 @@ export default function SubstanceUseHistory() {
                     {fields.map((field, index) => (
                         <div key={field.id} className="space-y-4">
                             <div className="flex justify-between items-center">
-                            <p className="font-medium py-6">Substance {index + 1}</p>
-                            <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
-                        </div>
+                                <p className="font-medium py-6">Substance {index + 1}</p>
+                                <button type="button" onClick={() => fields.length > 0 && remove(fields.length - 1)} className="text-red-600 px-4 py-2 rounded-md">- Remove Substance</button>
+                            </div>
                             <input {...register(`other_drugs.${index}.drug_used`)} placeholder="Substance Name" className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                             {errors.other_drugs && errors.other_drugs[index]?.drug_used && (
                                 <span className="label-text-alt text-red-500">{errors.other_drugs[index]?.drug_used?.message}</span>

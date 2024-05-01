@@ -180,7 +180,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       notes: "Notes",
     },
     medicalServicesForSubstanceUse: {
-      mat_engaged: "Medication Assisted Treatment (MAT) Engaged",
+      mat_engaged: "MAT Engaged",
       date_used_mat: "Date of Last MAT Use",
       medications: "Medications",
       mat_clinic_name: "MAT Clinic Name",
@@ -188,7 +188,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       used_addiction_medicine_services: "Addiction Medicine Services",
       date_used_medicine_service: "Date of Last Medicine Service",
       addiction_medicine_clinic: "Addiction Medicine Clinic",
-      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Information",
+      addiction_medicine_clinic_phone: "Addiction Medicine Clinic Contact Info",
     },
     substanceUseHistory: {
       alcohol: "Alcohol",
@@ -310,7 +310,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const PscyhiatricHistoryDiagnoses = (data: any) => {
+  const PsychiatricHistoryDiagnoses = (data: any) => {
     return data.map((x: any, index: any) => {
       return (
         <div key={index}>
@@ -521,7 +521,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
               {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
                 MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
               ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
-                PscyhiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                PsychiatricHistoryDiagnoses((formData as any)?.[key] || [])
               ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
                 MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
               ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
