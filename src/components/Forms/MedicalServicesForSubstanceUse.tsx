@@ -17,12 +17,12 @@ const MedicalServicesSubstanceUseInputs = z.object({
     mat_engaged: z.string().min(1, 'MAT engaged required'),
     date_used_mat: z.string().nullable(),
     medications: z.array(Medications),
-    mat_clinic_name: z.string().min(1, 'MAT clinic name required'),
-    mat_clinic_phone: z.string().min(1, 'MAT clinic phone number required'),
+    mat_clinic_name: z.string().nullable(),
+    mat_clinic_phone: z.string().nullable(),
     used_addiction_medicine_services: z.string().min(1, 'This field is required'),
     date_used_medicine_service: z.string().nullable(),
-    addiction_medicine_clinic: z.string().min(1, 'Addiction medicine clinic name required'),
-    addiction_medicine_clinic_phone: z.string().min(1, 'Addiction medicine clinic phone number required')
+    addiction_medicine_clinic: z.string().nullable(),
+    addiction_medicine_clinic_phone: z.string().nullable(),
 });
 type MedicalServicesSubstanceUseInputs = z.infer<typeof MedicalServicesSubstanceUseInputs>
 
@@ -44,19 +44,23 @@ export default function MedicalServicesForSubstanceUse() {
         return date.toISOString().split('T')[0];
     };
 
-    const [showMatDate, setShowMatDate] = useState(false)
-    const handleShowMatDate = (value: string) => {
-        setShowMatDate(value === 'Prior MAT use');
+    const [showMatDetails, setShowMatDetails] = useState(false)
+    const handleShowMatDetails = (value: string) => {
+        setShowMatDetails(value === 'Prior MAT use',);
         if (value !== 'Prior MAT use') {
             setValue('date_used_mat', null);
+            setValue('mat_clinic_name', null);
+            setValue('mat_clinic_phone', null);
         }
     };
 
-    const [showAddictionServiceDate, setShowAddictionServiceDate] = useState(false)
-    const handleShowAddictionServiceDate = (value: string) => {
-        setShowAddictionServiceDate(value === 'Prior Use');
+    const [showAddictionServiceDetails, setShowAddictionServiceDetails] = useState(false)
+    const handleShowAddictionServiceDetails = (value: string) => {
+        setShowAddictionServiceDetails(value === 'Prior Use');
         if (value !== 'Prior Use') {
             setValue('date_used_medicine_service', null);
+            setValue('addiction_medicine_clinic', null);
+            setValue('addiction_medicine_clinic_phone', null);
         }
     };
 
@@ -97,8 +101,8 @@ export default function MedicalServicesForSubstanceUse() {
                         }
                     });
 
-                    setShowMatDate(userData.mat_engaged === 'Prior MAT use');
-                    setShowAddictionServiceDate(userData.used_addiction_medicine_services === 'Prior Use')
+                    setShowMatDetails(userData.mat_engaged === 'Prior MAT use');
+                    setShowAddictionServiceDetails(userData.used_addiction_medicine_services === 'Prior Use')
                 } catch (error) {
                     console.error('Error fetching user data:', error);
                 }
@@ -112,6 +116,7 @@ export default function MedicalServicesForSubstanceUse() {
 
         let responseData;
         let method;
+        console.log(data);
         if (submissionId) {
             responseData = await axios.put(`http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`, { ...data, user_id: user_id })
             method = "updated";
@@ -146,21 +151,30 @@ export default function MedicalServicesForSubstanceUse() {
                 <p className="font-medium">Medication Assisted Treatment (MAT) engaged?</p>
                 {["Never", "Currently", "Prior MAT use"].map((status) => (
                     <label key={status} className="flex pt-2">
-                        <input {...register("mat_engaged")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowMatDate(e.target.value)} />
+                        <input {...register("mat_engaged")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowMatDetails(e.target.value)} />
                         <span className="ml-2">{status}</span>
                     </label>))}
                 {errors.mat_engaged && <span className="label-text-alt text-red-500">{errors.mat_engaged.message}</span>}
 
-                {showMatDate &&
+                {showMatDetails &&
                     <>
                         <p className="font-medium">Date Last Used</p>
                         <input {...register("date_used_mat")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.date_used_mat && <span className="label-text-alt text-red-500">{errors.date_used_mat.message}</span>}
+
+                        <p className="font-medium">MAT Clinic</p>
+                        <input {...register("mat_clinic_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.mat_clinic_name && <span className="label-text-alt text-red-500">{errors.mat_clinic_name.message}</span>}
+
+                        <p className="font-medium">MAT Clinic Phone Number</p>
+                        <input {...register("mat_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.mat_clinic_phone && <span className="label-text-alt text-red-500">{errors.mat_clinic_phone.message}</span>}
                     </>
                 }
 
-                {fields.map((_fields, index) => (
-                    <div key={index} className="py-6 space-y-6">
+                <p className="font-medium">Medications</p>
+                {fields.map((field, index) => (
+                    <div key={field.id} className="py-6 space-y-6">
 
                         <div className="flex justify-between items-center py-6">
                             <p className="font-medium pb-2 pt-8">Medication {index + 1}</p>
@@ -177,48 +191,35 @@ export default function MedicalServicesForSubstanceUse() {
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
                         )}
 
-                        {/* <div className="flex justify-end">
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
-
-                        </div> */}
                     </div>))}
-
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
                 </div>
 
-                <p className="font-medium">MAT Clinic</p>
-                <input {...register("mat_clinic_name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.mat_clinic_name && <span className="label-text-alt text-red-500">{errors.mat_clinic_name.message}</span>}
-
-                <p className="font-medium">MAT Clinic Phone Number</p>
-                <input {...register("mat_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.mat_clinic_phone && <span className="label-text-alt text-red-500">{errors.mat_clinic_phone.message}</span>}
-
                 <p className="font-medium">Used Addiction Medicine Services?</p>
                 {["Never", "Currently", "Prior Use"].map((status) => (
                     <label key={status} className="flex items-center pt-2">
-                        <input {...register("used_addiction_medicine_services")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowAddictionServiceDate(e.target.value)} />
+                        <input {...register("used_addiction_medicine_services")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowAddictionServiceDetails(e.target.value)} />
                         <span className="ml-2">{status}</span>
                     </label>))}
                 {errors.used_addiction_medicine_services && <span className="label-text-alt text-red-500">{errors.used_addiction_medicine_services.message}</span>}
 
-                {showAddictionServiceDate &&
+                {showAddictionServiceDetails &&
                     <>
                         <p className="font-medium">Date Last Used</p>
                         <input {...register("date_used_medicine_service")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
                         {errors.date_used_medicine_service && <span className="label-text-alt text-red-500">{errors.date_used_medicine_service.message}</span>}
+
+                        <p className="font-medium">Addiction Medicine Clinic Name</p>
+                        <input {...register("addiction_medicine_clinic")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.addiction_medicine_clinic && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic.message}</span>}
+
+                        <p className="font-medium">Addiction Medicine Clinic Phone Number</p>
+                        <input {...register("addiction_medicine_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.addiction_medicine_clinic_phone && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic_phone.message}</span>}
                     </>
                 }
-
-                <p className="font-medium">Addiction Medicine Clinic Name</p>
-                <input {...register("addiction_medicine_clinic")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.addiction_medicine_clinic && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic.message}</span>}
-
-                <p className="font-medium">Addiction Medicine Clinic Phone Number</p>
-                <input {...register("addiction_medicine_clinic_phone")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.addiction_medicine_clinic_phone && <span className="label-text-alt text-red-500">{errors.addiction_medicine_clinic_phone.message}</span>}
 
                 <div className="flex justify-center">
                     <button type="submit" className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md">Save</button>
