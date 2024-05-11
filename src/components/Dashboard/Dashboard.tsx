@@ -7,13 +7,14 @@ function Dashboard() {
 
   const { user } = useAppStore();
   const user_id = user ? user.id : "";
+  const name = user ? user.name : "";
 
   return (
     <div className="flex flex-col md:flex-row md:px-0 px-10">
       <LeftSidebar />
       <div className="md:pl-10 md:pr-32 py-5 md:py-10 w-full">
         <div className="flex flex-row justify-between items-center md:items-baseline">
-          <div className="flex text-2xl md:text-3xl font-semibold">First Name Last Name</div>
+          <div className="flex text-2xl md:text-3xl font-semibold">{name}</div>
           <div className="flex pr-3 md:pr-6">
             <img className="w-6 hidden md:block" src="./images/meatballs.svg"></img>
             <img className="h-6 md:hidden block" src="./images/kebab.svg"></img>

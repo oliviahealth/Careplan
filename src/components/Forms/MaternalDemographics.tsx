@@ -62,8 +62,11 @@ export default function MaternalDemographics() {
 
   const { submissionId } = useParams();
 
-  const { user } = useAppStore();
+  const { user, access_token } = useAppStore();
   const user_id = user ? user.id : "";
+
+  console.log("user_id: ", user_id)
+  console.log("token: ", access_token)
 
   const navigate = useNavigate();
 
