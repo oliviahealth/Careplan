@@ -3,7 +3,7 @@ import { useMutation } from 'react-query'
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import useAppStore from "../../store/useAppStore";
 
@@ -13,6 +13,7 @@ const Caregiver = z.object({
     contact_number: z.string().min(1, "Contact number required"),
     relationship: z.string().min(1, "Relationship required")
 });
+export type Caregivers = z.infer<typeof Caregiver>
 
 const RelapsePreventionPlanInputs = z.object({
     three_things_that_trigger_desire_to_use: z.string().min(1, "3 things that trigger desire required"),
@@ -36,10 +37,10 @@ export default function RelapsePreventionPlan() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id,
-    }
+        "userId": user?.id || '',
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
@@ -91,7 +92,7 @@ export default function RelapsePreventionPlan() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: RelapsePreventionPlanInputs) => {
         let responseData;

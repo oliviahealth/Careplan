@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useMutation } from 'react-query'
 import axios from 'axios'
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
 
@@ -14,6 +14,7 @@ const diagnosesSchema = z.object({
     date_of_diagnosis: z.string().min(1, "Date of diagnosis is required"),
     taking_medication: z.string().min(1, "This field is required"),
 });
+export type Diagnoses = z.infer<typeof diagnosesSchema>
 
 export const PsychiatricHistoryInputsSchema = z.object({
     diagnoses: z.array(diagnosesSchema),
@@ -30,17 +31,17 @@ export default function PsychiatricHistory() {
 
     const { submissionId } = useParams();
 
-    const formatDate = (date: any) => {
+    const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
     };
 
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id,
-    }
+        "userId": user?.id || '',
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
@@ -96,7 +97,7 @@ export default function PsychiatricHistory() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
         let responseData;

@@ -25,7 +25,7 @@ const SignUp: React.FC = () => {
     });
     type SignupFormData = z.infer<typeof SignUpSchema>;
 
-    let { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
+    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
 
     const { mutate } = useMutation(async (data: SignupFormData) => {
         interface SignupResponse extends User {
