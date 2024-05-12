@@ -69,13 +69,13 @@ const SignUp: React.FC = () => {
 
                 <div>
                     <p className="font-medium text-sm mb-1 ml-1">Password</p>
-                    <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                    <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
                     {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
                 </div>
 
                 <div>
                     <p className="font-medium text-sm mb-1 ml-1">Confirm Password</p>
-                    <input {...register("confirmPassword")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                    <input {...register("confirmPassword")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
                     {errors.confirmPassword && <span className="label-text-alt text-red-500">{errors.confirmPassword.message}</span>}
                 </div>
 
