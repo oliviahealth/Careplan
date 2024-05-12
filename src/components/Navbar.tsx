@@ -67,11 +67,11 @@ const Navbar: React.FC = () => {
             )}
 
             {user ? (
-              <button className="block md:flex button md:button-filled" onClick={() => mutate()}>
+              <button className="block md:flex button md:button-filled md:rounded-full" onClick={() => mutate()}>
                 Sign Out
               </button>
             ) : (
-              <Link to={"/sign-in"} className="block md:flex button md:button-filled ">
+              <Link to={"/sign-in"} className="block md:flex button md:button-filled md:rounded-full">
                 Sign In
               </Link>
             )}

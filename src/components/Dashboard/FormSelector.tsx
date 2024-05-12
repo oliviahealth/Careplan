@@ -604,7 +604,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             <div className="flex">There are no submissions for this form. Please fill out a new submission.</div>
           )}
           <div className="flex">
-            <Link to={path} className="button-filled font-semibold">
+            <Link to={path} className="button-filled rounded-full font-semibold">
               New Submission
             </Link>
           </div>

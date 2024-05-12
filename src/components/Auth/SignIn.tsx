@@ -47,23 +47,28 @@ const SignUp: React.FC = () => {
     })
 
     return (
-        <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
+        <div className="flex justify-center h-full mt-[10vh]">
+            <form onSubmit={handleSubmit((data) => mutate(data))} className="flex flex-col w-3/4 md:w-1/3 h-fit justify-between [&>*]:my-3">
+                <div className="flex self-center font-medium text-3xl">Welcome Back!</div>
+                <div>
+                    <p className="font-medium text-sm mb-1 ml-1">Email Address</p>
+                    <input {...register("email")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                    {errors.email && <span className="label-text-alt text-red-500">{errors.email.message}</span>}
+                </div>
 
-            <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <div>
+                <p className="font-medium text-sm mb-1 ml-1">Password</p>
+                    <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
+                    {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
+                </div>
 
-                <p className="font-medium">Email</p>
-                <input {...register("email")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
-                {errors.email && <span className="label-text-alt text-red-500">{errors.email.message}</span>}
-
-                <p className="font-medium">Password</p>
-                <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
-                {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
-
-                <button className="btn btn-primary w-full mt-6">
-                    Sign In
+                <button className="button-filled rounded-full py-3 w-full">
+                    Sign in
                 </button>
 
-                <p className="text-sm mt-8">Don't have an account? <span className="text-primary"><Link to={'/sign-up'}>Sign Up</Link></span></p>
+                <div className="flex self-center">
+                    <p className="text-sm">Don't have an account? <span className="button-colored font-medium p-0"><Link to={'/sign-up'}>Create one now.</Link></span></p>
+                </div>
             </form>
         </div>
     )
