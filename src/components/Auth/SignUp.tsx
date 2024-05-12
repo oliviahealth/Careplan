@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import { z } from "zod";
@@ -10,13 +10,11 @@ import useAppStore, { UserSchema, User } from "../../store/useAppStore";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
-    // const setError = useAppStore(state => state.setError);
 
     const setUser = useAppStore((state) => state.setUser);
     const setAccessToken = useAppStore((state) => state.setAccessToken);
-    // const [errorDetected, setErrorDetected] = useState(false);
 
-    const signupSchema = z.object({
+    const SignUpSchema = z.object({
         name: z.string().min(1, 'Name is required'),
         email: z.string().email().min(1, 'Email is required'),
         password: z.string().min(1, 'Password is required'),
@@ -25,9 +23,9 @@ const SignUp: React.FC = () => {
         path: ['confirmPassword'],
         message: 'Passwords must match'
     });
-    type SignupFormData = z.infer<typeof signupSchema>; // Create the type from Zod inference
+    type SignupFormData = z.infer<typeof SignUpSchema>;
 
-    let { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(signupSchema) });
+    let { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
 
     const { mutate } = useMutation(async (data: SignupFormData) => {
         interface SignupResponse extends User {

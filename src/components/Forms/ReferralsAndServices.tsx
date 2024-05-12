@@ -109,8 +109,13 @@ export default function ReferralsAndServices() {
 
     const { submissionId } = useParams();
 
-    const { user } = useAppStore();
-    const user_id = user ? user.id : "";
+    const user = useAppStore((state) => state.user);
+    const access_token = useAppStore((state) => state.access_token);
+
+    const headers = {
+        "Authorization": "Bearer " + access_token,
+        "userId": user?.id,
+    }
 
     const navigate = useNavigate();
 
@@ -208,7 +213,10 @@ export default function ReferralsAndServices() {
         const fetchUserData = async () => {
             if (submissionId) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:5000/api/get_referrals_and_services/${user_id}/${submissionId}`)
+                    const response = await axios.get(
+                        `http://127.0.0.1:5000/api/get_referrals_and_services/${submissionId}`,
+                        { headers: { ...headers } }
+                    )
                     const userData = response.data;
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
@@ -229,10 +237,18 @@ export default function ReferralsAndServices() {
         let responseData;
         let method;
         if (submissionId) {
-            responseData = await axios.put(`http://127.0.0.1:5000/api/update_referrals_and_services/${submissionId}`, { ...data, user_id: user_id });
+            responseData = await axios.put(
+                `http://127.0.0.1:5000/api/update_referrals_and_services/${submissionId}`,
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "updated";
         } else {
-            responseData = await axios.post('http://127.0.0.1:5000/api/add_referrals_and_services', { ...data, user_id: user_id });
+            responseData = await axios.post(
+                'http://127.0.0.1:5000/api/add_referrals_and_services',
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "added";
         }
 

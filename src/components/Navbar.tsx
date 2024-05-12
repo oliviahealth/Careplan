@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
     const headers = {
       "Authorization": "Bearer " + access_token,
     }
-    await axios.post(`http://127.0.0.1:5000/api/signout`, null, { headers })
+    await axios.post(`http://127.0.0.1:5000/api/signout`, null, { headers: { ...headers } })
   }, {
     onSettled: () => {
       sessionStorage.removeItem('access_token');

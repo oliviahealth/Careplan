@@ -62,10 +62,15 @@ export default function MaternalDemographics() {
 
   const { submissionId } = useParams();
 
-  const { user, access_token } = useAppStore();
-  const user_id = user ? user.id : "";
+  const user = useAppStore((state) => state.user);
+  const access_token = useAppStore((state) => state.access_token);
 
-  console.log("user_id: ", user_id)
+  const headers = {
+    "Authorization": "Bearer " + access_token,
+    "userId": user?.id,
+  }
+
+  console.log("user_id: ", user?.id)
   console.log("token: ", access_token)
 
   const navigate = useNavigate();
@@ -80,7 +85,9 @@ export default function MaternalDemographics() {
     const fetchUserData = async () => {
       if (submissionId) {
         try {
-          const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_demographics/${user_id}/${submissionId}`)
+          const response = await axios.get(
+            `http://127.0.0.1:5000/api/get_maternal_demographics/${submissionId}`,
+            { headers: { ...headers } })
           const userData = response.data;
           Object.keys(userData).forEach(key => {
             if (key !== 'id' && key !== 'user_id') {
@@ -104,10 +111,16 @@ export default function MaternalDemographics() {
     let responseData;
     let method;
     if (submissionId) {
-      responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`, { ...data, user_id: user_id })
+      responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`,
+        { ...data },
+        { headers: { ...headers } }
+      )
       method = "updated";
     } else {
-      responseData = await axios.post('http://127.0.0.1:5000/api/add_maternal_demographics', { ...data, user_id: user_id });
+      responseData = await axios.post(`http://127.0.0.1:5000/api/add_maternal_demographics`,
+        { ...data },
+        { headers: { ...headers } }
+      )
       method = "added";
     }
 
