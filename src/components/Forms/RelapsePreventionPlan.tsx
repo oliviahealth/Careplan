@@ -33,8 +33,13 @@ export default function RelapsePreventionPlan() {
 
     const { submissionId } = useParams();
 
-    const { user } = useAppStore();
-    const user_id = user ? user.id : "";
+    const user = useAppStore((state) => state.user);
+    const access_token = useAppStore((state) => state.access_token);
+
+    const headers = {
+        "Authorization": "Bearer " + access_token,
+        "userId": user?.id,
+    }
 
     const navigate = useNavigate();
 
@@ -69,7 +74,10 @@ export default function RelapsePreventionPlan() {
         const fetchUserData = async () => {
             if (submissionId) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:5000/api/get_relapse_prevention_plan/${user_id}/${submissionId}`)
+                    const response = await axios.get(
+                        `http://127.0.0.1:5000/api/get_relapse_prevention_plan/${submissionId}`,
+                        { headers: { ...headers } }
+                    );
                     const userData = response.data;
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
@@ -89,10 +97,18 @@ export default function RelapsePreventionPlan() {
         let responseData;
         let method;
         if (submissionId) {
-            responseData = await axios.put(`http://127.0.0.1:5000/api/update_relapse_prevention_plan/${submissionId}`, { ...data, user_id: user_id });
+            responseData = await axios.put(
+                `http://127.0.0.1:5000/api/update_relapse_prevention_plan/${submissionId}`,
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "updated";
         } else {
-            responseData = await axios.post('http://127.0.0.1:5000/api/add_relapse_prevention_plan', { ...data, user_id: user_id });
+            responseData = await axios.post(
+                'http://127.0.0.1:5000/api/add_relapse_prevention_plan',
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "added";
         }
 
@@ -158,7 +174,7 @@ export default function RelapsePreventionPlan() {
                         {errors.safe_caregivers && errors.safe_caregivers[index]?.relationship && (
                             <span className="label-text-alt text-red-500">{errors.safe_caregivers[index]?.relationship?.message}</span>)}
 
-                        
+
                     </div>))}
 
                 <div className="flex justify-center">

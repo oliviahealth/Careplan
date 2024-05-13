@@ -35,8 +35,13 @@ export default function MedicalServicesForSubstanceUse() {
 
     const { submissionId } = useParams();
 
-    const { user } = useAppStore();
-    const user_id = user ? user.id : "";
+    const user = useAppStore((state) => state.user);
+    const access_token = useAppStore((state) => state.access_token);
+
+    const headers = {
+        "Authorization": "Bearer " + access_token,
+        "userId": user?.id,
+    }
 
     const navigate = useNavigate();
 
@@ -88,7 +93,10 @@ export default function MedicalServicesForSubstanceUse() {
         const fetchUserData = async () => {
             if (submissionId) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}/${submissionId}`)
+                    const response = await axios.get(
+                        `http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${submissionId}`,
+                        { headers: { ...headers } }
+                    )
                     const userData = response.data;
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
@@ -118,10 +126,17 @@ export default function MedicalServicesForSubstanceUse() {
         let method;
         console.log(data);
         if (submissionId) {
-            responseData = await axios.put(`http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`, { ...data, user_id: user_id })
+            responseData = await axios.put(
+                `http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`,
+                { ...data },
+                { headers: { ...headers } }
+            )
             method = "updated";
         } else {
-            responseData = await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user_id });
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use',
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "added";
         }
 
@@ -132,12 +147,12 @@ export default function MedicalServicesForSubstanceUse() {
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
-            alert(`Maternal Services For Substance Use ${method} successfully!`);
-            console.log(`MaternalServicesForSubstanceUse data ${method} successfully.`, userData);
+            alert(`Medical Services For Substance Use ${method} successfully!`);
+            console.log(`MedicalServicesForSubstanceUse data ${method} successfully.`, userData);
             navigate('/dashboard')
         },
         onError: () => {
-            alert("Error while adding Maternal Services For Substance Use data.");
+            alert("Error while adding Medical Services For Substance Use data.");
         }
     });
 

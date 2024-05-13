@@ -2,19 +2,18 @@ import React, { /*useEffect,*/ useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Accordion from "../Accordion";
+import useAppStore from "../../store/useAppStore";
 
 interface FormSelectorProps {
   name: string;
   path: string;
   apiUrl: string;
-  userID: string;
 }
 
 const FormSelector: React.FC<FormSelectorProps> = ({
   name,
   path,
-  apiUrl,
-  userID,
+  apiUrl
 }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   // const [completed, setCompleted] = useState<boolean>(true);
@@ -31,11 +30,20 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     }));
   };
 
+  const user = useAppStore((state) => state.user);
+  const access_token = useAppStore((state) => state.access_token);
+
+  const headers = {
+    "Authorization": "Bearer " + access_token,
+    "userId": user?.id,
+  }
+
   const fetchSubmissions = async () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:5000/api/get_${apiUrl}/${userID}`
+        `http://127.0.0.1:5000/api/get_${apiUrl}`,
+        { headers: { ...headers } }
       );
       const allSubmissions = response.data;
       setSubmissions(allSubmissions);
@@ -68,7 +76,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     if (confirmed) {
       try {
         await axios.delete(
-          `http://127.0.0.1:5000/api/delete_${apiUrl}/${submissionID}`
+          `http://127.0.0.1:5000/api/delete_${apiUrl}/${submissionID}`,
+          { headers: { ...headers } }
         );
         fetchSubmissions();
         setFormData({});
@@ -90,21 +99,21 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div className="relative flex space-x-2 items-center">
         {selectedSubmissionID && (
           <>
-          <select
-          value={selectedSubmissionID || ""}
-          onChange={(e) => handleSubmissionClick(e.target.value)}
-          className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-          {sortedSubmissions.map((submission: any) => (
-            <option key={submission.id} value={submission.id}>
-              Submission{" "}
-              {new Date(submission.timestamp).toLocaleString("en-US", {
-                timeZone: "America/Chicago",
-              })}{" "}
-              CST
-            </option>
-          ))}
-        </select>
+            <select
+              value={selectedSubmissionID || ""}
+              onChange={(e) => handleSubmissionClick(e.target.value)}
+              className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              {sortedSubmissions.map((submission: any) => (
+                <option key={submission.id} value={submission.id}>
+                  Submission{" "}
+                  {new Date(submission.timestamp).toLocaleString("en-US", {
+                    timeZone: "America/Chicago",
+                  })}{" "}
+                  CST
+                </option>
+              ))}
+            </select>
             <Link to={`${path}/${selectedSubmissionID}`}>
               <img className="w-8 h-8" src="./images/edit.svg"></img>
             </Link>
@@ -595,7 +604,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             <div className="flex">There are no submissions for this form. Please fill out a new submission.</div>
           )}
           <div className="flex">
-            <Link to={path} className="button-filled font-semibold">
+            <Link to={path} className="button-filled rounded-full font-semibold">
               New Submission
             </Link>
           </div>

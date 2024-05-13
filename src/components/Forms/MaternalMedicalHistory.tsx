@@ -41,8 +41,13 @@ export default function MaternalMedicalHistory() {
 
     const { submissionId } = useParams();
 
-    const { user } = useAppStore();
-    const user_id = user ? user.id : "";
+    const user = useAppStore((state) => state.user);
+    const access_token = useAppStore((state) => state.access_token);
+
+    const headers = {
+        "Authorization": "Bearer " + access_token,
+        "userId": user?.id,
+    }
 
     const navigate = useNavigate();
 
@@ -87,7 +92,10 @@ export default function MaternalMedicalHistory() {
         const fetchUserData = async () => {
             if (submissionId) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${user_id}/${submissionId}`)
+                    const response = await axios.get(
+                        `http://127.0.0.1:5000/api/get_maternal_medical_history/${submissionId}`,
+                        { headers: { ...headers } }
+                    )
                     const userData = response.data;
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
@@ -114,10 +122,18 @@ export default function MaternalMedicalHistory() {
         let responseData;
         let method;
         if (submissionId) {
-            responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_medical_history/${submissionId}`, { ...data, user_id: user_id });
+            responseData = await axios.put(
+                `http://127.0.0.1:5000/api/update_maternal_medical_history/${submissionId}`,
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "updated";
         } else {
-            responseData = await axios.post('http://127.0.0.1:5000/api/add_maternal_medical_history', { ...data, user_id: user_id });
+            responseData = await axios.post(
+                'http://127.0.0.1:5000/api/add_maternal_medical_history',
+                { ...data },
+                { headers: { ...headers } }
+            );
             method = "added";
         }
 
@@ -127,7 +143,7 @@ export default function MaternalMedicalHistory() {
         return { userData, method };
     }, {
         onSuccess: (data) => {
-            const {userData, method} = data;
+            const { userData, method } = data;
             alert(`Maternal Medical History ${method} successfully!`);
             console.log(`Maternal Medical History data ${method} successfully.`, userData);
             navigate('/dashboard')
@@ -231,7 +247,7 @@ export default function MaternalMedicalHistory() {
                     <div key={field.id} className="py-6">
                         <div className="flex justify-between items-center">
                             <p className="font-medium pb-2 pt-8">Medication {index + 1}</p>
-                                <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medicine</button>
+                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medicine</button>
                         </div>
                         <input {...register(`current_medication_list.${index}.name`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.current_medication_list && errors.current_medication_list[index]?.name && (
