@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { states } from "../../utils";
 import { useMutation } from 'react-query'
 import axios from 'axios'
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore';
 
 const livingArrangementsEnum = z.enum([
@@ -51,12 +51,14 @@ const MaternalDemographicsInputsSchema = z.object({
   subscriber_id: z.string().min(1, 'Insurance plan subscriber ID is required'),
   group_id: z.string().min(1, 'Insurance plan group ID is required'),
 })
-type MaternalDemographicsInputsType = z.infer<typeof MaternalDemographicsInputsSchema>
+export type MaternalDemographicsInputsType = z.infer<typeof MaternalDemographicsInputsSchema>
 
 const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.extend({
   id: z.string(),
-  user_id: z.string()
+  user_id: z.string(),
 });
+
+export type MaternalDemographicsResponseType = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
 
@@ -65,17 +67,17 @@ export default function MaternalDemographics() {
   const user = useAppStore((state) => state.user);
   const access_token = useAppStore((state) => state.access_token);
 
-  const headers = {
+  const headers = useMemo(() => ({
     "Authorization": "Bearer " + access_token,
     "userId": user?.id,
-  }
-
+  }), [access_token, user?.id]);
+  
   console.log("user_id: ", user?.id)
   console.log("token: ", access_token)
 
   const navigate = useNavigate();
 
-  const formatDate = (date: any) => {
+  const formatDate = (date: Date) => {
     return date.toISOString().split('T')[0];
   };
 
@@ -105,19 +107,21 @@ export default function MaternalDemographics() {
       }
     };
     fetchUserData();
-  }, [submissionId]);
+  }, [submissionId, headers, setValue]);
 
   const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
     let responseData;
     let method;
     if (submissionId) {
-      responseData = await axios.put(`http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`,
+      responseData = await axios.put(
+        `http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`,
         { ...data },
         { headers: { ...headers } }
       )
       method = "updated";
     } else {
-      responseData = await axios.post(`http://127.0.0.1:5000/api/add_maternal_demographics`,
+      responseData = await axios.post(
+        `http://127.0.0.1:5000/api/add_maternal_demographics`,
         { ...data },
         { headers: { ...headers } }
       )

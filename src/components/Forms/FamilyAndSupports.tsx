@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
 const HouseholdMember = z.object({
@@ -12,6 +12,7 @@ const HouseholdMember = z.object({
     date_of_birth: z.string().min(1, "Date of birth required"),
     relation: z.string().min(1, "Relation required")
 });
+export type HouseholdMembers = z.infer<typeof HouseholdMember>
 
 const Child = z.object({
     name: z.string().min(1, "Child name required"),
@@ -19,6 +20,7 @@ const Child = z.object({
     caregiver: z.string().min(1, "Caregiver name required"),
     caregiver_number: z.string().min(1, "Caregiver number required"),
 });
+export type Children = z.infer<typeof Child>
 
 const FamilyAndSupportsInputs = z.object({
     people_living_in_home: z.array(HouseholdMember),
@@ -42,10 +44,10 @@ export default function FamilyAndSupports() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
-    }
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
@@ -100,7 +102,7 @@ export default function FamilyAndSupports() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
 

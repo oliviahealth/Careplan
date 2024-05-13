@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore';
 
 const displayNames: Record<string, string> = {
@@ -48,6 +48,7 @@ const Services = z.object({
     organization: z.string().min(1, "Organization required"),
     organization_contact_information: z.string().min(1, "Organization contact info required")
 })
+export type Services = z.infer<typeof Services>
 
 const AdditionalServices = z.object({
     name: z.string().min(1, "Service name required"),
@@ -55,6 +56,7 @@ const AdditionalServices = z.object({
     organization: z.string().min(1, "Organization required"),
     organization_contact_information: z.string().min(1, "Organization contact info required")
 });
+export type AdditionalServices = z.infer<typeof AdditionalServices>
 
 const ReferralsAndServicesInputs = z.object({
     parenting_classes: Services,
@@ -112,10 +114,10 @@ export default function ReferralsAndServices() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
-    }
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
@@ -230,7 +232,7 @@ export default function ReferralsAndServices() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: ReferralsAndServicesInputs) => {
         console.log("button clicked");
@@ -268,7 +270,7 @@ export default function ReferralsAndServices() {
         }
     })
 
-    const generateFormFields = (keys: string[], errors: Record<string, any>) => {
+    const generateFormFields = (keys: string[], errors: any) => {
         return keys.map((key, index) => (
             <div key={index}>
                 <p className="font-medium text-xl pt-6">{displayNames[key]}</p>

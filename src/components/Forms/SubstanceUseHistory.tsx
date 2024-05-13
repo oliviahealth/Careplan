@@ -1,5 +1,5 @@
 import { useForm, useFieldArray } from "react-hook-form";
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,6 +13,7 @@ const DrugInfo = z.object({
     date_last_used: z.string().nullable(),
     notes: z.string().nullable()
 })
+export type Drugs = z.infer<typeof DrugInfo>
 
 const AdditionalDrugs = z.object({
     drug_used: z.string().min(1, 'Substance name required'),
@@ -20,7 +21,7 @@ const AdditionalDrugs = z.object({
     date_last_used: z.string().min(1, 'Date required'),
     notes: z.string().nullable()
 });
-type AdditionalDrugs = z.infer<typeof AdditionalDrugs>
+export type AdditionalDrugs = z.infer<typeof AdditionalDrugs>
 
 const SubstanceUseHistoryInputs = z.object({
     alcohol: DrugInfo,
@@ -49,14 +50,14 @@ export default function SubstanceUseHistory() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
-    }
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
-    const formatDate = (date: any) => {
+    const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
     };
 
@@ -130,7 +131,7 @@ export default function SubstanceUseHistory() {
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId, headers, setValue]);
 
 
     const { mutate } = useMutation(async (data: SubstanceUseHistoryInputs) => {

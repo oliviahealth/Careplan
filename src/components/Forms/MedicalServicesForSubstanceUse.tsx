@@ -5,13 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation } from 'react-query'
 import axios from 'axios'
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import useAppStore from "../../store/useAppStore";
 
 const Medications = z.object({
     medication: z.string().min(1, 'Medication required'),
     dose: z.string().min(1, 'Dose required')
 });
+export type SubstanceUseMedications = z.infer<typeof Medications>
 
 const MedicalServicesSubstanceUseInputs = z.object({
     mat_engaged: z.string().min(1, 'MAT engaged required'),
@@ -38,14 +39,14 @@ export default function MedicalServicesForSubstanceUse() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
-    }
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
-    const formatDate = (date: any) => {
+    const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
     };
 
@@ -117,7 +118,7 @@ export default function MedicalServicesForSubstanceUse() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
 
     const { mutate } = useMutation(async (data: MedicalServicesSubstanceUseInputs) => {

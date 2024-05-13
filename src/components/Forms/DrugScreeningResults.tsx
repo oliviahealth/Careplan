@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
 const DrugTest = z.object({
@@ -17,6 +17,7 @@ const DrugTest = z.object({
     provider_reviewed: z.string().min(1, 'Reviewed with provider requried'),
     date_reviewed: z.string().nullable()
 })
+export type DrugTests = z.infer<typeof DrugTest>
 
 const DrugScreeningResultsInputs = z.object({
     tests: z.array(DrugTest),
@@ -37,10 +38,10 @@ export default function DrugScreeningResults() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
-    }
+    }), [access_token, user?.id]);
 
     const [showDateReviewed, setShowDateReviewed] = useState<boolean[]>([]);
     const handleShowDateReviewed = (index: number, value: string) => {
@@ -51,10 +52,6 @@ export default function DrugScreeningResults() {
             setValue(`tests.${index}.date_reviewed`, null);
         }
     }
-
-    const formatDate = (date: any) => {
-        return date.toISOString().split('T')[0];
-    };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<DrugScreeningResultsInputs>({
         resolver: zodResolver(DrugScreeningResultsInputs),
@@ -106,16 +103,11 @@ export default function DrugScreeningResults() {
                     Object.keys(userData).forEach(key => {
                         if (key !== 'id' && key !== 'user_id') {
                             const formKey = key as keyof DrugScreeningResultsInputs;
-                            if (key === 'date_reviewed') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            } else {
-                                setValue(formKey, userData[key]);
-                            }
+                            setValue(formKey, userData[key]);
+
                             if (key === 'tests') {
-                                if (key === 'tests') {
-                                    const newShowDateReviewed = userData[key].map((test: any) => test.provider_reviewed === 'Yes');
-                                    setShowDateReviewed(newShowDateReviewed);
-                                }
+                                const newShowDateReviewed = userData[key].map((test: DrugTests) => test.provider_reviewed === 'Yes');
+                                setShowDateReviewed(newShowDateReviewed);
                             }
                         }
                     });
@@ -125,7 +117,7 @@ export default function DrugScreeningResults() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: DrugScreeningResultsInputs) => {
         let responseData;
