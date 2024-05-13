@@ -66,7 +66,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       setFormData(selectedSubmission);
       setSelectedSubmissionID(submissionID);
     }
-  };
+  }; 
 
   const handleDeleteSubmission = async (submissionID: string) => {
     const confirmed = window.confirm(
@@ -99,20 +99,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div className="relative flex space-x-2 items-center">
         {selectedSubmissionID && (
           <>
-            <select
-              value={selectedSubmissionID || ""}
-              onChange={(e) => handleSubmissionClick(e.target.value)}
-              className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
+            <select value={selectedSubmissionID || ""} onChange={(e) => handleSubmissionClick(e.target.value)} className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
               {sortedSubmissions.map((submission: any) => (
                 <option key={submission.id} value={submission.id}>
                   Submission{" "}
-                  {new Date(submission.timestamp).toLocaleString("en-US", {
-                    timeZone: "America/Chicago",
-                  })}{" "}
-                  CST
-                </option>
-              ))}
+                  {new Date(submission.timestamp).toLocaleString("en-US", { timeZone: "America/Chicago",})}{" "}CST
+                </option>))}
             </select>
             <Link to={`${path}/${selectedSubmissionID}`}>
               <img className="w-8 h-8" src="./images/edit.svg"></img>
@@ -120,8 +112,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             <button onClick={() => handleDeleteSubmission(selectedSubmissionID)}>
               <img className="w-8 h-8" src="./images/delete.svg"></img>
             </button>
-          </>
-        )}
+          </>)}
       </div>
     );
   };
@@ -305,6 +296,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       comments: "Comments",
     },
   };
+
+  
 
   const MaternalMedicalHistoryMedicationList = (data: any) => {
     return data.map((x: any, index: any) => {
@@ -520,58 +513,148 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
+  const renderMaternalDemographics = () => {
+    return (
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-6">Maternal Demographics</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Personal Information */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
+            <div className="mb-4">
+              <p className="font-semibold">Name</p>
+              <p>Jane Doe</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Date of Birth</p>
+              <p>00/00/00</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Gender</p>
+              <p>Female</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Age</p>
+              <p>24</p>
+            </div>
+          </div>
+  
+          {/* Contact */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Contact</h3>
+            <div className="mb-4">
+              <p className="font-semibold">Phone number</p>
+              <p>+1(000)-0000-0000</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Email</p>
+              <p>mypersonalemail@gmail.com</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Address</p>
+              <p>0000 Street Name Dr. City, State 00000</p>
+            </div>
+          </div>
+        </div>
+  
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          {/* Insurance */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Insurance</h3>
+            <div className="mb-4">
+              <p className="font-semibold">Marital Status</p>
+              <p>Married</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Effective Date</p>
+              <p>00/00/00</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Insurance Plan</p>
+              <p>AllSaver's</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Subscriber ID</p>
+              <p>00000</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Group ID</p>
+              <p>00000</p>
+            </div>
+          </div>
+  
+          {/* Emergency Contact */}
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Emergency Contact</h3>
+            <div className="mb-4">
+              <p className="font-semibold">Name</p>
+              <p>John Doe</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Relation</p>
+              <p>Husband</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Phone number</p>
+              <p>+1(100)-0000-0000</p>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Email</p>
+              <p>mypersonalemail2@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
-      <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
-        {Object.entries<string>(fields).map(([key, fieldName]) => (
-          <React.Fragment key={key}>
-            <div className="flex flex-row gap-1">
-              <div className="font-semibold">{fieldName}:</div>
-              {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
-                MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
-              ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
-                PsychiatricHistoryDiagnoses((formData as any)?.[key] || [])
-              ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
-                MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-              ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
-                SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
-              ) : fieldNames.substanceUseHistory[key] && key === "other_drugs" ? (
-                SubstanceUseHistoryOtherDrugs((formData as any)?.[key] || [])
-              ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
-                DrugScreeningResultsTests((formData as any)?.[key] || [])
-              ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
-                FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-              ) : fieldNames.familyAndSupports[key] && key === "clients_children_not_living_in_home" ? (
-                FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-              ) : fieldNames.infantInformation[key] && key === "infant_care_needs_items" ? (
-                InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
-              ) : fieldNames.infantInformation[key] && key === "infant_medications" ? (
-                InfantInformationMedications((formData as any)?.[key] || [])
-              ) : fieldNames.referralsAndServices[key] &&
-                !["additional_notes",
-                  "support_services_other",
-                  "food_nutrition_other",
-                  "healthcare_other",
-                  "substance_use_treatment_other",
-                  "child_related_other",
-                  "legal_assistance_other"].includes(key) ? (
-                ReferralsAndServices((formData as any)?.[key] || [])
-              ) : fieldNames.referralsAndServices[key] &&
-                ["support_services_other",
-                  "food_nutrition_other",
-                  "healthcare_other",
-                  "substance_use_treatment_other",
-                  "child_related_other",
-                  "legal_assistance_other"].includes(key) ? (
-                ReferralsAndServicesOther((formData as any)?.[key] || [])
-              ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
-                RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
-              ) : (
-                <div>{(formData as any)?.[key]}</div>
-              )}
-            </div>
-          </React.Fragment>
-        ))}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 py-2">
+        {Object.entries<string>(fields).map(([key, fieldName]) => {
+            return (
+              <React.Fragment key={key}>
+                <div className="flex flex-col gap-1">
+                  <div className="font-semibold truncate">{fieldName}:</div>
+                  <div className="text-sm">
+                  {fieldName === "Maternal Demographics" && renderMaternalDemographics()}
+                    {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
+                      MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
+                    ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
+                      PsychiatricHistoryDiagnoses((formData as any)?.[key] || [])
+                    ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
+                      MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
+                    ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
+                      SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
+                    ) : fieldNames.substanceUseHistory[key] && key === "other_drugs" ? (
+                      SubstanceUseHistoryOtherDrugs((formData as any)?.[key] || [])
+                    ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
+                      DrugScreeningResultsTests((formData as any)?.[key] || [])
+                    ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
+                      FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
+                    ) : fieldNames.familyAndSupports[key] && key === "clients_children_not_living_in_home" ? (
+                      FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
+                    ) : fieldNames.infantInformation[key] && key === "infant_care_needs_items" ? (
+                      InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
+                    ) : fieldNames.infantInformation[key] && key === "infant_medications" ? (
+                      InfantInformationMedications((formData as any)?.[key] || [])
+                    ) : fieldNames.referralsAndServices[key] &&
+                      !["additional_notes", "support_services_other", "food_nutrition_other", "healthcare_other", "substance_use_treatment_other", "child_related_other", "legal_assistance_other"].includes(key) ? (
+                      ReferralsAndServices((formData as any)?.[key] || [])
+                    ) : fieldNames.referralsAndServices[key] &&
+                      ["support_services_other", "food_nutrition_other", "healthcare_other", "substance_use_treatment_other", "child_related_other", "legal_assistance_other"].includes(key) ? (
+                      ReferralsAndServicesOther((formData as any)?.[key] || [])
+                    ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
+                      RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
+                    ) : (
+                      <div className="truncate">{(formData as any)?.[key]}</div>
+                    )}
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+        })}
       </div>
     );
   };

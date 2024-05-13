@@ -8,6 +8,7 @@ function Dashboard() {
   const user = useAppStore((state) => state.user);
 
   return (
+
     <div className="flex flex-col w-full h-full md:px-[15vw] px-5 overflow-hidden">
       <div className="flex flex-row mx-5 my-5 justify-between items-center md:items-baseline">
         <div className="flex text-3xl md:text-4xl font-semibold">Hello {user?.name.substring(0, user?.name.indexOf(" "))}!</div>
