@@ -628,6 +628,99 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     safe_caregivers: Caregivers[];
   }
 
+  const renderMaternalDemographics = (fields: { [key: string]: string }) => {
+    const personalInformationFields = ['name', 'date_of_birth'];
+    const contactFields = ['primary_phone_number', 'phone_type'];
+    const insuranceFields = ['marital_status', 'insurance_plan', 'effective_date', 'subscriber_id', 'group_id'];
+    const emergencyContactFields = ['emergency_contact', 'emergency_contact_phone', 'relationship'];
+  
+    const getAddressString = () => {
+      const { street_address, city, state, zip_code } = formData;
+      const addressParts = [street_address, city, state, zip_code].filter(Boolean);
+      return addressParts.join(', ');
+    };
+  
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+        <div className="col-span-2">
+          <h2 className="text-xl font-semibold mb-4">Maternal Demographics</h2>
+        </div>
+  
+        {/* Personal Information */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {personalInformationFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+  
+        {/* Contact */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-base font-semibold mb-1">Address</h4>
+              <div className="text-gray-500">{getAddressString() || 'N/A'}</div>
+            </div>
+            {contactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+  
+        {/* Insurance */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Insurance</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insuranceFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+  
+        {/* Emergency Contact */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Emergency Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {emergencyContactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
@@ -636,7 +729,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           return (
             <React.Fragment key={key}>
               <div className="flex flex-row gap-1">
-                <div className="font-semibold">{fieldName}:</div>
+                <div className="font-semibold truncate">{fieldName}:</div>
                 {(() => {
                   if (fieldNames.maternalMedicalHistory[key] && key === "current_medication_list") {
                     return MaternalMedicalHistoryMedicationList(
@@ -735,8 +828,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   return (
     <div>
-      <Accordion title={name} /*completed={completed}*/ isLoading={isLoading} onClick={handleAccordionClick}>
-        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalDemographics)}
+      <Accordion title={name} isLoading={isLoading} onClick={handleAccordionClick}>
+        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderMaternalDemographics(fieldNames.maternalDemographics)}
         {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalMedicalHistory)}
         {name === "Psychiatric History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.psychiatricHistory)}
         {name === "Substance Use History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.substanceUseHistory)}
@@ -746,7 +839,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {name === "Infant Information" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.infantInformation)}
         {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
         {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
-
+  
         <div className="flex justify-between mt-6">
           {submissionsExist[apiUrl] && (
             <div className="flex">{renderSubmissions()}</div>

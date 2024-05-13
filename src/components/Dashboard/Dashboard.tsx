@@ -1,5 +1,5 @@
 import FormSelector from "./FormSelector";
-import LeftSidebar from "./LeftSidebar";
+// import LeftSidebar from "./LeftSidebar";
 
 import useAppStore from '../../store/useAppStore.ts';
 
@@ -10,7 +10,7 @@ function Dashboard() {
 
   return (
     <div className="flex flex-col md:flex-row md:px-0 px-10">
-      <LeftSidebar />
+      {/* <LeftSidebar /> */}
       <div className="md:pl-10 md:pr-32 py-5 md:py-10 w-full">
         <div className="flex flex-row justify-between items-center md:items-baseline">
           <div className="flex text-2xl md:text-3xl font-semibold">{user?.name}</div>
