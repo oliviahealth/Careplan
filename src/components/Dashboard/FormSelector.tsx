@@ -22,7 +22,8 @@ interface FormSelectorProps {
 interface Submission {
   [key: string]: string | null;
   id: string;
-  timestamp: string;
+  date_created: string;
+  date_last_modified: string;
 }
 
 const FormSelector: React.FC<FormSelectorProps> = ({
@@ -105,8 +106,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const renderSubmissions = () => {
 
     const sortedSubmissions = [...submissions].sort((a: Submission, b: Submission) => {
-      const dateA = new Date(a.timestamp);
-      const dateB = new Date(b.timestamp);
+      const dateA = new Date(a.date_created);
+      const dateB = new Date(b.date_created);
       return dateA.getTime() - dateB.getTime();
     });
 
@@ -122,7 +123,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
               {sortedSubmissions.map((submission: Submission) => (
                 <option key={submission.id} value={submission.id}>
                   Submission{" "}
-                  {new Date(submission.timestamp).toLocaleString("en-US", {
+                  {new Date(submission.date_created).toLocaleString("en-US", {
                     timeZone: "America/Chicago",
                   })}{" "}
                   CST
@@ -633,19 +634,19 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     const contactFields = ['primary_phone_number', 'phone_type'];
     const insuranceFields = ['marital_status', 'insurance_plan', 'effective_date', 'subscriber_id', 'group_id'];
     const emergencyContactFields = ['emergency_contact', 'emergency_contact_phone', 'relationship'];
-  
+
     const getAddressString = () => {
       const { street_address, city, state, zip_code } = formData;
       const addressParts = [street_address, city, state, zip_code].filter(Boolean);
       return addressParts.join(', ');
     };
-  
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
         <div className="col-span-2">
           <h2 className="text-xl font-semibold mb-4">Maternal Demographics</h2>
         </div>
-  
+
         {/* Personal Information */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
@@ -662,7 +663,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-  
+
         {/* Contact */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-4">Contact</h3>
@@ -683,7 +684,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-  
+
         {/* Insurance */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-4">Insurance</h3>
@@ -700,7 +701,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-  
+
         {/* Emergency Contact */}
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-4">Emergency Contact</h3>
@@ -720,7 +721,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       </div>
     );
   };
-  
+
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
@@ -839,7 +840,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {name === "Infant Information" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.infantInformation)}
         {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
         {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
-  
+
         <div className="flex justify-between mt-6">
           {submissionsExist[apiUrl] && (
             <div className="flex">{renderSubmissions()}</div>
