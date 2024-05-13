@@ -1,5 +1,5 @@
 import { useForm, useFieldArray } from "react-hook-form";
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,40 +32,41 @@ const MedicalServicesSubstanceUseResponse = MedicalServicesSubstanceUseInputs.ex
 });
 
 export default function MedicalServicesForSubstanceUse() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
-    const { user } = useAppStore();
-    const user_id = user ? user.id : "";
-
-    const navigate = useNavigate();
-
-    const formatDate = (date: any) => {
-        return date.toISOString().split('T')[0];
-    };
+    const user = useAppStore(state => state.user);
 
     const [showMatDate, setShowMatDate] = useState(false)
-    const handleShowMatDate = (value: string) => {
-        setShowMatDate(value === 'Prior MAT use');
-        if (value !== 'Prior MAT use') {
-            setValue('date_used_mat', null);
+    const handleShowMatDate = (evt: ChangeEvent<HTMLInputElement>) => {
+        const value = evt.target.value;
+
+        if(value === 'Prior MAT use') {
+            setShowMatDate(true);
+
+            return;
         }
+
+        setShowMatDate(false);
+        setValue('date_used_mat', null);
     };
 
     const [showAddictionServiceDate, setShowAddictionServiceDate] = useState(false)
-    const handleShowAddictionServiceDate = (value: string) => {
-        setShowAddictionServiceDate(value === 'Prior Use');
-        if (value !== 'Prior Use') {
-            setValue('date_used_medicine_service', null);
+    const handleShowAddictionServiceDate = (evt: ChangeEvent<HTMLInputElement>) => {
+        const value = evt.target.value;
+
+        if(value === 'Prior Use') {
+            setShowAddictionServiceDate(true);
+
+            return;
         }
+
+        setShowAddictionServiceDate(false);
+        setValue('date_used_medicine_service', null);
     };
 
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MedicalServicesSubstanceUseInputs>({
-        resolver: zodResolver(MedicalServicesSubstanceUseInputs),
-        defaultValues: {
-            date_used_mat: '',
-            date_used_medicine_service: ''
-        },
+        resolver: zodResolver(MedicalServicesSubstanceUseInputs), 
     });
 
     const { fields, append, remove } = useFieldArray({
@@ -73,27 +74,24 @@ export default function MedicalServicesForSubstanceUse() {
         name: 'medications'
     });
 
-    const addNewMedication = () => {
-        append({
-            medication: '',
-            dose: '',
-        })
-    };
+    const addNewMedication = () => append({ medication: '', dose: '' });
 
     useEffect(() => {
         const fetchUserData = async () => {
             if (submissionId) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user_id}/${submissionId}`)
+                    const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${user?.id}/${submissionId}`)
                     const userData = response.data;
+
                     Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof MedicalServicesSubstanceUseInputs;
-                            if (key === 'date_used_mat' || key === 'date_used_medicine_service') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            } else {
-                                setValue(formKey, userData[key]);
-                            }
+                        if(key === 'id' || key === 'user_id') return;
+
+                        const formKey = key as keyof MedicalServicesSubstanceUseInputs;
+
+                        if (key === 'date_used_mat' || key === 'date_used_medicine_service') {
+                            setValue(formKey, new Date(userData[key]).toISOString().split('T')[0]);
+                        } else {
+                            setValue(formKey, userData[key]);
                         }
                     });
 
@@ -104,31 +102,34 @@ export default function MedicalServicesForSubstanceUse() {
                 }
             }
         };
+
         fetchUserData();
     }, [submissionId]);
 
-
     const { mutate } = useMutation(async (data: MedicalServicesSubstanceUseInputs) => {
-
         let responseData;
         let method;
+
         if (submissionId) {
-            responseData = await axios.put(`http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`, { ...data, user_id: user_id })
+            responseData = await axios.put(`http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`, { ...data, user_id: user?.id })
             method = "updated";
         } else {
-            responseData = await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user_id });
+            responseData = await axios.post('http://127.0.0.1:5000/api/add_medical_services_for_substance_use', { ...data, user_id: user?.id });
             method = "added";
         }
 
         const userData = responseData.data;
         MedicalServicesSubstanceUseResponse.parse(userData);
+
         console.log(userData);
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+
             alert(`Maternal Services For Substance Use ${method} successfully!`);
             console.log(`MaternalServicesForSubstanceUse data ${method} successfully.`, userData);
+
             navigate('/dashboard')
         },
         onError: () => {
@@ -146,7 +147,7 @@ export default function MedicalServicesForSubstanceUse() {
                 <p className="font-medium">Medication Assisted Treatment (MAT) engaged?</p>
                 {["Never", "Currently", "Prior MAT use"].map((status) => (
                     <label key={status} className="flex pt-2">
-                        <input {...register("mat_engaged")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowMatDate(e.target.value)} />
+                        <input {...register("mat_engaged")} type="radio" value={status} className="form-radio" onChange={handleShowMatDate} />
                         <span className="ml-2">{status}</span>
                     </label>))}
                 {errors.mat_engaged && <span className="label-text-alt text-red-500">{errors.mat_engaged.message}</span>}
@@ -175,14 +176,8 @@ export default function MedicalServicesForSubstanceUse() {
                         <input {...register(`medications.${index}.dose`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.medications && errors.medications[index]?.dose && (
                             <span className="label-text-alt text-red-500">{errors.medications[index]?.dose?.message}</span>
-                        )}
-
-                        {/* <div className="flex justify-end">
-                            <button type="button" onClick={() => remove(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={fields.length === 0}>- Remove Medication</button>
-
-                        </div> */}
+                        )}                        
                     </div>))}
-
 
                 <div className="flex justify-center">
                     <button type="button" onClick={addNewMedication} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Medication</button>
@@ -199,7 +194,7 @@ export default function MedicalServicesForSubstanceUse() {
                 <p className="font-medium">Used Addiction Medicine Services?</p>
                 {["Never", "Currently", "Prior Use"].map((status) => (
                     <label key={status} className="flex items-center pt-2">
-                        <input {...register("used_addiction_medicine_services")} type="radio" value={status} className="form-radio" onChange={(e) => handleShowAddictionServiceDate(e.target.value)} />
+                        <input {...register("used_addiction_medicine_services")} type="radio" value={status} className="form-radio" onChange={handleShowAddictionServiceDate} />
                         <span className="ml-2">{status}</span>
                     </label>))}
                 {errors.used_addiction_medicine_services && <span className="label-text-alt text-red-500">{errors.used_addiction_medicine_services.message}</span>}
