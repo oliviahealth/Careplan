@@ -20,6 +20,7 @@ interface FormSelectorProps {
 }
 
 interface Submission {
+  [key: string]: string | null;
   id: string;
   timestamp: string;
 }
@@ -77,11 +78,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const handleSubmissionClick = async (submissionID: string) => {
     const selectedSubmission = submissions.find(submission => submission.id === submissionID);
     if (selectedSubmission) {
-      const formData: Record<string, string | null> = {
-        id: selectedSubmission.id,
-        timestamp: selectedSubmission.timestamp,
-      };
-      setFormData(formData);
+      setFormData(selectedSubmission);
       setSelectedSubmissionID(submissionID);
     }
   };

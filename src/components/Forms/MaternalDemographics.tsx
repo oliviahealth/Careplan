@@ -55,8 +55,9 @@ export type MaternalDemographicsInputsType = z.infer<typeof MaternalDemographics
 
 const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.extend({
   id: z.string(),
-  user_id: z.string()
+  user_id: z.string(),
 });
+
 export type MaternalDemographicsResponseType = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
