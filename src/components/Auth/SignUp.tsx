@@ -52,32 +52,41 @@ const SignUp: React.FC = () => {
     })
 
     return (
-        <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
+        <div className="flex justify-center h-full mt-[10vh]">
+            <form onSubmit={handleSubmit((data) => mutate(data))} className="flex flex-col w-3/4 md:w-1/3 h-fit justify-between [&>*]:my-3">
+                <div className="flex self-center font-medium text-3xl">Sign up</div>
+                <div>
+                    <p className="font-medium text-sm mb-1 ml-1">Name</p>
+                    <input {...register("name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                    {errors.name && <span className="label-text-alt text-red-500">{errors.name.message}</span>}
+                </div>
 
-            <form onSubmit={handleSubmit((data) => mutate(data))} className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4">
+                <div>
+                    <p className="font-medium text-sm mb-1 ml-1">Email</p>
+                    <input {...register("email")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                    {errors.email && <span className="label-text-alt text-red-500">{errors.email.message}</span>}
+                </div>
 
-                <p className="font-medium">Name</p>
-                <input {...register("name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
-                {errors.name && <span className="label-text-alt text-red-500">{errors.name.message}</span>}
+                <div>
+                    <p className="font-medium text-sm mb-1 ml-1">Password</p>
+                    <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
+                    {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
+                </div>
 
-                <p className="font-medium">Email</p>
-                <input {...register("email")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
-                {errors.email && <span className="label-text-alt text-red-500">{errors.email.message}</span>}
+                <div>
+                    <p className="font-medium text-sm mb-1 ml-1">Confirm Password</p>
+                    <input {...register("confirmPassword")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
+                    {errors.confirmPassword && <span className="label-text-alt text-red-500">{errors.confirmPassword.message}</span>}
+                </div>
 
-                <p className="font-medium">Password</p>
-                <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
-                {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
-
-                <p className="font-medium">Confirm Password</p>
-                <input {...register("confirmPassword")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
-                {errors.confirmPassword && <span className="label-text-alt text-red-500">{errors.confirmPassword.message}</span>}
-
-                <button className="btn btn-primary w-full mt-6">
+                <button className="button-filled rounded-full py-3 w-full">
                     Sign Up
                 </button>
 
-                <p className="text-sm mt-8">Have an account? <span className="text-primary"><Link to={'/sign-in'}>Sign In</Link></span></p>
-            </form>
+                <div className="flex self-center">
+                    <p className="text-sm">Already have an account? <span className="button-colored font-medium p-0"><Link to={'/sign-in'}>Sign in now.</Link></span></p>
+                </div>
+                </form>
         </div>
     )
 }
