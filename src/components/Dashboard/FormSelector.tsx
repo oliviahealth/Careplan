@@ -513,101 +513,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const renderMaternalDemographics = () => {
-    return (
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-6">Maternal Demographics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Personal Information */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
-            <div className="mb-4">
-              <p className="font-semibold">Name</p>
-              <p>Jane Doe</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Date of Birth</p>
-              <p>00/00/00</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Gender</p>
-              <p>Female</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Age</p>
-              <p>24</p>
-            </div>
-          </div>
-  
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Contact</h3>
-            <div className="mb-4">
-              <p className="font-semibold">Phone number</p>
-              <p>+1(000)-0000-0000</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Email</p>
-              <p>mypersonalemail@gmail.com</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Address</p>
-              <p>0000 Street Name Dr. City, State 00000</p>
-            </div>
-          </div>
-        </div>
-  
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          {/* Insurance */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Insurance</h3>
-            <div className="mb-4">
-              <p className="font-semibold">Marital Status</p>
-              <p>Married</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Effective Date</p>
-              <p>00/00/00</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Insurance Plan</p>
-              <p>AllSaver's</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Subscriber ID</p>
-              <p>00000</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Group ID</p>
-              <p>00000</p>
-            </div>
-          </div>
-  
-          {/* Emergency Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Emergency Contact</h3>
-            <div className="mb-4">
-              <p className="font-semibold">Name</p>
-              <p>John Doe</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Relation</p>
-              <p>Husband</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Phone number</p>
-              <p>+1(100)-0000-0000</p>
-            </div>
-            <div className="mb-4">
-              <p className="font-semibold">Email</p>
-              <p>mypersonalemail2@gmail.com</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-  
 
   const renderFields = (fields: { [key: string]: string }) => {
     return (
@@ -618,7 +523,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                 <div className="flex flex-col gap-1">
                   <div className="font-semibold truncate">{fieldName}:</div>
                   <div className="text-sm">
-                  {fieldName === "Maternal Demographics" && renderMaternalDemographics()}
                     {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
                       MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
                     ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
