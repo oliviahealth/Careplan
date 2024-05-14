@@ -38,6 +38,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
   const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
   const [submissionsExist, setSubmissionsExist] = useState<{ [key: string]: boolean }>({});
+  const [lastModifiedDate, setLastModifiedDate] = useState<string>("");
 
   const updateSubmissionsExist = (key: string, value: boolean) => {
     setSubmissionsExist(prevState => ({
@@ -68,6 +69,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         setFormData(allSubmissions[allSubmissions.length - 1]);
         setSelectedSubmissionID(allSubmissions[allSubmissions.length - 1].id);
         updateSubmissionsExist(apiUrl, true);
+
+        setLastModifiedDate(allSubmissions[allSubmissions.length - 1].date_last_modified);
       }
       setSubmissionsFetched(true);
     } catch (error) {
@@ -81,6 +84,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     if (selectedSubmission) {
       setFormData(selectedSubmission);
       setSelectedSubmissionID(submissionID);
+      setLastModifiedDate(selectedSubmission.date_last_modified);
     }
   }; 
 
@@ -1015,7 +1019,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
         {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
 
-        <div className="flex items-center justify-between mt-6 mb-2">
+        <div className="flex flex-row items-center justify-between mt-2 mb-1">
           {submissionsExist[apiUrl] && (
             <div className="flex">{renderSubmissions()}</div>
           )}
@@ -1028,6 +1032,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             </Link>
           </div>
         </div>
+        {submissionsExist[apiUrl] && (
+          <div className="pl-5 text-sm font-medium text-neutral-400 mb-4">Last Edit on {new Date(lastModifiedDate).toLocaleString("en-US", {timeZone: "America/Chicago"})}</div>
+        )}
       </Accordion>
     </div>
   );

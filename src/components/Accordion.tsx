@@ -26,7 +26,6 @@ const Accordion: React.FC<AccordionProps> = ({
     } else {
       setMaxHeight("0px");
     }
-    console.log(maxHeight);
   }, [isOpen, children, maxHeight]); 
 
   return (
