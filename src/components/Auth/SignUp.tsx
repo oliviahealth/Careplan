@@ -28,7 +28,11 @@ const SignUp: React.FC = () => {
 <<<<<<< HEAD
     const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
 =======
+<<<<<<< HEAD
+    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
+=======
     let { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
+>>>>>>> main
 >>>>>>> main
 
     const { mutate } = useMutation(async (data: SignupFormData) => {

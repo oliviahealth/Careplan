@@ -22,7 +22,8 @@ interface FormSelectorProps {
 interface Submission {
   [key: string]: string | null;
   id: string;
-  timestamp: string;
+  date_created: string;
+  date_last_modified: string;
 }
 
 const FormSelector: React.FC<FormSelectorProps> = ({
@@ -105,8 +106,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const renderSubmissions = () => {
 
     const sortedSubmissions = [...submissions].sort((a: Submission, b: Submission) => {
-      const dateA = new Date(a.timestamp);
-      const dateB = new Date(b.timestamp);
+      const dateA = new Date(a.date_created);
+      const dateB = new Date(b.date_created);
       return dateA.getTime() - dateB.getTime();
     });
 
@@ -122,7 +123,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
               {sortedSubmissions.map((submission: Submission) => (
                 <option key={submission.id} value={submission.id}>
                   Submission{" "}
-                  {new Date(submission.timestamp).toLocaleString("en-US", {
+                  {new Date(submission.date_created).toLocaleString("en-US", {
                     timeZone: "America/Chicago",
                   })}{" "}
                   CST
@@ -628,6 +629,220 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     safe_caregivers: Caregivers[];
   }
 
+  const renderMaternalDemographics = (fields: { [key: string]: string }) => {
+    const personalInformationFields = ['name', 'date_of_birth'];
+    const contactFields = ['primary_phone_number', 'phone_type'];
+    const insuranceFields = ['marital_status', 'insurance_plan', 'effective_date', 'subscriber_id', 'group_id'];
+    const emergencyContactFields = ['emergency_contact', 'emergency_contact_phone', 'relationship'];
+  
+    const getAddressString = () => {
+      const { street_address, city, state, zip_code } = formData;
+      return `${street_address} ${city}, ${state} ${zip_code}`
+    };
+  
+    const formatDate = (dateString: string) => {
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      };
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+  
+    const formatPhoneNumber = (phoneNumber: string) => {
+      const cleaned = phoneNumber.replace(/\D/g, '');
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        return `(${match[1]})-${match[2]}-${match[3]}`;
+      }
+      return phoneNumber;
+    };
+  
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+        <div className="col-span-2"></div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {personalInformationFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              const fieldValue = formData && formData[formDataKey];
+              const formattedValue = key === 'date_of_birth' && fieldValue ? formatDate(fieldValue) : fieldValue || 'N/A';
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{formattedValue}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100" >
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Address</h4>
+              <div className="font-semibold">{getAddressString() || 'N/A'}</div>
+            </div>
+            {contactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              const fieldValue = formData && formData[formDataKey];
+              const formattedValue = key === 'primary_phone_number' && fieldValue ? formatPhoneNumber(fieldValue) : fieldValue || 'N/A';
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{formattedValue}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Insurance</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insuranceFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              const fieldValue = formData && formData[formDataKey];
+              const formattedValue = key === 'effective_date' && fieldValue ? formatDate(fieldValue) : fieldValue || 'N/A';
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{formattedValue}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Emergency Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {emergencyContactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              const fieldValue = formData && formData[formDataKey];
+              const formattedValue = key === 'emergency_contact_phone' && fieldValue ? formatPhoneNumber(fieldValue) : fieldValue || 'N/A';
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{formattedValue}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  
+  const renderMaternalMedicalHistory = (fields: { [key: string]: string }) => {
+    const prenatalCareFields = [
+      "gestational_age",
+      "anticipated_delivery_date",
+      "planned_mode_delivery",
+      "actual_mode_delivery",
+      "attended_postpartum_visit",
+      "postpartum_visit_date",
+      "postpartum_visit_location"
+    ];
+    const obstetricHistoryFields = [
+      "total_num_pregnancies",
+      "total_num_live_births",
+      "total_num_children_with_mother",
+      "prior_complications"
+    ];
+    const medicalProblemsFields = ["med_problems_diagnoses"];
+  
+    const formatDate = (dateString: string) => {
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      };
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+  
+    const medicationList = Array.isArray(formData?.current_medication_list)
+      ? formData.current_medication_list
+      : [];
+  
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Prenatal Care</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {prenatalCareFields.map(key => {
+              const fieldName = fields[key];
+              const fieldValue = formData?.[key];
+              const formattedValue = (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') && fieldValue
+                ? formatDate(fieldValue)
+                : fieldValue || 'N/A';
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{formattedValue}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Obstetric History</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {obstetricHistoryFields.map(key => {
+              const fieldName = fields[key];
+              const fieldValue = formData?.[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{fieldValue || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Medical Problems</h3>
+          <div>
+            {medicalProblemsFields.map(key => {
+              const fieldName = fields[key];
+              const fieldValue = formData?.[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
+                  <div className="font-semibold">{fieldValue || 'N/A'}</div>
+                </div>
+              );
+            })}
+            <div className="mt-4">
+              <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Notes</h4>
+              <div className="font-semibold">{formData?.notes || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+        <div className="  rounded-lg p-4 bg-neutral-100">
+          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Current Medication List</h3>
+          <div>
+            {medicationList.map((medication: CurrentMedicationList, index: number) => (
+              <div key={index} className="mb-4">
+                <div className="font-semibold">{medication.name}</div>
+                <div>Dose: {medication.dose}</div>
+                <div>Prescriber: {medication.prescriber}</div>
+                <div>Notes: {medication.notes}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  
   const renderFields = (fields: { [key: string]: string }) => {
     return (
       <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
@@ -635,62 +850,102 @@ const FormSelector: React.FC<FormSelectorProps> = ({
           const formDataKey = key as keyof typeof formData;
           return (
             <React.Fragment key={key}>
-              <div className="flex flex-row gap-1">
-                <div className="font-semibold">{fieldName}:</div>
+              <div className="flex flex-col gap-1">
+                <div className="font-semibold truncate">{fieldName}</div>
                 {(() => {
                   if (fieldNames.maternalMedicalHistory[key] && key === "current_medication_list") {
-                    return MaternalMedicalHistoryMedicationList(
-                      Array.isArray((formData as MaternalMedicalHistoryData)?.[formDataKey])
-                        ? ((formData as MaternalMedicalHistoryData)?.[formDataKey] as CurrentMedicationList[])
-                        : []
+                    return (
+                      <div>
+                        {MaternalMedicalHistoryMedicationList(
+                          Array.isArray((formData as MaternalMedicalHistoryData)?.[formDataKey])
+                            ? ((formData as MaternalMedicalHistoryData)?.[formDataKey] as CurrentMedicationList[])
+                            : []
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.psychiatricHistory[key] && key === "diagnoses") {
-                    return PsychiatricHistoryDiagnoses(
-                      Array.isArray((formData as PsychiatricHistoryData)?.[formDataKey])
-                        ? ((formData as PsychiatricHistoryData)?.[formDataKey] as Diagnoses[])
-                        : []
+                    return (
+                      <div>
+                        {PsychiatricHistoryDiagnoses(
+                          Array.isArray((formData as PsychiatricHistoryData)?.[formDataKey])
+                            ? ((formData as PsychiatricHistoryData)?.[formDataKey] as Diagnoses[])
+                            : []
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.medicalServicesForSubstanceUse[key] && key === "medications") {
-                    return MedicalServicesForSubstanceUseMedications(
-                      Array.isArray((formData as MedicalServicesForSubstanceUseData)?.[formDataKey])
-                        ? ((formData as MedicalServicesForSubstanceUseData)?.[formDataKey] as SubstanceUseMedications[])
-                        : []
+                    return (
+                      <div>
+                        {MedicalServicesForSubstanceUseMedications(
+                          Array.isArray((formData as MedicalServicesForSubstanceUseData)?.[formDataKey])
+                            ? ((formData as MedicalServicesForSubstanceUseData)?.[formDataKey] as SubstanceUseMedications[])
+                            : []
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.substanceUseHistory[key]) {
                     if (key === "other_drugs") {
-                      return SubstanceUseHistoryOtherDrugs(
-                        Array.isArray((formData as SubstanceUseHistoryData)?.[formDataKey])
-                          ? ((formData as SubstanceUseHistoryData)?.[formDataKey] as AdditionalDrugs[])
-                          : []
+                      return (
+                        <div>
+                          {SubstanceUseHistoryOtherDrugs(
+                            Array.isArray((formData as SubstanceUseHistoryData)?.[formDataKey])
+                              ? ((formData as SubstanceUseHistoryData)?.[formDataKey] as AdditionalDrugs[])
+                              : []
+                          )}
+                        </div>
                       );
                     } else if (key === "notes") {
-                      return (formData as SubstanceUseHistoryData)?.[formDataKey] as string;
+                      return <div>{(formData as SubstanceUseHistoryData)?.[formDataKey] as string}</div>;
                     } else {
-                      return SubstanceUseHistoryDrugs(
-                        (formData as SubstanceUseHistoryData)?.[formDataKey] as Drugs
+                      return (
+                        <div>
+                          {SubstanceUseHistoryDrugs(
+                            (formData as SubstanceUseHistoryData)?.[formDataKey] as Drugs
+                          )}
+                        </div>
                       );
                     }
                   } else if (fieldNames.drugScreeningResults[key] && key === "tests") {
-                    return DrugScreeningResultsTests(
-                      Array.isArray((formData as DrugScreeningResultsData)?.[formDataKey])
-                        ? ((formData as DrugScreeningResultsData)?.[formDataKey] as DrugTests[])
-                        : []
+                    return (
+                      <div>
+                        {DrugScreeningResultsTests(
+                          Array.isArray((formData as DrugScreeningResultsData)?.[formDataKey])
+                            ? ((formData as DrugScreeningResultsData)?.[formDataKey] as DrugTests[])
+                            : []
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.familyAndSupports[key] && (key === "people_living_in_home")) {
-                    return FamilyAndSupportsPeopleInHome(
-                      (formData as FamilyAndSupportsData)?.[formDataKey] as HouseholdMembers[]
+                    return (
+                      <div>
+                        {FamilyAndSupportsPeopleInHome(
+                          (formData as FamilyAndSupportsData)?.[formDataKey] as HouseholdMembers[]
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.familyAndSupports[key] && (key === "clients_children_not_living_in_home")) {
-                    return FamilyAndSupportsChildrenNotHome(
-                      (formData as FamilyAndSupportsData)?.[formDataKey] as Children[]
+                    return (
+                      <div>
+                        {FamilyAndSupportsChildrenNotHome(
+                          (formData as FamilyAndSupportsData)?.[formDataKey] as Children[]
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.infantInformation[key] && (key === "infant_care_needs_items")) {
-                    return InfantInformationInfantCareNeeds(
-                      (formData as InfantInformationData)?.[formDataKey] as InfantCareNeeds[]
+                    return (
+                      <div>
+                        {InfantInformationInfantCareNeeds(
+                          (formData as InfantInformationData)?.[formDataKey] as InfantCareNeeds[]
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.infantInformation[key] && (key === "infant_medications")) {
-                    return InfantInformationMedications(
-                      (formData as InfantInformationData)?.[formDataKey] as InfantMeds[]
+                    return (
+                      <div>
+                        {InfantInformationMedications(
+                          (formData as InfantInformationData)?.[formDataKey] as InfantMeds[]
+                        )}
+                      </div>
                     );
                   } else if (fieldNames.referralsAndServices[key]) {
                     if (["support_services_other",
@@ -699,21 +954,33 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       "substance_use_treatment_other",
                       "child_related_other",
                       "legal_assistance_other"].includes(key)) {
-                      return ReferralsAndServicesOther(
-                        Array.isArray((formData as ReferralsAndServicesData)?.[formDataKey])
-                          ? ((formData as ReferralsAndServicesData)?.[formDataKey] as AdditionalServices[])
-                          : []
+                      return (
+                        <div>
+                          {ReferralsAndServicesOther(
+                            Array.isArray((formData as ReferralsAndServicesData)?.[formDataKey])
+                              ? ((formData as ReferralsAndServicesData)?.[formDataKey] as AdditionalServices[])
+                              : []
+                          )}
+                        </div>
                       );
                     } else if (key === "additional_notes") {
-                      return (formData as ReferralsAndServicesData)?.[formDataKey] as string;
+                      return <div>{(formData as ReferralsAndServicesData)?.[formDataKey] as string}</div>;
                     } else {
-                      return ReferralsAndServices(
-                        (formData as ReferralsAndServicesData)?.[formDataKey] as Services
+                      return (
+                        <div>
+                          {ReferralsAndServices(
+                            (formData as ReferralsAndServicesData)?.[formDataKey] as Services
+                          )}
+                        </div>
                       );
                     }
                   } else if (fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers") {
-                    return RelapsePreventionPlanSafeCaregivers(
-                      (formData as RelapsePreventionPlanData)?.[formDataKey] as Caregivers[]
+                    return (
+                      <div>
+                        {RelapsePreventionPlanSafeCaregivers(
+                          (formData as RelapsePreventionPlanData)?.[formDataKey] as Caregivers[]
+                        )}
+                      </div>
                     );
                   } else {
                     return <div>{(formData && formData[formDataKey]) || 'N/A'}</div>;
@@ -735,9 +1002,9 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   return (
     <div>
-      <Accordion title={name} /*completed={completed}*/ isLoading={isLoading} onClick={handleAccordionClick}>
-        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalDemographics)}
-        {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalMedicalHistory)}
+      <Accordion title={name} isLoading={isLoading} onClick={handleAccordionClick}>
+        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderMaternalDemographics(fieldNames.maternalDemographics)}
+        {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderMaternalMedicalHistory(fieldNames.maternalMedicalHistory)}
         {name === "Psychiatric History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.psychiatricHistory)}
         {name === "Substance Use History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.substanceUseHistory)}
         {name === "Medical Services For Substance Use" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.medicalServicesForSubstanceUse)}
