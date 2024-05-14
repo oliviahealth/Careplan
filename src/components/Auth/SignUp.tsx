@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import { z } from "zod";
@@ -13,6 +13,7 @@ const SignUp: React.FC = () => {
 
     const setUser = useAppStore((state) => state.setUser);
     const setAccessToken = useAppStore((state) => state.setAccessToken);
+    const [errorDetected, setErrorDetected] = useState(false);
 
     const SignUpSchema = z.object({
         name: z.string().min(1, 'Name is required'),
@@ -25,21 +26,9 @@ const SignUp: React.FC = () => {
     });
     type SignupFormData = z.infer<typeof SignUpSchema>;
 
-<<<<<<< HEAD
-    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
-=======
-<<<<<<< HEAD
-    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
-=======
-<<<<<<< HEAD
-    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
-=======
-    let { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
->>>>>>> main
->>>>>>> main
->>>>>>> main
+    const { register, handleSubmit: handleSignup, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
 
-    const { mutate } = useMutation(async (data: SignupFormData) => {
+    const { mutate: signupUser, isLoading } = useMutation(async (data: SignupFormData) => {
         interface SignupResponse extends User {
             access_token: string
         }
@@ -59,46 +48,61 @@ const SignUp: React.FC = () => {
             }
         },
         onError: (error: AxiosError) => {
-            alert(`error: ${error}`)
+            setErrorDetected(true);
+
+            console.error(error);
         }
     })
-
+    
     return (
-        <div className="flex justify-center h-full mt-[10vh]">
-            <form onSubmit={handleSubmit((data) => mutate(data))} className="flex flex-col w-3/4 md:w-1/3 h-fit justify-between [&>*]:my-3">
-                <div className="flex self-center font-medium text-3xl">Sign up</div>
-                <div>
-                    <p className="font-medium text-sm mb-1 ml-1">Name</p>
-                    <input {...register("name")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+        <div>
+            <div>
+                <p className="font-semibold text-2xl">Get Started</p>
+                <p className="text-sm">Create your account now</p>
+
+                {errorDetected && (<p className="text-sm text-red-500">Something went wrong. Please try again</p>)}
+            </div>
+
+            <form onSubmit={handleSignup((data) => signupUser(data))} className="form-control w-full py-4">
+                <div className="my-1">
+                    <label className="label">
+                        <span className="label-text text-black font-medium">Name</span>
+                    </label>
+                    <input {...register('name')} type="text" className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none" />
                     {errors.name && <span className="label-text-alt text-red-500">{errors.name.message}</span>}
                 </div>
 
-                <div>
-                    <p className="font-medium text-sm mb-1 ml-1">Email</p>
-                    <input {...register("email")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="text" />
+                <div className="my-1">
+                    <label className="label">
+                        <span className="label-text text-black font-medium">Email</span>
+                    </label>
+                    <input {...register('email')} type="email" className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none" />
                     {errors.email && <span className="label-text-alt text-red-500">{errors.email.message}</span>}
                 </div>
 
-                <div>
-                    <p className="font-medium text-sm mb-1 ml-1">Password</p>
-                    <input {...register("password")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
+                <div className="my-1">
+                    <label className="label">
+                        <span className="label-text text-black font-medium">Password</span>
+                    </label>
+                    <input {...register('password')} type="password" className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none" />
                     {errors.password && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
                 </div>
 
-                <div>
-                    <p className="font-medium text-sm mb-1 ml-1">Confirm Password</p>
-                    <input {...register("confirmPassword")} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="password" />
+                <div className="my-1">
+                    <label className="label">
+                        <span className="label-text text-black font-medium">Confirm Password</span>
+                    </label>
+                    <input {...register('confirmPassword')} type="password" className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none" />
                     {errors.confirmPassword && <span className="label-text-alt text-red-500">{errors.confirmPassword.message}</span>}
                 </div>
 
-                <button className="button-filled rounded-full py-3 w-full">
+                <button className="btn button-filled w-full mt-6" disabled={isLoading}>
+                    {isLoading && (<span className="loading loading-spinner loading-sm"></span>)}
                     Sign Up
                 </button>
+            </form>
 
-                <div className="flex self-center">
-                    <p className="text-sm">Already have an account? <span className="button-colored font-medium p-0"><Link to={'/sign-in'}>Sign in now.</Link></span></p>
-                </div>
-                </form>
+            <p className="text-sm mt-8">Have an account? <span className="button-colored"><Link to={'/signin'}>Sign In</Link></span></p>
         </div>
     )
 }

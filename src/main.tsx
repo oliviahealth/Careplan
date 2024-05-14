@@ -22,6 +22,7 @@ import DrugScreeningResults from './components/Forms/DrugScreeningResults.tsx';
 import ReferralsAndServices from './components/Forms/ReferralsAndServices.tsx';
 import RelapsePreventionPlan from './components/Forms/RelapsePreventionPlan.tsx';
 
+import AuthLayout from './components/Auth/AuthLayout.tsx';
 import SignUp from './components/Auth/SignUp.tsx';
 import SignIn from './components/Auth/SignIn.tsx';
 
@@ -35,8 +36,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route element={<Layout />}>
             <Route path='/' element={<LandingPage />} />
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/sign-up' element={<SignUp />} />
-            <Route path='/sign-in' element={<SignIn />} />
             <Route path='/maternal-demographics/:submissionId?' element={<BackPage><MaternalDemographics /></BackPage>} />
             <Route path='/maternal-medical-history/:submissionId?' element={<BackPage><MaternalMedicalHistory /></BackPage>} />
             <Route path='/psychiatric-history/:submissionId?' element={<BackPage><PsychiatricHistory /></BackPage>} />
@@ -47,6 +46,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path='/infant-information/:submissionId?' element={<BackPage><InfantInformation /></BackPage>} />
             <Route path='/referrals-and-services/:submissionId?' element={<BackPage><ReferralsAndServices /></BackPage>} />
             <Route path='/relapse-prevention-plan/:submissionId?' element={<BackPage><RelapsePreventionPlan /></BackPage>} />
+          </Route>
+          <Route element={<AuthLayout />}>
+            <Route path='/sign-in' element={<SignIn />} />
+            <Route path='/sign-up' element={<SignUp />} />
           </Route>
         </Routes>
       </BrowserRouter>
