@@ -40,7 +40,7 @@ export default function DrugScreeningResults() {
 
     const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id || '',
+        "userId": user?.id,
     }), [access_token, user?.id]);
 
     const [showDateReviewed, setShowDateReviewed] = useState<boolean[]>([]);

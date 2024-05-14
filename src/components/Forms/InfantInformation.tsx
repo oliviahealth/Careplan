@@ -90,7 +90,7 @@ export default function InfantInformation() {
 
     const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id || '',
+        "userId": user?.id,
     }), [access_token, user?.id]);
 
     const [showNICUStay, setShowNICUStay] = useState(false);
