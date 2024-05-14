@@ -751,7 +751,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  
   const renderMaternalMedicalHistory = (fields: { [key: string]: string }) => {
     const prenatalCareFields = [
       "gestational_age",
@@ -769,7 +768,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       "prior_complications"
     ];
     const medicalProblemsFields = ["med_problems_diagnoses"];
-  
+
     const formatDate = (dateString: string) => {
       const options: Intl.DateTimeFormatOptions = {
         weekday: 'short',
@@ -779,14 +778,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       };
       return new Date(dateString).toLocaleDateString('en-US', options);
     };
-  
+
     const medicationList = Array.isArray(formData?.current_medication_list)
       ? formData.current_medication_list
       : [];
-  
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Prenatal Care</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prenatalCareFields.map(key => {
@@ -804,7 +803,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Obstetric History</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {obstetricHistoryFields.map(key => {
@@ -819,36 +818,57 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
-          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Medical Problems</h3>
-          <div>
-            {medicalProblemsFields.map(key => {
-              const fieldName = fields[key];
-              const fieldValue = formData?.[key];
-              return (
-                <div key={key}>
-                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
-                  <div className="font-semibold">{fieldValue || 'N/A'}</div>
-                </div>
-              );
-            })}
-            <div className="mt-4">
-              <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Notes</h4>
-              <div className="font-semibold">{formData?.notes || 'N/A'}</div>
+        <div className="flex flex-col">
+          <div className="rounded-lg p-4 bg-neutral-100 flex-grow mb-4">
+            <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Medical Problems Requiring Ongoing Care</h3>
+            <div>
+              {medicalProblemsFields.map(key => {
+                const fieldValue = formData?.[key];
+                return (
+                  <div key={key}>
+                    <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Diagnoses</h4>
+                    <div className="font-semibold">{fieldValue || 'N/A'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="rounded-lg p-4 bg-neutral-100 flex-grow">
+            <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Notes</h3>
+            <div className="flex-grow">
+              <div className="mt-4">
+                <div className="font-semibold">{formData?.notes || 'N/A'}</div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Current Medication List</h3>
           <div>
-            {medicationList.map((medication: CurrentMedicationList, index: number) => (
-              <div key={index} className="mb-4">
-                <div className="font-semibold">{medication.name}</div>
-                <div>Dose: {medication.dose}</div>
-                <div>Prescriber: {medication.prescriber}</div>
-                <div>Notes: {medication.notes}</div>
-              </div>
-            ))}
+            <div>
+              {medicationList.map((medication: CurrentMedicationList, index: number) => (
+                <div key={index} className="mb-4 border rounded-lg p-4 bg-neutral-200">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Medication</h4>
+                      <div className="font-semibold">{medication.name}</div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Dose</h4>
+                      <div className="font-semibold">{medication.dose}</div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Prescriber</h4>
+                      <div className="font-semibold">{medication.prescriber}</div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Notes</h4>
+                    <div className="font-semibold">{medication.notes}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
