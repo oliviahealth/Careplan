@@ -71,6 +71,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         updateSubmissionsExist(apiUrl, true);
 
         setLastModifiedDate(allSubmissions[allSubmissions.length - 1].date_last_modified);
+      } else {
+        updateSubmissionsExist(apiUrl, false);
       }
       setSubmissionsFetched(true);
     } catch (error) {
