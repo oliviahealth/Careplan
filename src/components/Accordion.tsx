@@ -26,7 +26,6 @@ const Accordion: React.FC<AccordionProps> = ({
     } else {
       setMaxHeight("0px");
     }
-    console.log(maxHeight);
   }, [isOpen, children, maxHeight]); 
 
   return (
@@ -36,7 +35,7 @@ const Accordion: React.FC<AccordionProps> = ({
           setIsOpen(!isOpen);
           onClick && onClick();
         }}
-        className="w-full h-fit py-3 px-6 rounded-2xl bg-neutral-100 flex justify-between items-center"
+        className={`w-full h-fit py-3 px-6 rounded-2xl bg-neutral-100 flex justify-between items-center text-lg border-2 border-transparent transition duration-100 ease-in ${isOpen ? "border-[#5D1B2A]" : ""}`}
       >
         {title}
         <div className="flex flex-row gap-10">

@@ -26,7 +26,11 @@ const SignUp: React.FC = () => {
 <<<<<<< HEAD
     const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({ resolver: zodResolver(SignInSchema) });
 =======
+<<<<<<< HEAD
+    const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({ resolver: zodResolver(SignInSchema) });
+=======
     let { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({ resolver: zodResolver(SignInSchema) });
+>>>>>>> main
 >>>>>>> main
 >>>>>>> main
 
