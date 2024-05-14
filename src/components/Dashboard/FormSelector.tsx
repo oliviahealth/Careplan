@@ -738,19 +738,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  interface Medication {
-    name: string;
-    dose: string;
-    prescriber: string;
-    notes: string;
-  }
-  
-  interface Medication {
-    name: string;
-    dose: string;
-    prescriber: string;
-    notes: string;
-  }
   
   const renderMaternalMedicalHistory = (fields: { [key: string]: string }) => {
     const prenatalCareFields = [
@@ -841,7 +828,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         <div className="  rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Current Medication List</h3>
           <div>
-            {medicationList.map((medication: Medication, index: number) => (
+            {medicationList.map((medication: CurrentMedicationList, index: number) => (
               <div key={index} className="mb-4">
                 <div className="font-semibold">{medication.name}</div>
                 <div>Dose: {medication.dose}</div>
