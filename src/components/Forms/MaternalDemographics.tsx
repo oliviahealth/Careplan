@@ -69,7 +69,7 @@ export default function MaternalDemographics() {
 
   const headers = useMemo(() => ({
     "Authorization": "Bearer " + access_token,
-    "userId": user?.id || '',
+    "userId": user?.id,
   }), [access_token, user?.id]);
   
   console.log("user_id: ", user?.id)
