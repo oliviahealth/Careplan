@@ -3,7 +3,7 @@ import { useMutation } from 'react-query'
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import useAppStore from "../../store/useAppStore";
 
@@ -13,6 +13,7 @@ const CurrentMedicationList = z.object({
     prescriber: z.string().min(1, 'Prescriber is required'),
     notes: z.string().min(1, 'Notes is required')
 });
+export type CurrentMedicationList = z.infer<typeof CurrentMedicationList>
 
 const MaternalMedicalHistoryInputs = z.object({
     gestational_age: z.string().min(1, 'Gestational age is required'),
@@ -30,7 +31,7 @@ const MaternalMedicalHistoryInputs = z.object({
     med_problems_diagnoses: z.string().min(1, 'required'),
     notes: z.string().nullable(),
 });
-type MaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputs>;
+export type MaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputs>;
 
 const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
     id: z.string(),
@@ -44,14 +45,14 @@ export default function MaternalMedicalHistory() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id,
-    }
+        "userId": user?.id || '',
+    }), [access_token, user?.id]);
 
     const navigate = useNavigate();
 
-    const formatDate = (date: any) => {
+    const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
     };
 
@@ -116,7 +117,7 @@ export default function MaternalMedicalHistory() {
             }
         };
         fetchUserData();
-    }, [submissionId]);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
         let responseData;

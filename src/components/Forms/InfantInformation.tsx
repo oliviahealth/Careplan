@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import axios from 'axios'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useAppStore from "../../store/useAppStore";
 
 const InfantCareNeeds = z.object({
@@ -30,6 +30,7 @@ const InfantCareNeeds = z.object({
     other_name: z.string().nullable(),
     other_notes: z.string().nullable()
 });
+export type InfantCareNeeds = z.infer<typeof InfantCareNeeds>
 
 const InfantMeds = z.object({
     medication: z.string().min(1, 'Medication required'),
@@ -37,6 +38,7 @@ const InfantMeds = z.object({
     prescriber: z.string().min(1, 'Prescriber required'),
     notes: z.string().min(1, 'Notes required')
 });
+export type InfantMeds = z.infer<typeof InfantMeds>
 
 const InfantInformationInputs = z.object({
     child_name: z.string().min(1, 'Child name required'),
@@ -86,10 +88,10 @@ export default function InfantInformation() {
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
 
-    const headers = {
+    const headers = useMemo(() => ({
         "Authorization": "Bearer " + access_token,
-        "userId": user?.id,
-    }
+        "userId": user?.id || '',
+    }), [access_token, user?.id]);
 
     const [showNICUStay, setShowNICUStay] = useState(false);
     const handleShowNICUStay = (value: string) => {
@@ -101,7 +103,7 @@ export default function InfantInformation() {
 
     const navigate = useNavigate();
 
-    const formatDate = (date: any) => {
+    const formatDate = (date: Date) => {
         return date.toISOString().split('T')[0];
     };
 
@@ -180,7 +182,7 @@ export default function InfantInformation() {
             }
         };
         fetchUserData();
-    }, []);
+    }, [submissionId, headers, setValue]);
 
     const { mutate } = useMutation(async (data: InfantInformationInputs) => {
         let responseData;

@@ -3,11 +3,27 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Accordion from "../Accordion";
 import useAppStore from "../../store/useAppStore";
+import { CurrentMedicationList } from "../Forms/MaternalMedicalHistory";
+import { Diagnoses } from "../Forms/PsychiatricHistory";
+import { SubstanceUseMedications } from "../Forms/MedicalServicesForSubstanceUse";
+import { AdditionalDrugs, Drugs } from "../Forms/SubstanceUseHistory";
+import { DrugTests } from "../Forms/DrugScreeningResults";
+import { Children, HouseholdMembers } from "../Forms/FamilyAndSupports";
+import { InfantCareNeeds, InfantMeds } from "../Forms/InfantInformation";
+import { AdditionalServices, Services } from "../Forms/ReferralsAndServices";
+import { Caregivers } from "../Forms/RelapsePreventionPlan";
 
 interface FormSelectorProps {
   name: string;
   path: string;
   apiUrl: string;
+}
+
+interface Submission {
+  [key: string]: string | null;
+  id: string;
+  date_created: string;
+  date_last_modified: string;
 }
 
 const FormSelector: React.FC<FormSelectorProps> = ({
@@ -18,7 +34,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   const [formData, setFormData] = useState<Record<string, string | null>>({});
   // const [completed, setCompleted] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<string | null>(null);
   const [submissionsFetched, setSubmissionsFetched] = useState<boolean>(false);
   const [submissionsExist, setSubmissionsExist] = useState<{ [key: string]: boolean }>({});
@@ -89,22 +105,30 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   const renderSubmissions = () => {
 
-    const sortedSubmissions = [...submissions].sort((a: any, b: any) => {
-      a = new Date(a.timestamp);
-      b = new Date(b.timestamp)
-      return a.getTime() - b.getTime();
+    const sortedSubmissions = [...submissions].sort((a: Submission, b: Submission) => {
+      const dateA = new Date(a.date_created);
+      const dateB = new Date(b.date_created);
+      return dateA.getTime() - dateB.getTime();
     });
 
     return (
       <div className="relative flex space-x-2 items-center">
         {selectedSubmissionID && (
           <>
-            <select value={selectedSubmissionID || ""} onChange={(e) => handleSubmissionClick(e.target.value)} className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-              {sortedSubmissions.map((submission: any) => (
+            <select
+              value={selectedSubmissionID || ""}
+              onChange={(e) => handleSubmissionClick(e.target.value)}
+              className="block bg-white border border-neutral-300 hover:border-neutral-400 px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              {sortedSubmissions.map((submission: Submission) => (
                 <option key={submission.id} value={submission.id}>
                   Submission{" "}
-                  {new Date(submission.timestamp).toLocaleString("en-US", { timeZone: "America/Chicago",})}{" "}CST
-                </option>))}
+                  {new Date(submission.date_created).toLocaleString("en-US", {
+                    timeZone: "America/Chicago",
+                  })}{" "}
+                  CST
+                </option>
+              ))}
             </select>
             <Link to={`${path}/${selectedSubmissionID}`}>
               <img className="w-8 h-8" src="./images/edit.svg"></img>
@@ -193,6 +217,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     substanceUseHistory: {
       alcohol: "Alcohol",
       benzodiazepines: "Benzodiazepines",
+      cocaine: "Cocaine",
       heroin: "Heroin",
       kush: "Kush",
       marijuana: "Marijuana",
@@ -297,10 +322,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     },
   };
 
-  
-
-  const MaternalMedicalHistoryMedicationList = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const MaternalMedicalHistoryMedicationList = (data: CurrentMedicationList[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Name: {x.name} </div>
@@ -312,8 +335,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const PsychiatricHistoryDiagnoses = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const PsychiatricHistoryDiagnoses = (data: Diagnoses[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Provider: {x.provider} </div>
@@ -326,8 +349,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const MedicalServicesForSubstanceUseMedications = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const MedicalServicesForSubstanceUseMedications = (data: SubstanceUseMedications[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Medication: {x.medication} </div>
@@ -337,7 +360,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const SubstanceUseHistoryDrugs = (data: any) => {
+  const SubstanceUseHistoryDrugs = (data: Drugs | null | undefined) => {
+
     const namesMap: { [key: string]: string } = {
       ever_used: "Ever Used",
       date_last_used: "Date Last Used",
@@ -347,19 +371,17 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
     return (
       <div>
-        {Object.keys(data).map((item, index) => (
-          <div key={index}>
-            <div>
-              {namesMap[item] || item}: {data[item]}
-            </div>
+        {Object.keys(namesMap).map((key) => (
+          <div key={key}>
+            {namesMap[key]}: {data?.[key as keyof Drugs] || 'N/A'}
           </div>
         ))}
       </div>
     );
   };
 
-  const SubstanceUseHistoryOtherDrugs = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const SubstanceUseHistoryOtherDrugs = (data: AdditionalDrugs[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Name: {x.drug_used} </div>
@@ -371,8 +393,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const DrugScreeningResultsTests = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const DrugScreeningResultsTests = (data: DrugTests[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Test Description: {x.test_ordered} </div>
@@ -388,8 +410,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsPeopleInHome = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const FamilyAndSupportsPeopleInHome = (data: HouseholdMembers[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Person: {x.person} </div>
@@ -400,11 +422,11 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsChildrenNotHome = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const FamilyAndSupportsChildrenNotHome = (data: Children[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
-          <div> Person: {x.person} </div>
+          <div> Person: {x.name} </div>
           <div> Date of Birth: {x.date_of_birth} </div>
           <div> Caregiver: {x.caregiver} </div>
           <div> Caregiver Contact Number: {x.caregiver_number} </div>
@@ -413,7 +435,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const InfantInformationInfantCareNeeds = (data: any) => {
+  const InfantInformationInfantCareNeeds = (data: InfantCareNeeds[]) => {
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
       breast_pump_notes: "Breast Pump Notes",
@@ -440,12 +462,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
     return (
       <div>
-        {data.map((item: any, index: number) => (
+        {data.map((item, index: number) => (
           <div key={index}>
             {Object.keys(item).map((key: string, idx: number) => (
               <div key={idx}>
                 <div>
-                  {namesMap[key] || key}: {item[key]}
+                  {namesMap[key] || key}: {item[key as keyof InfantCareNeeds]}
                 </div>
               </div>
             ))}
@@ -455,8 +477,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const InfantInformationMedications = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const InfantInformationMedications = (data: InfantMeds[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Medication: {x.medication} </div>
@@ -468,28 +490,27 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const ReferralsAndServices = (data: any) => {
+  const ReferralsAndServices = (data: Services | null | undefined) => {
+
     const namesMap: { [key: string]: string } = {
-      status: "Status",
+      service_status: "Status",
       organization: "Organization",
       organization_contact_information: "Organization Contact Info",
     };
 
     return (
       <div>
-        {Object.keys(data).map((item, index) => (
-          <div key={index}>
-            <div>
-              {namesMap[item] || item}: {data[item]}
-            </div>
+        {Object.keys(namesMap).map((key) => (
+          <div key={key}>
+            {namesMap[key]}: {data?.[key as keyof Services] || 'N/A'}
           </div>
         ))}
       </div>
     );
   };
 
-  const ReferralsAndServicesOther = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const ReferralsAndServicesOther = (data: AdditionalServices[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Name: {x.name} </div>
@@ -501,8 +522,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const RelapsePreventionPlanSafeCaregivers = (data: any) => {
-    return data.map((x: any, index: any) => {
+  const RelapsePreventionPlanSafeCaregivers = (data: Caregivers[]) => {
+    return data.map((x, index) => {
       return (
         <div key={index}>
           <div> Name: {x.name} </div>
@@ -513,51 +534,287 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
+  interface MaternalMedicalHistoryData {
+    [key: string]: string | CurrentMedicationList[] | null;
+    current_medication_list: CurrentMedicationList[];
+  }
+
+  interface PsychiatricHistoryData {
+    [key: string]: string | Diagnoses[] | null;
+    diagnoses: Diagnoses[];
+  }
+  interface MedicalServicesForSubstanceUseData {
+    [key: string]: string | SubstanceUseMedications[] | null;
+    medications: SubstanceUseMedications[];
+  }
+
+  interface SubstanceUseHistoryData {
+    [key: string]: string | Drugs | AdditionalDrugs[] | null;
+    alcohol: Drugs,
+    benzodiazepines: Drugs,
+    cocaine: Drugs,
+    heroin: Drugs,
+    kush: Drugs,
+    marijuana: Drugs,
+    methamphetamine: Drugs,
+    prescription_drugs: Drugs,
+    tobacco: Drugs,
+    other_drugs: AdditionalDrugs[];
+    notes: string | null;
+  }
+
+  interface DrugScreeningResultsData {
+    [key: string]: string | DrugTests[] | null;
+    tests: DrugTests[];
+  }
+
+  interface FamilyAndSupportsData {
+    [key: string]: string | HouseholdMembers[] | Children[] | null;
+    people_living_in_home: HouseholdMembers[];
+    clients_children_not_living_in_home: Children[];
+  }
+
+  interface InfantInformationData {
+    [key: string]: string | InfantCareNeeds[] | InfantMeds[] | null;
+    infant_care_needs_items: InfantCareNeeds[];
+    infant_medications: InfantMeds[];
+  }
+
+  interface ReferralsAndServicesData {
+    [key: string]: string | Services | AdditionalServices[] | null;
+    parenting_classes: Services;
+    transportation_services: Services;
+    ssi_disability: Services;
+    temporary_assistance_for_needy_families: Services;
+    personal_safety: Services;
+    home_visitation_program: Services;
+    housing_assistance: Services;
+    healthy_start_program: Services;
+    support_services_other: AdditionalServices[];
+    breastfeeding_support: Services;
+    local_food_pantries: Services;
+    snap: Services;
+    women_infants_children: Services;
+    food_nutrition_other: AdditionalServices[];
+    health_insurance_enrollment: Services;
+    prenatal_healthcare: Services;
+    family_planning: Services;
+    primary_care: Services;
+    mental_health_counseling: Services;
+    smoking_cessation: Services;
+    healthcare_other: AdditionalServices[];
+    residential: Services;
+    outpatient: Services;
+    caring_for_two_program: Services;
+    the_cradles_program: Services;
+    recovery_support_services: Services;
+    medication_assisted_treatment: Services;
+    substance_use_treatment_other: AdditionalServices[];
+    early_childhood_intervention: Services;
+    early_head_start: Services;
+    NCI_childcare_subsidy: Services;
+    pediatrician_primary_care: Services;
+    safe_sleep_education: Services;
+    child_related_other: AdditionalServices[];
+    child_protective_service: Services;
+    legal_aid: Services;
+    specialty_court: Services;
+    legal_assistance_other: AdditionalServices[];
+    additional_notes: string | null;
+  }
+
+  interface RelapsePreventionPlanData {
+    [key: string]: string | Caregivers[] | null;
+    safe_caregivers: Caregivers[];
+  }
+
+  const renderMaternalDemographics = (fields: { [key: string]: string }) => {
+    const personalInformationFields = ['name', 'date_of_birth'];
+    const contactFields = ['primary_phone_number', 'phone_type'];
+    const insuranceFields = ['marital_status', 'insurance_plan', 'effective_date', 'subscriber_id', 'group_id'];
+    const emergencyContactFields = ['emergency_contact', 'emergency_contact_phone', 'relationship'];
+
+    const getAddressString = () => {
+      const { street_address, city, state, zip_code } = formData;
+      const addressParts = [street_address, city, state, zip_code].filter(Boolean);
+      return addressParts.join(', ');
+    };
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+        <div className="col-span-2">
+          <h2 className="text-xl font-semibold mb-4">Maternal Demographics</h2>
+        </div>
+
+        {/* Personal Information */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {personalInformationFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Contact */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-base font-semibold mb-1">Address</h4>
+              <div className="text-gray-500">{getAddressString() || 'N/A'}</div>
+            </div>
+            {contactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Insurance */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Insurance</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insuranceFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Emergency Contact */}
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Emergency Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {emergencyContactFields.map(key => {
+              const formDataKey = key as keyof typeof formData;
+              const fieldName = fields[key];
+              return (
+                <div key={key}>
+                  <h4 className="text-base font-semibold mb-1">{fieldName}</h4>
+                  <div className="text-gray-500">{(formData && formData[formDataKey]) || 'N/A'}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderFields = (fields: { [key: string]: string }) => {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 py-2">
+      <div className="grid grid-cols-1 gap-x-2 md:grid-cols-3 gap-y-1 py-2 text-sm">
         {Object.entries<string>(fields).map(([key, fieldName]) => {
-            return (
-              <React.Fragment key={key}>
-                <div className="flex flex-col gap-1">
-                  <div className="font-semibold truncate">{fieldName}:</div>
-                  <div className="text-sm">
-                    {fieldNames.maternalMedicalHistory[key] && key === "current_medication_list" ? (
-                      MaternalMedicalHistoryMedicationList((formData as any)?.[key] || [])
-                    ) : fieldNames.psychiatricHistory[key] && key === "diagnoses" ? (
-                      PsychiatricHistoryDiagnoses((formData as any)?.[key] || [])
-                    ) : fieldNames.medicalServicesForSubstanceUse[key] && key === "medications" ? (
-                      MedicalServicesForSubstanceUseMedications((formData as any)?.[key] || [])
-                    ) : fieldNames.substanceUseHistory[key] && key !== "notes" && key !== "other_drugs" ? (
-                      SubstanceUseHistoryDrugs((formData as any)?.[key] || [])
-                    ) : fieldNames.substanceUseHistory[key] && key === "other_drugs" ? (
-                      SubstanceUseHistoryOtherDrugs((formData as any)?.[key] || [])
-                    ) : fieldNames.drugScreeningResults[key] && key === "tests" ? (
-                      DrugScreeningResultsTests((formData as any)?.[key] || [])
-                    ) : fieldNames.familyAndSupports[key] && key === "people_living_in_home" ? (
-                      FamilyAndSupportsPeopleInHome((formData as any)?.[key] || [])
-                    ) : fieldNames.familyAndSupports[key] && key === "clients_children_not_living_in_home" ? (
-                      FamilyAndSupportsChildrenNotHome((formData as any)?.[key] || [])
-                    ) : fieldNames.infantInformation[key] && key === "infant_care_needs_items" ? (
-                      InfantInformationInfantCareNeeds((formData as any)?.[key] || [])
-                    ) : fieldNames.infantInformation[key] && key === "infant_medications" ? (
-                      InfantInformationMedications((formData as any)?.[key] || [])
-                    ) : fieldNames.referralsAndServices[key] &&
-                      !["additional_notes", "support_services_other", "food_nutrition_other", "healthcare_other", "substance_use_treatment_other", "child_related_other", "legal_assistance_other"].includes(key) ? (
-                      ReferralsAndServices((formData as any)?.[key] || [])
-                    ) : fieldNames.referralsAndServices[key] &&
-                      ["support_services_other", "food_nutrition_other", "healthcare_other", "substance_use_treatment_other", "child_related_other", "legal_assistance_other"].includes(key) ? (
-                      ReferralsAndServicesOther((formData as any)?.[key] || [])
-                    ) : fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers" ? (
-                      RelapsePreventionPlanSafeCaregivers((formData as any)?.[key] || [])
-                    ) : (
-                      <div className="truncate">{(formData as any)?.[key]}</div>
-                    )}
-                  </div>
-                </div>
-              </React.Fragment>
-            );
+          const formDataKey = key as keyof typeof formData;
+          return (
+            <React.Fragment key={key}>
+              <div className="flex flex-row gap-1">
+                <div className="font-semibold truncate">{fieldName}:</div>
+                {(() => {
+                  if (fieldNames.maternalMedicalHistory[key] && key === "current_medication_list") {
+                    return MaternalMedicalHistoryMedicationList(
+                      Array.isArray((formData as MaternalMedicalHistoryData)?.[formDataKey])
+                        ? ((formData as MaternalMedicalHistoryData)?.[formDataKey] as CurrentMedicationList[])
+                        : []
+                    );
+                  } else if (fieldNames.psychiatricHistory[key] && key === "diagnoses") {
+                    return PsychiatricHistoryDiagnoses(
+                      Array.isArray((formData as PsychiatricHistoryData)?.[formDataKey])
+                        ? ((formData as PsychiatricHistoryData)?.[formDataKey] as Diagnoses[])
+                        : []
+                    );
+                  } else if (fieldNames.medicalServicesForSubstanceUse[key] && key === "medications") {
+                    return MedicalServicesForSubstanceUseMedications(
+                      Array.isArray((formData as MedicalServicesForSubstanceUseData)?.[formDataKey])
+                        ? ((formData as MedicalServicesForSubstanceUseData)?.[formDataKey] as SubstanceUseMedications[])
+                        : []
+                    );
+                  } else if (fieldNames.substanceUseHistory[key]) {
+                    if (key === "other_drugs") {
+                      return SubstanceUseHistoryOtherDrugs(
+                        Array.isArray((formData as SubstanceUseHistoryData)?.[formDataKey])
+                          ? ((formData as SubstanceUseHistoryData)?.[formDataKey] as AdditionalDrugs[])
+                          : []
+                      );
+                    } else if (key === "notes") {
+                      return (formData as SubstanceUseHistoryData)?.[formDataKey] as string;
+                    } else {
+                      return SubstanceUseHistoryDrugs(
+                        (formData as SubstanceUseHistoryData)?.[formDataKey] as Drugs
+                      );
+                    }
+                  } else if (fieldNames.drugScreeningResults[key] && key === "tests") {
+                    return DrugScreeningResultsTests(
+                      Array.isArray((formData as DrugScreeningResultsData)?.[formDataKey])
+                        ? ((formData as DrugScreeningResultsData)?.[formDataKey] as DrugTests[])
+                        : []
+                    );
+                  } else if (fieldNames.familyAndSupports[key] && (key === "people_living_in_home")) {
+                    return FamilyAndSupportsPeopleInHome(
+                      (formData as FamilyAndSupportsData)?.[formDataKey] as HouseholdMembers[]
+                    );
+                  } else if (fieldNames.familyAndSupports[key] && (key === "clients_children_not_living_in_home")) {
+                    return FamilyAndSupportsChildrenNotHome(
+                      (formData as FamilyAndSupportsData)?.[formDataKey] as Children[]
+                    );
+                  } else if (fieldNames.infantInformation[key] && (key === "infant_care_needs_items")) {
+                    return InfantInformationInfantCareNeeds(
+                      (formData as InfantInformationData)?.[formDataKey] as InfantCareNeeds[]
+                    );
+                  } else if (fieldNames.infantInformation[key] && (key === "infant_medications")) {
+                    return InfantInformationMedications(
+                      (formData as InfantInformationData)?.[formDataKey] as InfantMeds[]
+                    );
+                  } else if (fieldNames.referralsAndServices[key]) {
+                    if (["support_services_other",
+                      "food_nutrition_other",
+                      "healthcare_other",
+                      "substance_use_treatment_other",
+                      "child_related_other",
+                      "legal_assistance_other"].includes(key)) {
+                      return ReferralsAndServicesOther(
+                        Array.isArray((formData as ReferralsAndServicesData)?.[formDataKey])
+                          ? ((formData as ReferralsAndServicesData)?.[formDataKey] as AdditionalServices[])
+                          : []
+                      );
+                    } else if (key === "additional_notes") {
+                      return (formData as ReferralsAndServicesData)?.[formDataKey] as string;
+                    } else {
+                      return ReferralsAndServices(
+                        (formData as ReferralsAndServicesData)?.[formDataKey] as Services
+                      );
+                    }
+                  } else if (fieldNames.relapsePreventionPlan[key] && key === "safe_caregivers") {
+                    return RelapsePreventionPlanSafeCaregivers(
+                      (formData as RelapsePreventionPlanData)?.[formDataKey] as Caregivers[]
+                    );
+                  } else {
+                    return <div>{(formData && formData[formDataKey]) || 'N/A'}</div>;
+                  }
+                })()}
+              </div>
+            </React.Fragment>
+          );
         })}
       </div>
     );
@@ -571,8 +828,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
 
   return (
     <div>
-      <Accordion title={name} /*completed={completed}*/ isLoading={isLoading} onClick={handleAccordionClick}>
-        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalDemographics)}
+      <Accordion title={name} isLoading={isLoading} onClick={handleAccordionClick}>
+        {name === "Maternal Demographics" && formData && submissionsExist[apiUrl] && renderMaternalDemographics(fieldNames.maternalDemographics)}
         {name === "Maternal Medical History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.maternalMedicalHistory)}
         {name === "Psychiatric History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.psychiatricHistory)}
         {name === "Substance Use History" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.substanceUseHistory)}
