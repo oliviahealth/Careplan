@@ -842,7 +842,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         {name === "Referrals and Services" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.referralsAndServices)}
         {name === "Relapse Prevention Plan" && formData && submissionsExist[apiUrl] && renderFields(fieldNames.relapsePreventionPlan)}
 
-        <div className="flex justify-between mt-6">
+        <div className="flex items-center justify-between mt-6 mb-2">
           {submissionsExist[apiUrl] && (
             <div className="flex">{renderSubmissions()}</div>
           )}
