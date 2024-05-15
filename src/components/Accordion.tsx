@@ -11,7 +11,6 @@ interface AccordionProps {
 
 const Accordion: React.FC<AccordionProps> = ({
   title,
-  // completed,
   children,
   isLoading,
   onClick,
@@ -35,18 +34,10 @@ const Accordion: React.FC<AccordionProps> = ({
           setIsOpen(!isOpen);
           onClick && onClick();
         }}
-        className={`w-full h-fit py-3 px-6 rounded-2xl bg-neutral-100 flex justify-between items-center text-lg border-2 border-transparent transition duration-100 ease-in ${isOpen ? "border-[#5D1B2A]" : ""}`}
+        className={`w-full h-fit py-3 px-6 rounded-2xl bg-neutral-100 flex justify-between items-center text-lg border-2 transition duration-100 ease-in ${isOpen ? "border-[#5D1B2A]" : "border-transparent "}`}
       >
         {title}
         <div className="flex flex-row gap-10">
-          {/* <div className="flex flex-row text-red-500">
-            {!completed && (
-              <>
-                <img className="w-4 mr-2" src={`./images/action.svg`} />
-                Actions Required
-              </>
-            )}
-          </div> */}
           <Chevron
             className="stroke-black h-4"
             direction={`${isOpen ? "up" : "down"}`}

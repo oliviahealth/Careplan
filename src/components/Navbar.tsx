@@ -5,7 +5,6 @@ import axios from "axios";
 import { useMutation } from "react-query";
 
 const Navbar: React.FC = () => {
-
   const navigate = useNavigate();
 
   const [isOpen, setOpen] = useState(false);

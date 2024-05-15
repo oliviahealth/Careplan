@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useMemo } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
-const DrugTest = z.object({
+const DrugTestSchema = z.object({
     test_ordered: z.string().min(1, 'Test name required'),
     date_collected: z.string().min(1, 'Test date requried'),
     provider: z.string().min(1, 'Test provider required'),
@@ -17,23 +17,21 @@ const DrugTest = z.object({
     provider_reviewed: z.string().min(1, 'Reviewed with provider requried'),
     date_reviewed: z.string().nullable()
 })
-export type DrugTests = z.infer<typeof DrugTest>
+export type IDrugTest = z.infer<typeof DrugTestSchema>
 
-const DrugScreeningResultsInputs = z.object({
-    tests: z.array(DrugTest),
+const DrugScreeningResultsInputsSchema = z.object({
+    tests: z.array(DrugTestSchema),
 })
-type DrugScreeningResultsInputs = z.infer<typeof DrugScreeningResultsInputs>;
+type IDrugScreeningResultsInputs = z.infer<typeof DrugScreeningResultsInputsSchema>;
 
-const DrugScreeningResultsResponse = DrugScreeningResultsInputs.extend({
+const DrugScreeningResultsResponseSchema = DrugScreeningResultsInputsSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
 export default function DrugScreeningResults() {
-
-    const { submissionId } = useParams();
-
     const navigate = useNavigate();
+    const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
@@ -48,13 +46,14 @@ export default function DrugScreeningResults() {
         const newShowDateReviewed = [...showDateReviewed];
         newShowDateReviewed[index] = value === 'Yes';
         setShowDateReviewed(newShowDateReviewed);
+
         if (value === 'No') {
             setValue(`tests.${index}.date_reviewed`, null);
         }
     }
 
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<DrugScreeningResultsInputs>({
-        resolver: zodResolver(DrugScreeningResultsInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IDrugScreeningResultsInputs>({
+        resolver: zodResolver(DrugScreeningResultsInputsSchema),
         defaultValues: {
             tests: [{
                 test_ordered: '',
@@ -74,22 +73,18 @@ export default function DrugScreeningResults() {
         name: 'tests'
     });
 
-    const addNewDrugTest = () => {
-        append({
-            test_ordered: '',
-            date_collected: '',
-            provider: '',
-            provider_location: '',
-            results: '',
-            specify_results: '',
-            provider_reviewed: '',
-            date_reviewed: ''
-        })
-    };
+    const addNewDrugTest = () => append({
+        test_ordered: '',
+        date_collected: '',
+        provider: '',
+        provider_location: '',
+        results: '',
+        specify_results: '',
+        provider_reviewed: '',
+        date_reviewed: ''
+    });
 
-    const removeLastDrugTest = () => {
-        remove(fields.length - 1);
-    };
+    const removeLastDrugTest = () => remove(fields.length - 1);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -99,19 +94,26 @@ export default function DrugScreeningResults() {
                         `http://127.0.0.1:5000/api/get_drug_screening_results/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof DrugScreeningResultsInputs;
-                            setValue(formKey, userData[key]);
+                    const pastSubmissionData = response.data;
 
-                            if (key === 'tests') {
-                                const newShowDateReviewed = userData[key].map((test: DrugTests) => test.provider_reviewed === 'Yes');
-                                setShowDateReviewed(newShowDateReviewed);
-                            }
+                    DrugScreeningResultsResponseSchema.parse(pastSubmissionData);
+
+                    Object.keys(pastSubmissionData).forEach(key => {
+                        if (key === 'id' || key === 'user_id') {
+                            return;
+                        }
+
+                        const formKey = key as keyof IDrugScreeningResultsInputs;
+                        setValue(formKey, pastSubmissionData[key]);
+
+                        if (key === 'tests') {
+                            const newShowDateReviewed = pastSubmissionData[key].map((test: IDrugTest) => test.provider_reviewed === 'Yes');
+                            setShowDateReviewed(newShowDateReviewed);
                         }
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+                    
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -119,7 +121,7 @@ export default function DrugScreeningResults() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: DrugScreeningResultsInputs) => {
+    const { mutate } = useMutation(async (data: IDrugScreeningResultsInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -139,14 +141,16 @@ export default function DrugScreeningResults() {
         }
 
         const userData = responseData.data;
-        DrugScreeningResultsResponse.parse(userData);
-        console.log(userData);
+        DrugScreeningResultsResponseSchema.parse(userData);
+        
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+
             alert(`Drug screening results ${method} successfully!`);
             console.log(`DrugScreeningResults data ${method} successfully.`, userData);
+            
             navigate('/dashboard');
         },
         onError: () => {
@@ -161,10 +165,7 @@ export default function DrugScreeningResults() {
                 <p className="font-semibold text-red-700">Complete with Provider Ordering UDS or Recovery Coach</p>
                 <div className="w-full h-px bg-gray-300"></div>
                 {fields.map((field, index) => (
-
                     <div key={field.id} className="py-6 space-y-6">
-
-
                         <div className="flex justify-between items-center py-6">
                             <p className="font-medium pb-2 pt-8">Test Ordered {index + 1}</p>
                             <button type="button" onClick={() => removeLastDrugTest()} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Test</button>

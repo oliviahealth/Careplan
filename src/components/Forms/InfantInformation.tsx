@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect, useMemo } from "react";
 import useAppStore from "../../store/useAppStore";
 
-const InfantCareNeeds = z.object({
+const InfantCareNeedsSchema = z.object({
     breast_pump: z.string().min(1, 'Breast pump information required'),
     breast_pump_notes: z.string().nullable(),
     breastfeeding_support: z.string().min(1, 'Breastfeeding support information required'),
@@ -30,17 +30,17 @@ const InfantCareNeeds = z.object({
     other_name: z.string().nullable(),
     other_notes: z.string().nullable()
 });
-export type InfantCareNeeds = z.infer<typeof InfantCareNeeds>
+export type IInfantCareNeeds = z.infer<typeof InfantCareNeedsSchema>
 
-const InfantMeds = z.object({
+const InfantMedsSchema = z.object({
     medication: z.string().min(1, 'Medication required'),
     dose: z.string().min(1, 'Dose required'),
     prescriber: z.string().min(1, 'Prescriber required'),
     notes: z.string().min(1, 'Notes required')
 });
-export type InfantMeds = z.infer<typeof InfantMeds>
+export type IInfantMeds = z.infer<typeof InfantMedsSchema>
 
-const InfantInformationInputs = z.object({
+const InfantInformationInputsSchema = z.object({
     child_name: z.string().min(1, 'Child name required'),
     date_of_birth: z.string().min(1, 'Date of birth required'),
     sex: z.string().min(1, 'Sex required'),
@@ -57,11 +57,11 @@ const InfantInformationInputs = z.object({
     neonatal_opiod_withdraw: z.string().min(1, 'Neonatal opiod withdraw info required'),
     neonatal_opiod_withdraw_treatment_method: z.string().nullable(),
     DX_problems_additional_information: z.string().min(1, 'DX Problems/Additional Information required'),
-    infant_care_needs_items: z.array(InfantCareNeeds),
+    infant_care_needs_items: z.array(InfantCareNeedsSchema),
     where_will_baby_sleep: z.string().min(1, 'Baby sleeping information required'),
     where_will_baby_sleep_specify: z.string().nullable(),
     infant_care_needs_additional_notes: z.string().nullable(),
-    infant_medications: z.array(InfantMeds),
+    infant_medications: z.array(InfantMedsSchema),
     infant_medication_notes: z.string().nullable(),
     father_name: z.string().min(1, 'Father name required'),
     father_date_of_birth: z.string().min(1, 'Father date of birth required'),
@@ -74,15 +74,15 @@ const InfantInformationInputs = z.object({
     father_involved_in_babys_life_comments: z.string().nullable(),
     father_notes: z.string().nullable(),
 });
-type InfantInformationInputs = z.infer<typeof InfantInformationInputs>;
+type IInfantInformationInputs = z.infer<typeof InfantInformationInputsSchema>;
 
-const InfantInformationResponse = InfantInformationInputs.extend({
+const InfantInformationResponseSchema = InfantInformationInputsSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
 export default function InfantInformation() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -96,19 +96,19 @@ export default function InfantInformation() {
     const [showNICUStay, setShowNICUStay] = useState(false);
     const handleShowNICUStay = (value: string) => {
         setShowNICUStay(value === 'Yes');
-        if (value === 'No') {
-            setValue('NICU_length_of_stay', null);
+
+        if (value === 'Yes') {
+            setShowNICUStay(true);
+
+            return;
         }
+
+        setShowNICUStay(false);
+        setValue('NICU_length_of_stay', null);
     };
 
-    const navigate = useNavigate();
-
-    const formatDate = (date: Date) => {
-        return date.toISOString().split('T')[0];
-    };
-
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<InfantInformationInputs>({
-        resolver: zodResolver(InfantInformationInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IInfantInformationInputs>({
+        resolver: zodResolver(InfantInformationInputsSchema),
         defaultValues: {
             infant_medications: [{
                 medication: '',
@@ -153,6 +153,8 @@ export default function InfantInformation() {
         name: "infant_care_needs_items"
     })
 
+    const addInfantMed = () => appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' });
+
     useEffect(() => {
         const fetchUserData = async () => {
             if (submissionId) {
@@ -161,22 +163,37 @@ export default function InfantInformation() {
                         `http://127.0.0.1:5000/api/get_infant_information/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof InfantInformationInputs;
-                            if (key === 'date_of_birth' || key === 'father_date_of_birth') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            } else {
-                                setValue(formKey, userData[key]);
-                            }
+                    const pastSubmissionData = response.data;
+
+                    InfantInformationResponseSchema.parse(pastSubmissionData);
+
+                    Object.keys(pastSubmissionData).forEach(key => {
+                        if (key === 'id' || key === 'user_id') {
+                            return;
+                        }
+
+                        const formKey = key as keyof IInfantInformationInputs;
+                        if (key === 'date_of_birth' || key === 'father_date_of_birth') {
+                            const newDate = new Date(pastSubmissionData[key]).toISOString().split('T')[0];
+
+                            setValue(formKey, newDate);
+                        } else {
+                            setValue(formKey, pastSubmissionData[key]);
                         }
                     });
-                    setShowNICUStay(userData.NICU_stay === 'Yes');
-                    if (userData.NICU_stay === 'No') {
+
+                    if(pastSubmissionData.NICU_stay === 'Yes') {
+                        setShowNICUStay(true);
+                    } else {
+                        setShowNICUStay(false);
+                    }
+                    
+                    if (pastSubmissionData.NICU_stay === 'No') {
                         setValue('NICU_length_of_stay', null)
                     }
                 } catch (error) {
+                    alert("Something went wrong!");
+                    
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -184,7 +201,7 @@ export default function InfantInformation() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: InfantInformationInputs) => {
+    const { mutate } = useMutation(async (data: IInfantInformationInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -204,14 +221,16 @@ export default function InfantInformation() {
         }
 
         const userData = responseData.data;
-        InfantInformationResponse.parse(userData);
-        console.log(userData);
+        InfantInformationResponseSchema.parse(userData);
+
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+            
             alert(`Infant Information ${method} successfully!`);
             console.log(`InfantInformation data ${method} successfully.`, userData);
+            
             navigate("/dashboard");
         },
         onError: () => {
@@ -240,7 +259,6 @@ export default function InfantInformation() {
                         {status}
                     </label>))}
                 {errors.sex && <span className="label-text-alt text-red-500">{errors.sex.message}</span>}
-
 
                 <p className="font-medium">Birth Weight (lbs)</p>
                 <input {...register("birth_weight")} className="border border-gray-300 px-4 py-2 rounded-md" />
@@ -490,8 +508,7 @@ export default function InfantInformation() {
                     <div key={item.id} className="space-y-6 pt-6">
                         <div className="flex justify-between items-center py-6">
                             <p className="font-medium pb-2 pt-8">Name {index + 1}</p>
-                            {index !== 0 && (
-                                <button type="button" onClick={() => infantMedsFields.length > 0 && removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medication</button>)}
+                            <button type="button" onClick={() => removeInfantMed(infantMedsFields.length - 1)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Medication</button>
                         </div>
                         <input {...register(`infant_medications.${index}.medication`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.infant_medications && errors.infant_medications[index]?.medication && (
@@ -514,7 +531,7 @@ export default function InfantInformation() {
                     </div>))}
 
                 <div className="flex justify-center">
-                    <button type="button" onClick={() => appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' })} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
+                    <button type="button" onClick={addInfantMed} className="text-black px-4 py-2 rounded-md">+ Add Medication</button>
                 </div>
 
                 <p className="font-medium">Infant Medication Notes</p>

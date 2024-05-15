@@ -102,7 +102,7 @@ const SignUp: React.FC = () => {
                 </button>
             </form>
 
-            <p className="text-sm mt-8">Have an account? <span className="button-colored"><Link to={'/signin'}>Sign In</Link></span></p>
+            <p className="text-sm mt-8">Have an account? <span className="button-colored p-0"><Link to={'/sign-in'}>Sign In</Link></span></p>
         </div>
     )
 }

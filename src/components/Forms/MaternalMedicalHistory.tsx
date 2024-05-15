@@ -7,15 +7,15 @@ import { useEffect, useState, useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import useAppStore from "../../store/useAppStore";
 
-const CurrentMedicationList = z.object({
+const CurrentMedicationSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     dose: z.string().min(1, 'Dose is required'),
     prescriber: z.string().min(1, 'Prescriber is required'),
     notes: z.string().min(1, 'Notes is required')
 });
-export type CurrentMedicationList = z.infer<typeof CurrentMedicationList>
+export type ICurrentMedication = z.infer<typeof CurrentMedicationSchema>
 
-const MaternalMedicalHistoryInputs = z.object({
+const MaternalMedicalHistoryInputsSchema = z.object({
     gestational_age: z.string().min(1, 'Gestational age is required'),
     anticipated_delivery_date: z.string().min(1, 'Anticipated delivery date is required'),
     planned_mode_delivery: z.string().min(1, 'Planned mode of delivery is required'),
@@ -27,19 +27,19 @@ const MaternalMedicalHistoryInputs = z.object({
     total_num_live_births: z.string().min(0, 'Total number of live births is required'),
     total_num_children_with_mother: z.string().min(1, 'Total number of children with mother is required'),
     prior_complications: z.string().default(""),
-    current_medication_list: z.array(CurrentMedicationList),
-    med_problems_diagnoses: z.string().min(1, 'required'),
+    current_medication_list: z.array(CurrentMedicationSchema),
+    med_problems_diagnosis: z.string().min(1, 'required'),
     notes: z.string().nullable(),
 });
-export type MaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputs>;
+export type IMaternalMedicalHistoryInputs = z.infer<typeof MaternalMedicalHistoryInputsSchema>;
 
-const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputs.extend({
+const MaternalMedicalHistoryResponse = MaternalMedicalHistoryInputsSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
 export default function MaternalMedicalHistory() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -50,23 +50,21 @@ export default function MaternalMedicalHistory() {
         "userId": user?.id,
     }), [access_token, user?.id]);
 
-    const navigate = useNavigate();
-
-    const formatDate = (date: Date) => {
-        return date.toISOString().split('T')[0];
-    };
-
     const [showPostpartumLocationDate, setShowPostpartumLocationDate] = useState(false);
     const handlePostpartumAttendance = (value: string) => {
-        setShowPostpartumLocationDate(value === 'Yes');
-        if (value === 'No') {
-            setValue('postpartum_visit_location', null);
-            setValue('postpartum_visit_date', null)
+        if (value === 'Yes') {
+            setShowPostpartumLocationDate(true);
+
+            return;
         }
+
+        setShowPostpartumLocationDate(false);
+        setValue('postpartum_visit_location', null);
+        setValue('postpartum_visit_date', null);
     };
 
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<MaternalMedicalHistoryInputs>({
-        resolver: zodResolver(MaternalMedicalHistoryInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IMaternalMedicalHistoryInputs>({
+        resolver: zodResolver(MaternalMedicalHistoryInputsSchema),
         defaultValues: {
             current_medication_list: [],
             planned_mode_delivery: "",
@@ -80,14 +78,7 @@ export default function MaternalMedicalHistory() {
         name: 'current_medication_list'
     })
 
-    const addNewMedication = () => {
-        append({
-            name: '',
-            dose: '',
-            prescriber: '',
-            notes: ''
-        })
-    };
+    const addNewMedication = () => append({ name: '', dose: '', prescriber: '', notes: '' });
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -97,21 +88,30 @@ export default function MaternalMedicalHistory() {
                         `http://127.0.0.1:5000/api/get_maternal_medical_history/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof MaternalMedicalHistoryInputs;
-                            if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            } else {
-                                setValue(formKey, userData[key]);
-                            }
+                    const pastSubmissionData = response.data;
+
+                    MaternalMedicalHistoryResponse.parse(pastSubmissionData);
+
+                    Object.keys(pastSubmissionData).forEach(key => {
+                        if (key === 'id' || key === 'user_id') {
+                            return;
+                        }
+
+                        const formKey = key as keyof IMaternalMedicalHistoryInputs;
+                        if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
+                            const newDate = new Date(pastSubmissionData[key]).toISOString().split('T')[0];
+
+                            setValue(formKey, newDate);
+                        } else {
+                            setValue(formKey, pastSubmissionData[key]);
                         }
                     });
 
-                    setShowPostpartumLocationDate(userData.attended_postpartum_visit === 'Yes');
+                    setShowPostpartumLocationDate(pastSubmissionData.attended_postpartum_visit === 'Yes');
 
                 } catch (error) {
+                    alert("Something went wrong!");
+
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -119,7 +119,7 @@ export default function MaternalMedicalHistory() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: MaternalMedicalHistoryInputs) => {
+    const { mutate } = useMutation(async (data: IMaternalMedicalHistoryInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -140,13 +140,15 @@ export default function MaternalMedicalHistory() {
 
         const userData = responseData.data;
         MaternalMedicalHistoryResponse.parse(userData);
-        console.log(userData);
+
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+
             alert(`Maternal Medical History ${method} successfully!`);
             console.log(`Maternal Medical History data ${method} successfully.`, userData);
+            
             navigate('/dashboard')
         },
         onError: () => {
@@ -239,9 +241,9 @@ export default function MaternalMedicalHistory() {
 
                 <p className="font-medium text-xl pt-6">Medical Problems Requiring Ongoing Care</p>
 
-                <p className="font-medium">Diagnoses</p>
-                <textarea {...register("med_problems_diagnoses")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                {errors.med_problems_diagnoses && <span className="label-text-alt text-red-500">{errors.med_problems_diagnoses.message}</span>}
+                <p className="font-medium">Diagnosis</p>
+                <textarea {...register("med_problems_diagnosis")} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                {errors.med_problems_diagnosis && <span className="label-text-alt text-red-500">{errors.med_problems_diagnosis.message}</span>}
 
                 <p className="font-medium text-xl">Current Medication List</p>
                 {fields.map((field, index) => (

@@ -7,44 +7,44 @@ import { useMutation } from 'react-query'
 import axios from 'axios'
 import useAppStore from "../../store/useAppStore";
 
-const DrugInfo = z.object({
+const DrugInfoSchema = z.object({
     ever_used: z.string().min(1, 'Field required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
     date_last_used: z.string().nullable(),
     notes: z.string().nullable()
 })
-export type Drugs = z.infer<typeof DrugInfo>
+export type IDrug = z.infer<typeof DrugInfoSchema>
 
-const AdditionalDrugs = z.object({
+const AdditionalDrugSchema = z.object({
     drug_used: z.string().min(1, 'Substance name required'),
     used_during_pregnancy: z.string().min(1, 'Field required'),
     date_last_used: z.string().min(1, 'Date required'),
     notes: z.string().nullable()
 });
-export type AdditionalDrugs = z.infer<typeof AdditionalDrugs>
+export type IAdditionalDrug = z.infer<typeof AdditionalDrugSchema>
 
-const SubstanceUseHistoryInputs = z.object({
-    alcohol: DrugInfo,
-    benzodiazepines: DrugInfo,
-    cocaine: DrugInfo,
-    heroin: DrugInfo,
-    kush: DrugInfo,
-    marijuana: DrugInfo,
-    methamphetamine: DrugInfo,
-    prescription_drugs: DrugInfo,
-    tobacco: DrugInfo,
-    other_drugs: z.array(AdditionalDrugs),
+const SubstanceUseHistoryInputSchema = z.object({
+    alcohol: DrugInfoSchema,
+    benzodiazepines: DrugInfoSchema,
+    cocaine: DrugInfoSchema,
+    heroin: DrugInfoSchema,
+    kush: DrugInfoSchema,
+    marijuana: DrugInfoSchema,
+    methamphetamine: DrugInfoSchema,
+    prescription_drugs: DrugInfoSchema,
+    tobacco: DrugInfoSchema,
+    other_drugs: z.array(AdditionalDrugSchema),
     notes: z.string().nullable()
 })
-export type SubstanceUseHistoryInputs = z.infer<typeof SubstanceUseHistoryInputs>
+export type ISubstanceUseHistoryInput = z.infer<typeof SubstanceUseHistoryInputSchema>
 
-const SubstanceUseHistoryReponse = SubstanceUseHistoryInputs.extend({
+const SubstanceUseHistoryReponseSchema = SubstanceUseHistoryInputSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
 export default function SubstanceUseHistory() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -54,12 +54,6 @@ export default function SubstanceUseHistory() {
         "Authorization": "Bearer " + access_token,
         "userId": user?.id,
     }), [access_token, user?.id]);
-
-    const navigate = useNavigate();
-
-    const formatDate = (date: Date) => {
-        return date.toISOString().split('T')[0];
-    };
 
     type DrugVisibilityState = {
         [key: string]: boolean;
@@ -82,14 +76,13 @@ export default function SubstanceUseHistory() {
             [drug]: value === 'Yes',
         }));
         if (value === 'No') {
-            setValue(`${drug}.date_last_used` as keyof SubstanceUseHistoryInputs, null);
+            setValue(`${drug}.date_last_used` as keyof ISubstanceUseHistoryInput, null);
         }
     };
 
 
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<SubstanceUseHistoryInputs>({
-
-        resolver: zodResolver(SubstanceUseHistoryInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<ISubstanceUseHistoryInput>({
+        resolver: zodResolver(SubstanceUseHistoryInputSchema),
         defaultValues: {
             other_drugs: []
         },
@@ -108,24 +101,30 @@ export default function SubstanceUseHistory() {
                         `http://127.0.0.1:5000/api/get_substance_use_history/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
+                    const pastResponseData = response.data;
 
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof SubstanceUseHistoryInputs;
-                            if (key === 'date_last_used') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            } else {
-                                setValue(formKey, userData[key]);
-                            }
+                    SubstanceUseHistoryReponseSchema.parse(pastResponseData);
 
-                            setShowDrugDate(prevState => ({
-                                ...prevState,
-                                [key]: userData[key]?.ever_used === 'Yes',
-                            }));
+                    Object.keys(pastResponseData).forEach(key => {
+                        if (key === 'id' || key === 'user_id') return;
+
+                        const formKey = key as keyof ISubstanceUseHistoryInput;
+                        if (key === 'date_last_used') {
+                            const newDate = new Date(pastResponseData[key]).toISOString().split('T')[0];
+
+                            setValue(formKey, newDate);
+                        } else {
+                            setValue(formKey, pastResponseData[key]);
                         }
+
+                        setShowDrugDate(prevState => ({
+                            ...prevState,
+                            [key]: pastResponseData[key]?.ever_used === 'Yes',
+                        }));
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -134,7 +133,7 @@ export default function SubstanceUseHistory() {
     }, [submissionId, headers, setValue]);
 
 
-    const { mutate } = useMutation(async (data: SubstanceUseHistoryInputs) => {
+    const { mutate } = useMutation(async (data: ISubstanceUseHistoryInput) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -154,14 +153,16 @@ export default function SubstanceUseHistory() {
         }
 
         const userData = responseData.data
-        SubstanceUseHistoryReponse.parse(userData);
-        console.log(userData)
+        SubstanceUseHistoryReponseSchema.parse(userData);
+        
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+
             alert(`Substance Use History ${method} successfully!`);
             console.log(`SubstanceUseHistory data ${method} successfully.`, userData);
+            
             navigate('/dashboard')
         },
         onError: () => {
@@ -223,7 +224,6 @@ export default function SubstanceUseHistory() {
                 ))}
 
                 <div className="pt-10">
-
                     {fields.map((field, index) => (
                         <div key={field.id} className="space-y-4">
                             <div className="flex justify-between items-center">

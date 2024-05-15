@@ -7,20 +7,20 @@ import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
 
-const diagnosesSchema = z.object({
+const DiagnosisSchema = z.object({
     diagnosis: z.string().min(1, "Diagnosis is required"),
     provider: z.string().min(1, "Provider is required"),
     phone_number: z.string().min(1, "Phone number is required"),
     date_of_diagnosis: z.string().min(1, "Date of diagnosis is required"),
     taking_medication: z.string().min(1, "This field is required"),
 });
-export type Diagnoses = z.infer<typeof diagnosesSchema>
+export type IDiagnosis = z.infer<typeof DiagnosisSchema>
 
 export const PsychiatricHistoryInputsSchema = z.object({
-    diagnoses: z.array(diagnosesSchema),
+    diagnosis: z.array(DiagnosisSchema),
     notes: z.string().default(""),
 });
-export type PsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
+export type IPsychiatricHistoryInputs = z.infer<typeof PsychiatricHistoryInputsSchema>
 
 const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
     id: z.string(),
@@ -28,12 +28,8 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
 });
 
 export default function PsychiatricHistory() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
-
-    const formatDate = (date: Date) => {
-        return date.toISOString().split('T')[0];
-    };
 
     const user = useAppStore((state) => state.user);
     const access_token = useAppStore((state) => state.access_token);
@@ -43,12 +39,10 @@ export default function PsychiatricHistory() {
         "userId": user?.id,
     }), [access_token, user?.id]);
 
-    const navigate = useNavigate();
-
-    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<PsychiatricHistoryInputs>({
+    const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<IPsychiatricHistoryInputs>({
         resolver: zodResolver(PsychiatricHistoryInputsSchema),
         defaultValues: {
-            diagnoses: [{
+            diagnosis: [{
                 diagnosis: '',
                 provider: '',
                 phone_number: '',
@@ -60,18 +54,10 @@ export default function PsychiatricHistory() {
 
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'diagnoses'
+        name: 'diagnosis'
     })
 
-    const addNewDiagnoses = () => {
-        append({
-            diagnosis: '',
-            provider: '',
-            phone_number: '',
-            date_of_diagnosis: '',
-            taking_medication: '',
-        })
-    };
+    const addNewDiagnosis = () => append({ diagnosis: '', provider: '', phone_number: '', date_of_diagnosis: '', taking_medication: '' })
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -81,17 +67,24 @@ export default function PsychiatricHistory() {
                         `http://127.0.0.1:5000/api/get_psychiatric_history/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof PsychiatricHistoryInputs;
-                            if (key === 'date_of_diagnoses') {
-                                setValue(formKey, formatDate(new Date(userData[key])));
-                            }
-                            setValue(formKey, userData[key]);
+                    const pastResponseData = response.data;
+
+                    PsychiatricHistoryResponseSchema.parse(pastResponseData);
+
+                    Object.keys(pastResponseData).forEach(key => {
+                        if (key === 'id' || key === 'user_id') return;
+
+                        const formKey = key as keyof IPsychiatricHistoryInputs;
+                        if (key === 'date_of_diagnosis') {
+                            const newDate = new Date(pastResponseData[key]).toISOString().split('T')[0];
+
+                            setValue(formKey, newDate);
                         }
+                        setValue(formKey, pastResponseData[key]);
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -99,7 +92,7 @@ export default function PsychiatricHistory() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: PsychiatricHistoryInputs) => {
+    const { mutate } = useMutation(async (data: IPsychiatricHistoryInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -119,13 +112,15 @@ export default function PsychiatricHistory() {
 
         const userData = responseData.data;
         PsychiatricHistoryResponseSchema.parse(userData);
-        console.log(userData)
+
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+            
             alert(`Psychiatric History ${method} successfully!`);
             console.log(`PsychiatricHistory data ${method} successfully.`, userData);
+            
             navigate('/dashboard')
         },
         onError: () => {
@@ -141,50 +136,49 @@ export default function PsychiatricHistory() {
                 <div className="w-full h-px bg-gray-300"></div>
 
                 {fields.map((field, index) => (
-
                     <div key={field.id} className="py-6">
                         <div className="flex justify-between items-center">
                             <p className="font-medium pb-2 pt-8">Diagnosis {index + 1}</p>
                             <button type="button" onClick={() => remove(index)} className="text-red-600 px-4 py-2 mt-6 rounded-md whitespace-nowrap">- Remove Diagnosis</button>
                         </div>
-                        <input {...register(`diagnoses.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.diagnoses && errors.diagnoses[index]?.diagnosis && (
-                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.diagnosis?.message}</span>
+                        <input {...register(`diagnosis.${index}.diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnosis && errors.diagnosis[index]?.diagnosis && (
+                            <span className="label-text-alt text-red-500">{errors.diagnosis[index]?.diagnosis?.message}</span>
                         )}
 
                         <p className="font-medium pt-6">Provider</p>
-                        <input {...register(`diagnoses.${index}.provider`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.diagnoses && errors.diagnoses[index]?.provider && (
-                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.provider?.message}</span>
+                        <input {...register(`diagnosis.${index}.provider`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnosis && errors.diagnosis[index]?.provider && (
+                            <span className="label-text-alt text-red-500">{errors.diagnosis[index]?.provider?.message}</span>
                         )}
 
                         <p className="font-medium pt-6">Phone Number</p>
-                        <input {...register(`diagnoses.${index}.phone_number`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
-                        {errors.diagnoses && errors.diagnoses[index]?.phone_number && (
-                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.phone_number?.message}</span>
+                        <input {...register(`diagnosis.${index}.phone_number`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
+                        {errors.diagnosis && errors.diagnosis[index]?.phone_number && (
+                            <span className="label-text-alt text-red-500">{errors.diagnosis[index]?.phone_number?.message}</span>
                         )}
 
                         <p className="font-medium pt-6">Date of Diagnosis</p>
-                        <input {...register(`diagnoses.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
-                        {errors.diagnoses && errors.diagnoses[index]?.date_of_diagnosis && (
-                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.date_of_diagnosis?.message}</span>
+                        <input {...register(`diagnosis.${index}.date_of_diagnosis`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" type="date" />
+                        {errors.diagnosis && errors.diagnosis[index]?.date_of_diagnosis && (
+                            <span className="label-text-alt text-red-500">{errors.diagnosis[index]?.date_of_diagnosis?.message}</span>
                         )}
 
                         <p className="font-medium pt-6">Are You Currently Taking Medicine for this Diagnosis?</p>
                         <div className="flex flex-col space-y-2">
                             {["Yes", "No"].map((status, idx) => (
                                 <label key={idx} className="inline-flex items-center">
-                                    <input {...register(`diagnoses.${index}.taking_medication`)} type="radio" value={status} className="form-radio" />
+                                    <input {...register(`diagnosis.${index}.taking_medication`)} type="radio" value={status} className="form-radio" />
                                     <span className="ml-2">{status}</span>
                                 </label>))}
                         </div>
-                        {errors.diagnoses && errors.diagnoses[index]?.taking_medication && (
-                            <span className="label-text-alt text-red-500">{errors.diagnoses[index]?.taking_medication?.message}</span>
+                        {errors.diagnosis && errors.diagnosis[index]?.taking_medication && (
+                            <span className="label-text-alt text-red-500">{errors.diagnosis[index]?.taking_medication?.message}</span>
                         )}
                     </div>))}
 
                 <div className="flex justify-center">
-                    <button type="button" onClick={addNewDiagnoses} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>
+                    <button type="button" onClick={addNewDiagnosis} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Diagnosis</button>
                 </div>
 
                 <p className="font-medium">Notes</p>
