@@ -6,11 +6,11 @@ import useAppStore from "../../store/useAppStore";
 import { ICurrentMedication } from "../Forms/MaternalMedicalHistory";
 import { IDiagnosis } from "../Forms/PsychiatricHistory";
 import { IMedication } from "../Forms/MedicalServicesForSubstanceUse";
-import { AdditionalDrugSchema, IDrug } from "../Forms/SubstanceUseHistory";
+import { IAdditionalDrug, IDrug } from "../Forms/SubstanceUseHistory";
 import { IDrugTest } from "../Forms/DrugScreeningResults";
 import { IChild, IHouseholdMembers } from "../Forms/FamilyAndSupports";
 import { IInfantCareNeeds, IInfantMeds } from "../Forms/InfantInformation";
-import { AdditionalServiceSchema, ServiceSchema } from "../Forms/ReferralsAndServices";
+import { IAdditionalService, IService } from "../Forms/ReferralsAndServices";
 import { ICaregiver } from "../Forms/RelapsePreventionPlan";
 
 interface FormSelectorProps {
@@ -394,7 +394,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const SubstanceUseHistoryOtherDrugs = (data: AdditionalDrugs[]) => {
+  const SubstanceUseHistoryOtherDrugs = (data: IAdditionalDrug[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -504,7 +504,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const ReferralsAndServices = (data: Services | null | undefined) => {
+  const ReferralsAndServices = (data: IService | null | undefined) => {
 
     const namesMap: { [key: string]: string } = {
       service_status: "Status",
@@ -516,14 +516,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div>
         {Object.keys(namesMap).map((key) => (
           <div key={key}>
-            {namesMap[key]}: {data?.[key as keyof Services] || 'N/A'}
+            {namesMap[key]}: {data?.[key as keyof IService] || 'N/A'}
           </div>
         ))}
       </div>
     );
   };
 
-  const ReferralsAndServicesOther = (data: AdditionalServices[]) => {
+  const ReferralsAndServicesOther = (data: IAdditionalService[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -563,7 +563,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   }
 
   interface SubstanceUseHistoryData {
-    [key: string]: string | IDrug | AdditionalDrugs[] | null;
+    [key: string]: string | IDrug | IAdditionalDrug[] | null;
     alcohol: IDrug,
     benzodiazepines: IDrug,
     cocaine: IDrug,
@@ -573,7 +573,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     methamphetamine: IDrug,
     prescription_drugs: IDrug,
     tobacco: IDrug,
-    other_drugs: AdditionalDrugs[];
+    other_drugs: IAdditionalDrug[];
     notes: string | null;
   }
 
@@ -595,45 +595,45 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   }
 
   interface ReferralsAndServicesData {
-    [key: string]: string | Services | AdditionalServices[] | null;
-    parenting_classes: Services;
-    transportation_services: Services;
-    ssi_disability: Services;
-    temporary_assistance_for_needy_families: Services;
-    personal_safety: Services;
-    home_visitation_program: Services;
-    housing_assistance: Services;
-    healthy_start_program: Services;
-    support_services_other: AdditionalServices[];
-    breastfeeding_support: Services;
-    local_food_pantries: Services;
-    snap: Services;
-    women_infants_children: Services;
-    food_nutrition_other: AdditionalServices[];
-    health_insurance_enrollment: Services;
-    prenatal_healthcare: Services;
-    family_planning: Services;
-    primary_care: Services;
-    mental_health_counseling: Services;
-    smoking_cessation: Services;
-    healthcare_other: AdditionalServices[];
-    residential: Services;
-    outpatient: Services;
-    caring_for_two_program: Services;
-    the_cradles_program: Services;
-    recovery_support_services: Services;
-    medication_assisted_treatment: Services;
-    substance_use_treatment_other: AdditionalServices[];
-    early_childhood_intervention: Services;
-    early_head_start: Services;
-    NCI_childcare_subsidy: Services;
-    pediatrician_primary_care: Services;
-    safe_sleep_education: Services;
-    child_related_other: AdditionalServices[];
-    child_protective_service: Services;
-    legal_aid: Services;
-    specialty_court: Services;
-    legal_assistance_other: AdditionalServices[];
+    [key: string]: string | IService | IAdditionalService[] | null;
+    parenting_classes: IService;
+    transportation_services: IService;
+    ssi_disability: IService;
+    temporary_assistance_for_needy_families: IService;
+    personal_safety: IService;
+    home_visitation_program: IService;
+    housing_assistance: IService;
+    healthy_start_program: IService;
+    support_services_other: IAdditionalService[];
+    breastfeeding_support: IService;
+    local_food_pantries: IService;
+    snap: IService;
+    women_infants_children: IService;
+    food_nutrition_other: IAdditionalService[];
+    health_insurance_enrollment: IService;
+    prenatal_healthcare: IService;
+    family_planning: IService;
+    primary_care: IService;
+    mental_health_counseling: IService;
+    smoking_cessation: IService;
+    healthcare_other: IAdditionalService[];
+    residential: IService;
+    outpatient: IService;
+    caring_for_two_program: IService;
+    the_cradles_program: IService;
+    recovery_support_services: IService;
+    medication_assisted_treatment: IService;
+    substance_use_treatment_other: IAdditionalService[];
+    early_childhood_intervention: IService;
+    early_head_start: IService;
+    NCI_childcare_subsidy: IService;
+    pediatrician_primary_care: IService;
+    safe_sleep_education: IService;
+    child_related_other: IAdditionalService[];
+    child_protective_service: IService;
+    legal_aid: IService;
+    specialty_court: IService;
+    legal_assistance_other: IAdditionalService[];
     additional_notes: string | null;
   }
 
@@ -751,7 +751,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  
   const renderMaternalMedicalHistory = (fields: { [key: string]: string }) => {
     const prenatalCareFields = [
       "gestational_age",
@@ -779,14 +778,14 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       };
       return new Date(dateString).toLocaleDateString('en-US', options);
     };
-  
+
     const medicationList = Array.isArray(formData?.current_medication_list)
       ? formData.current_medication_list
       : [];
-  
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Prenatal Care</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {prenatalCareFields.map(key => {
@@ -804,7 +803,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Obstetric History</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {obstetricHistoryFields.map(key => {
@@ -819,36 +818,57 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             })}
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
-          <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Medical Problems</h3>
-          <div>
-            {medicalProblemsFields.map(key => {
-              const fieldName = fields[key];
-              const fieldValue = formData?.[key];
-              return (
-                <div key={key}>
-                  <h4 className="text-xs mb-1" style={{ color: '#797474' }}>{fieldName}</h4>
-                  <div className="font-semibold">{fieldValue || 'N/A'}</div>
-                </div>
-              );
-            })}
-            <div className="mt-4">
-              <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Notes</h4>
-              <div className="font-semibold">{formData?.notes || 'N/A'}</div>
+        <div className="flex flex-col">
+          <div className="rounded-lg p-4 bg-neutral-100 flex-grow mb-4">
+            <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Medical Problems Requiring Ongoing Care</h3>
+            <div>
+              {medicalProblemsFields.map(key => {
+                const fieldValue = formData?.[key];
+                return (
+                  <div key={key}>
+                    <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Diagnoses</h4>
+                    <div className="font-semibold">{fieldValue || 'N/A'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="rounded-lg p-4 bg-neutral-100 flex-grow">
+            <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Notes</h3>
+            <div className="flex-grow">
+              <div className="mt-4">
+                <div className="font-semibold">{formData?.notes || 'N/A'}</div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="  rounded-lg p-4 bg-neutral-100">
+        <div className="rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Current Medication List</h3>
           <div>
-            {medicationList.map((medication: ICurrentMedication, index: number) => (
-              <div key={index} className="mb-4">
-                <div className="font-semibold">{medication.name}</div>
-                <div>Dose: {medication.dose}</div>
-                <div>Prescriber: {medication.prescriber}</div>
-                <div>Notes: {medication.notes}</div>
-              </div>
-            ))}
+            <div>
+              {medicationList.map((medication: ICurrentMedication, index: number) => (
+                <div key={index} className="mb-4 border rounded-lg p-4 bg-neutral-200">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Medication</h4>
+                      <div className="font-semibold">{medication.name}</div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Dose</h4>
+                      <div className="font-semibold">{medication.dose}</div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Prescriber</h4>
+                      <div className="font-semibold">{medication.prescriber}</div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="text-xs mb-1" style={{ color: '#797474' }}>Notes</h4>
+                    <div className="font-semibold">{medication.notes}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -902,7 +922,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                         <div>
                           {SubstanceUseHistoryOtherDrugs(
                             Array.isArray((formData as SubstanceUseHistoryData)?.[formDataKey])
-                              ? ((formData as SubstanceUseHistoryData)?.[formDataKey] as AdditionalDrugs[])
+                              ? ((formData as SubstanceUseHistoryData)?.[formDataKey] as IAdditionalDrug[])
                               : []
                           )}
                         </div>
@@ -971,7 +991,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                         <div>
                           {ReferralsAndServicesOther(
                             Array.isArray((formData as ReferralsAndServicesData)?.[formDataKey])
-                              ? ((formData as ReferralsAndServicesData)?.[formDataKey] as AdditionalServices[])
+                              ? ((formData as ReferralsAndServicesData)?.[formDataKey] as IAdditionalService[])
                               : []
                           )}
                         </div>
@@ -982,7 +1002,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       return (
                         <div>
                           {ReferralsAndServices(
-                            (formData as ReferralsAndServicesData)?.[formDataKey] as Services
+                            (formData as ReferralsAndServicesData)?.[formDataKey] as IService
                           )}
                         </div>
                       );
