@@ -11,7 +11,6 @@ interface AccordionProps {
 
 const Accordion: React.FC<AccordionProps> = ({
   title,
-  // completed,
   children,
   isLoading,
   onClick,
@@ -39,14 +38,6 @@ const Accordion: React.FC<AccordionProps> = ({
       >
         {title}
         <div className="flex flex-row gap-10">
-          {/* <div className="flex flex-row text-red-500">
-            {!completed && (
-              <>
-                <img className="w-4 mr-2" src={`./images/action.svg`} />
-                Actions Required
-              </>
-            )}
-          </div> */}
           <Chevron
             className="stroke-black h-4"
             direction={`${isOpen ? "up" : "down"}`}

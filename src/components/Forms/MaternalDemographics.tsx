@@ -20,7 +20,7 @@ const livingArrangementsEnum = z.enum([
 const livingArrangements = Object.values(livingArrangementsEnum.Values);
 
 const phoneTypeEnum = z.enum(["Mobile", "Home", "Other"]);
-const phones = Object.values(phoneTypeEnum.Values);
+const phoneTypes = Object.values(phoneTypeEnum.Values);
 
 const maritalStatusEnum = z.enum([
   "Single",
@@ -51,17 +51,16 @@ const MaternalDemographicsInputsSchema = z.object({
   subscriber_id: z.string().min(1, 'Insurance plan subscriber ID is required'),
   group_id: z.string().min(1, 'Insurance plan group ID is required'),
 })
-export type MaternalDemographicsInputsType = z.infer<typeof MaternalDemographicsInputsSchema>
+export type IMaternalDemographicsInputs = z.infer<typeof MaternalDemographicsInputsSchema>
 
 const MaternalDemographicsResponseSchema = MaternalDemographicsInputsSchema.extend({
   id: z.string(),
   user_id: z.string(),
 });
-
-export type MaternalDemographicsResponseType = z.infer<typeof MaternalDemographicsResponseSchema>
+export type IMaternalDemographicsResponse = z.infer<typeof MaternalDemographicsResponseSchema>
 
 export default function MaternalDemographics() {
-
+  const navigate = useNavigate();
   const { submissionId } = useParams();
 
   const user = useAppStore((state) => state.user);
@@ -71,17 +70,8 @@ export default function MaternalDemographics() {
     "Authorization": "Bearer " + access_token,
     "userId": user?.id,
   }), [access_token, user?.id]);
-  
-  console.log("user_id: ", user?.id)
-  console.log("token: ", access_token)
 
-  const navigate = useNavigate();
-
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<MaternalDemographicsInputsType>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<IMaternalDemographicsInputs>({ resolver: zodResolver(MaternalDemographicsInputsSchema) });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -90,18 +80,28 @@ export default function MaternalDemographics() {
           const response = await axios.get(
             `http://127.0.0.1:5000/api/get_maternal_demographics/${submissionId}`,
             { headers: { ...headers } })
-          const userData = response.data;
-          Object.keys(userData).forEach(key => {
-            if (key !== 'id' && key !== 'user_id') {
-              const formKey = key as keyof MaternalDemographicsInputsType;
-              if (key === 'date_of_birth' || key === 'effective_date') {
-                setValue(formKey, formatDate(new Date(userData[key])));
-              } else {
-                setValue(formKey, userData[key]);
-              }
+
+          const pastSubmissionData = response.data;
+
+          MaternalDemographicsResponseSchema.parse(pastSubmissionData);
+
+          Object.keys(pastSubmissionData).forEach(key => {
+            if (key === 'id' || key === 'user_id') {
+              return;
+            }
+
+            const formKey = key as keyof IMaternalDemographicsInputs;
+            if (key === 'date_of_birth' || key === 'effective_date') {
+              const newDate = new Date(pastSubmissionData[key]).toISOString().split('T')[0];
+
+              setValue(formKey, newDate);
+            } else {
+              setValue(formKey, pastSubmissionData[key]);
             }
           });
         } catch (error) {
+          alert("Something went wrong!");
+
           console.error('Error fetching user data:', error);
         }
       }
@@ -109,7 +109,7 @@ export default function MaternalDemographics() {
     fetchUserData();
   }, [submissionId, headers, setValue]);
 
-  const { mutate } = useMutation(async (data: MaternalDemographicsInputsType) => {
+  const { mutate } = useMutation(async (data: IMaternalDemographicsInputs) => {
     let responseData;
     let method;
     if (submissionId) {
@@ -130,13 +130,15 @@ export default function MaternalDemographics() {
 
     const userData = responseData.data;
     MaternalDemographicsResponseSchema.parse(userData);
-    console.log(userData);
+
     return { userData, method };
   }, {
     onSuccess: (data) => {
       const { userData, method } = data;
+
       alert(`Maternal Demographics ${method} successfully!`);
       console.log(`MaternalDemographics data ${method} successfully.`, userData);
+      
       navigate("/dashboard");
     },
     onError: () => {
@@ -211,7 +213,7 @@ export default function MaternalDemographics() {
 
         <p className="font-medium mb-2">Phone Type:</p>
         <div className="flex flex-col gap-2">
-          {phones.map((type) => (
+          {phoneTypes.map((type) => (
             <label key={type} className="inline-flex items-center">
               <input {...register("phone_type")} type="radio" value={type} className="form-radio" />
               <span className="ml-2">{type}</span>

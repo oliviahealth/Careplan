@@ -1,15 +1,16 @@
 import FormSelector from "./FormSelector";
 import useAppStore from '../../store/useAppStore.ts';
+import { useMemo } from "react";
 
 function Dashboard() {
-
-
   const user = useAppStore((state) => state.user);
+
+  const userFirstName = useMemo(() => user?.name.substring(0, user?.name.indexOf(" ")), [user?.name]);
 
   return (
     <div className="flex flex-col w-full h-full md:px-[15vw] px-5 overflow-hidden">
       <div className="flex flex-row mx-5 my-5 justify-between items-center md:items-baseline">
-        <div className="flex text-3xl md:text-4xl font-semibold">Hello {user?.name.substring(0, user?.name.indexOf(" "))}!</div>
+        <div className="flex text-3xl md:text-4xl font-semibold">Hello {userFirstName}!</div>
         <div className="flex">
           <img className="w-6 hidden md:block" src="./images/meatballs.svg"></img>
           <img className="h-6 md:hidden block" src="./images/kebab.svg"></img>

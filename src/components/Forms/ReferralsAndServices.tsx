@@ -43,72 +43,71 @@ const displayNames: Record<string, string> = {
     additional_notes: "Additional Notes",
 };
 
-const Services = z.object({
+const ServiceSchema = z.object({
     service_status: z.string().min(1, "Service status required"),
     organization: z.string().min(1, "Organization required"),
     organization_contact_information: z.string().min(1, "Organization contact info required")
 })
-export type Services = z.infer<typeof Services>
+export type IService = z.infer<typeof ServiceSchema>
 
-const AdditionalServices = z.object({
+const AdditionalServiceSchema = z.object({
     name: z.string().min(1, "Service name required"),
     service_status: z.string().min(1, "Service status required"),
     organization: z.string().min(1, "Organization required"),
     organization_contact_information: z.string().min(1, "Organization contact info required")
 });
-export type AdditionalServices = z.infer<typeof AdditionalServices>
+export type IAdditionalService = z.infer<typeof AdditionalServiceSchema>
 
-const ReferralsAndServicesInputs = z.object({
-    parenting_classes: Services,
-    transportation_services: Services,
-    ssi_disability: Services,
-    temporary_assistance_for_needy_families: Services,
-    personal_safety: Services,
-    home_visitation_program: Services,
-    housing_assistance: Services,
-    healthy_start_program: Services,
-    support_services_other: z.array(AdditionalServices),
-    breastfeeding_support: Services,
-    local_food_pantries: Services,
-    snap: Services,
-    women_infants_children: Services,
-    food_nutrition_other: z.array(AdditionalServices),
-    health_insurance_enrollment: Services,
-    prenatal_healthcare: Services,
-    family_planning: Services,
-    primary_care: Services,
-    mental_health_counseling: Services,
-    smoking_cessation: Services,
-    healthcare_other: z.array(AdditionalServices),
-    residential: Services,
-    outpatient: Services,
-    caring_for_two_program: Services,
-    the_cradles_program: Services,
-    recovery_support_services: Services,
-    medication_assisted_treatment: Services,
-    substance_use_treatment_other: z.array(AdditionalServices),
-    early_childhood_intervention: Services,
-    early_head_start: Services,
-    NCI_childcare_subsidy: Services,
-    pediatrician_primary_care: Services,
-    safe_sleep_education: Services,
-    child_related_other: z.array(AdditionalServices),
-    child_protective_service: Services,
-    legal_aid: Services,
-    specialty_court: Services,
-    legal_assistance_other: z.array(AdditionalServices),
+const ReferralsAndServicesInputsSchema = z.object({
+    parenting_classes: ServiceSchema,
+    transportation_services: ServiceSchema,
+    ssi_disability: ServiceSchema,
+    temporary_assistance_for_needy_families: ServiceSchema,
+    personal_safety: ServiceSchema,
+    home_visitation_program: ServiceSchema,
+    housing_assistance: ServiceSchema,
+    healthy_start_program: ServiceSchema,
+    support_services_other: z.array(AdditionalServiceSchema),
+    breastfeeding_support: ServiceSchema,
+    local_food_pantries: ServiceSchema,
+    snap: ServiceSchema,
+    women_infants_children: ServiceSchema,
+    food_nutrition_other: z.array(AdditionalServiceSchema),
+    health_insurance_enrollment: ServiceSchema,
+    prenatal_healthcare: ServiceSchema,
+    family_planning: ServiceSchema,
+    primary_care: ServiceSchema,
+    mental_health_counseling: ServiceSchema,
+    smoking_cessation: ServiceSchema,
+    healthcare_other: z.array(AdditionalServiceSchema),
+    residential: ServiceSchema,
+    outpatient: ServiceSchema,
+    caring_for_two_program: ServiceSchema,
+    the_cradles_program: ServiceSchema,
+    recovery_support_services: ServiceSchema,
+    medication_assisted_treatment: ServiceSchema,
+    substance_use_treatment_other: z.array(AdditionalServiceSchema),
+    early_childhood_intervention: ServiceSchema,
+    early_head_start: ServiceSchema,
+    NCI_childcare_subsidy: ServiceSchema,
+    pediatrician_primary_care: ServiceSchema,
+    safe_sleep_education: ServiceSchema,
+    child_related_other: z.array(AdditionalServiceSchema),
+    child_protective_service: ServiceSchema,
+    legal_aid: ServiceSchema,
+    specialty_court: ServiceSchema,
+    legal_assistance_other: z.array(AdditionalServiceSchema),
     additional_notes: z.string(),
 });
-type ReferralsAndServicesInputs = z.infer<typeof ReferralsAndServicesInputs>
+type IReferralsAndServicesInputs = z.infer<typeof ReferralsAndServicesInputsSchema>
 
-const ReferralsAndServicesResponse = ReferralsAndServicesInputs.extend({
+const ReferralsAndServicesResponseSchema = ReferralsAndServicesInputsSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
-
 export default function ReferralsAndServices() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -119,13 +118,9 @@ export default function ReferralsAndServices() {
         "userId": user?.id,
     }), [access_token, user?.id]);
 
-    const navigate = useNavigate();
-
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<ReferralsAndServicesInputs>({
-        resolver: zodResolver(ReferralsAndServicesInputs)
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IReferralsAndServicesInputs>({
+        resolver: zodResolver(ReferralsAndServicesInputsSchema)
     });
-
-    console.log(errors)
 
     const { fields: supportServicesOtherFields, append: appendSupportServicesOther, remove: removeSupportServicesOther } = useFieldArray({
         control,
@@ -157,59 +152,17 @@ export default function ReferralsAndServices() {
         name: 'legal_assistance_other',
     });
 
-    const addNewSupportService = () => {
-        appendSupportServicesOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewSupportService = () => appendSupportServicesOther({ service_status: '', organization: '', organization_contact_information: '', name: '' });
 
-    const addNewFoodService = () => {
-        appendFoodNutritionOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewFoodService = () => appendFoodNutritionOther({ service_status: '', organization: '', organization_contact_information: '', name: ''})
 
-    const addNewHealthcareService = () => {
-        appendHealthcareOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewHealthcareService = () => appendHealthcareOther({ service_status: '', organization: '', organization_contact_information: '', name: ''});
 
-    const addNewSubstanceUseTreatmentService = () => {
-        appendSubstanceUseTreatmentOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewSubstanceUseTreatmentService = () => appendSubstanceUseTreatmentOther({ service_status: '', organization: '', organization_contact_information: '', name: ''});
 
-    const addNewChildRelatedService = () => {
-        appendChildRelatedOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewChildRelatedService = () => appendChildRelatedOther({ service_status: '', organization: '', organization_contact_information: '', name: '' });
 
-    const addNewLegalAssistanceService = () => {
-        appendLegalAssistanceOther({
-            service_status: '',
-            organization: '',
-            organization_contact_information: '',
-            name: '',
-        });
-    };
+    const addNewLegalAssistanceService = () => appendLegalAssistanceOther({ service_status: '', organization: '', organization_contact_information: '', name: '' });
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -219,14 +172,19 @@ export default function ReferralsAndServices() {
                         `http://127.0.0.1:5000/api/get_referrals_and_services/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof ReferralsAndServicesInputs;
-                            setValue(formKey, userData[key]);
-                        }
+                    const pastResponseData = response.data;
+
+                    ReferralsAndServicesResponseSchema.parse(pastResponseData);
+
+                    Object.keys(pastResponseData).forEach(key => {
+                        if(key === 'id' || key === 'user_id') return;
+                        
+                        const formKey = key as keyof IReferralsAndServicesInputs;
+                        setValue(formKey, pastResponseData[key]);
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+                    
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -234,8 +192,7 @@ export default function ReferralsAndServices() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: ReferralsAndServicesInputs) => {
-        console.log("button clicked");
+    const { mutate } = useMutation(async (data: IReferralsAndServicesInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -255,15 +212,17 @@ export default function ReferralsAndServices() {
         }
 
         const userData = responseData.data;
-        ReferralsAndServicesResponse.parse(userData);
-        console.log(userData);
+        ReferralsAndServicesResponseSchema.parse(userData);
+
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+            
             alert(`Referrals and Services ${method} successfully!`);
             console.log(`ReferralsAndServices data ${method} successfully.`, userData);
-            navigate('/dashboard')
+            
+            navigate('/dashboard');
         },
         onError: () => {
             alert("Error while adding/updating ReferralsAndServices data.");
@@ -279,7 +238,7 @@ export default function ReferralsAndServices() {
                     {["Discussed", "Needed", "Referred", "Participating", "Completed"].map((status) => (
                         <label key={status} className="inline-flex items-center pt-2">
                             <input
-                                {...register(`${key}.service_status` as keyof ReferralsAndServicesInputs)}
+                                {...register(`${key}.service_status` as keyof IReferralsAndServicesInputs)}
                                 type="radio"
                                 value={status}
                                 className="form-radio"
@@ -292,13 +251,13 @@ export default function ReferralsAndServices() {
 
                 <p className="font-medium pt-6">Organization</p>
                 <input
-                    {...register(`${key}.organization` as keyof ReferralsAndServicesInputs)}
+                    {...register(`${key}.organization` as keyof IReferralsAndServicesInputs)}
                     className="border border-gray-300 px-4 py-2 rounded-md w-full"
                 />
                 {errors[key]?.organization && <span className="label-text-alt text-red-500">{errors[key]?.organization.message}</span>}
                 <p className="font-medium pt-6">Organization Contact Information</p>
                 <input
-                    {...register(`${key}.organization_contact_information` as keyof ReferralsAndServicesInputs)}
+                    {...register(`${key}.organization_contact_information` as keyof IReferralsAndServicesInputs)}
                     className="border border-gray-300 px-4 py-2 rounded-md w-full"
                 />
                 {errors[key]?.organization_contact_information && <span className="label-text-alt text-red-500">{errors[key]?.organization_contact_information.message}</span>}
@@ -353,10 +312,6 @@ export default function ReferralsAndServices() {
                         <input {...register(`support_services_other.${index}.organization_contact_information`)} className="border border-gray-300 px-4 py-2 rounded-md w-full" />
                         {errors.support_services_other && errors.support_services_other[index]?.organization_contact_information && (
                             <span className="label-text-alt text-red-500">{errors.support_services_other[index]?.organization_contact_information?.message}</span>)}
-
-                        {/* <div className="flex justify-center">
-                            <button type="button" onClick={() => removeSupportServicesOther(index)} className="text-red-600 px-20 py-2 mt-6 rounded-md whitespace-nowrap" disabled={supportServicesOtherFields.length === 0}>- Remove Service</button>
-                        </div> */}
                     </div>))}
 
                 <div className="flex justify-center">

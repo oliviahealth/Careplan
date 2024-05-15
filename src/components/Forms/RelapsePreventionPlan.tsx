@@ -8,30 +8,30 @@ import { useNavigate, useParams } from "react-router-dom";
 import useAppStore from "../../store/useAppStore";
 
 
-const Caregiver = z.object({
+const CaregiverSchema = z.object({
     name: z.string().min(1, "Name required"),
     contact_number: z.string().min(1, "Contact number required"),
     relationship: z.string().min(1, "Relationship required")
 });
-export type Caregivers = z.infer<typeof Caregiver>
+export type ICaregiver = z.infer<typeof CaregiverSchema>
 
-const RelapsePreventionPlanInputs = z.object({
+const RelapsePreventionPlanInputSchema = z.object({
     three_things_that_trigger_desire_to_use: z.string().min(1, "3 things that trigger desire required"),
     three_skills_you_enjoy: z.string().min(1, "3 enjoyable activities required"),
     three_people_to_talk_to: z.string().min(1, "3 people to talk to required"),
-    safe_caregivers: z.array(Caregiver),
+    safe_caregivers: z.array(CaregiverSchema),
     have_naloxone: z.string().min(1, "Field required"),
     comments: z.string().nullable(),
 });
-type RelapsePreventionPlanInputs = z.infer<typeof RelapsePreventionPlanInputs>
+type IRelapsePreventionPlanInput = z.infer<typeof RelapsePreventionPlanInputSchema>
 
-const RelapsePreventionPlanResponse = RelapsePreventionPlanInputs.extend({
+const RelapsePreventionPlanResponseSchema = RelapsePreventionPlanInputSchema.extend({
     id: z.string(),
     user_id: z.string()
 });
 
 export default function RelapsePreventionPlan() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -42,10 +42,8 @@ export default function RelapsePreventionPlan() {
         "userId": user?.id,
     }), [access_token, user?.id]);
 
-    const navigate = useNavigate();
-
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<RelapsePreventionPlanInputs>({
-        resolver: zodResolver(RelapsePreventionPlanInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IRelapsePreventionPlanInput>({
+        resolver: zodResolver(RelapsePreventionPlanInputSchema),
         defaultValues: {
             safe_caregivers: [{
                 name: '',
@@ -56,20 +54,12 @@ export default function RelapsePreventionPlan() {
         },
     });
 
-    console.log(errors);
-
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'safe_caregivers'
     })
 
-    const addAnotherCaregiver = () => {
-        append({
-            name: '',
-            contact_number: '',
-            relationship: '',
-        })
-    };
+    const addAnotherCaregiver = () => append({ name: '', contact_number: '', relationship: '' });
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -79,14 +69,19 @@ export default function RelapsePreventionPlan() {
                         `http://127.0.0.1:5000/api/get_relapse_prevention_plan/${submissionId}`,
                         { headers: { ...headers } }
                     );
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof RelapsePreventionPlanInputs;
-                            setValue(formKey, userData[key]);
-                        }
+                    const pastResponseData = response.data;
+
+                    RelapsePreventionPlanResponseSchema.parse(pastResponseData);
+
+                    Object.keys(pastResponseData).forEach(key => {
+                        if(key === 'id' || key === 'user_id') return;
+                        
+                        const formKey = key as keyof IRelapsePreventionPlanInput;
+                        setValue(formKey, pastResponseData[key]);
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+                    
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -94,7 +89,7 @@ export default function RelapsePreventionPlan() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: RelapsePreventionPlanInputs) => {
+    const { mutate } = useMutation(async (data: IRelapsePreventionPlanInput) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -114,14 +109,16 @@ export default function RelapsePreventionPlan() {
         }
 
         const userData = responseData.data;
-        RelapsePreventionPlanResponse.parse(userData);
-        console.log(userData);
+        RelapsePreventionPlanResponseSchema.parse(userData);
+        
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+            
             alert(`Relapse Prevention Plan ${method} successfully!`);
             console.log(`RelapsePreventionPlan data ${method} successfully.`, userData);
+            
             navigate('/dashboard')
         },
         onError: () => {

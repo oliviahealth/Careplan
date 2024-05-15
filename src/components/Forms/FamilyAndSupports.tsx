@@ -7,38 +7,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react"
 import useAppStore from '../../store/useAppStore.ts';
 
-const HouseholdMember = z.object({
+const HouseholdMemberSchema = z.object({
     person: z.string().min(1, "Household member required"),
     date_of_birth: z.string().min(1, "Date of birth required"),
     relation: z.string().min(1, "Relation required")
 });
-export type HouseholdMembers = z.infer<typeof HouseholdMember>
+export type IHouseholdMembers = z.infer<typeof HouseholdMemberSchema>
 
-const Child = z.object({
+const ChildSchema = z.object({
     name: z.string().min(1, "Child name required"),
     date_of_birth: z.string().min(1, "Date of birth required"),
     caregiver: z.string().min(1, "Caregiver name required"),
     caregiver_number: z.string().min(1, "Caregiver number required"),
 });
-export type Children = z.infer<typeof Child>
+export type IChild = z.infer<typeof ChildSchema>
 
-const FamilyAndSupportsInputs = z.object({
-    people_living_in_home: z.array(HouseholdMember),
-    clients_children_not_living_in_home: z.array(Child),
+const FamilyAndSupportsInputsSchema = z.object({
+    people_living_in_home: z.array(HouseholdMemberSchema),
+    clients_children_not_living_in_home: z.array(ChildSchema),
     notes: z.string().nullable(),
     current_support_system: z.string().min(1, "Current support system required"),
     strength_of_client_and_support_system: z.string().min(1, "Strengths required"),
     goals: z.string().min(1, "Goal(s) required")
 });
-type FamilyAndSupportsInputs = z.infer<typeof FamilyAndSupportsInputs>
+type IFamilyAndSupportsInputs = z.infer<typeof FamilyAndSupportsInputsSchema>
 
-const FamilyAndSupportsResponse = FamilyAndSupportsInputs.extend({
+const FamilyAndSupportsResponseSchema = FamilyAndSupportsInputsSchema.extend({
     id: z.string(),
     user_id: z.string()
 })
 
 export default function FamilyAndSupports() {
-
+    const navigate = useNavigate();
     const { submissionId } = useParams();
 
     const user = useAppStore((state) => state.user);
@@ -49,10 +49,8 @@ export default function FamilyAndSupports() {
         "userId": user?.id,
     }), [access_token, user?.id]);
 
-    const navigate = useNavigate();
-
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<FamilyAndSupportsInputs>({
-        resolver: zodResolver(FamilyAndSupportsInputs),
+    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<IFamilyAndSupportsInputs>({
+        resolver: zodResolver(FamilyAndSupportsInputsSchema),
         defaultValues: {
             people_living_in_home: [{
                 person: '',
@@ -81,6 +79,10 @@ export default function FamilyAndSupports() {
         name: 'clients_children_not_living_in_home'
     });
 
+    const addNewHouseholdMember = () => appendHouseholdMember({ person: '', date_of_birth: '', relation: '' });
+
+    const addNewChild = () => appendChild({ name: '', date_of_birth: '', caregiver: '', caregiver_number: '' });
+
     useEffect(() => {
         const fetchUserData = async () => {
             if (submissionId) {
@@ -89,14 +91,21 @@ export default function FamilyAndSupports() {
                         `http://127.0.0.1:5000/api/get_family_and_supports/${submissionId}`,
                         { headers: { ...headers } }
                     )
-                    const userData = response.data;
-                    Object.keys(userData).forEach(key => {
-                        if (key !== 'id' && key !== 'user_id') {
-                            const formKey = key as keyof FamilyAndSupportsInputs;
-                            setValue(formKey, userData[key]);
+                    const pastSubmissionData = response.data;
+
+                    FamilyAndSupportsResponseSchema.parse(pastSubmissionData);
+
+                    Object.keys(pastSubmissionData).forEach(key => {
+                        if(key === 'id' || key === 'user_id') {
+                            return;
                         }
+                        
+                        const formKey = key as keyof IFamilyAndSupportsInputs;
+                        setValue(formKey, pastSubmissionData[key]);
                     });
                 } catch (error) {
+                    alert("Something went wrong!");
+                    
                     console.error('Error fetching user data:', error);
                 }
             }
@@ -104,8 +113,7 @@ export default function FamilyAndSupports() {
         fetchUserData();
     }, [submissionId, headers, setValue]);
 
-    const { mutate } = useMutation(async (data: FamilyAndSupportsInputs) => {
-
+    const { mutate } = useMutation(async (data: IFamilyAndSupportsInputs) => {
         let responseData;
         let method;
         if (submissionId) {
@@ -125,14 +133,16 @@ export default function FamilyAndSupports() {
         }
 
         const userData = responseData.data;
-        FamilyAndSupportsResponse.parse(userData);
-        console.log(userData);
+        FamilyAndSupportsResponseSchema.parse(userData);
+        
         return { userData, method };
     }, {
         onSuccess: (data) => {
             const { userData, method } = data;
+            
             alert(`Family And Supports ${method} successfully!`);
             console.log(`Family And Supports data ${method} successfully.`, userData);
+            
             navigate("/dashboard");
         },
         onError: () => {
@@ -169,7 +179,7 @@ export default function FamilyAndSupports() {
                     </div>))}
 
                 <div className="flex justify-center">
-                    <button type="button" onClick={() => appendHouseholdMember({ person: '', date_of_birth: '', relation: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Member</button>
+                    <button type="button" onClick={addNewHouseholdMember} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Member</button>
                 </div>
 
                 <p className="font-medium text-xl">Client's Children NOT Living in the home</p>
@@ -200,7 +210,7 @@ export default function FamilyAndSupports() {
                     </div>))}
 
                 <div className="flex justify-center">
-                    <button type="button" onClick={() => appendChild({ name: '', date_of_birth: '', caregiver: '', caregiver_number: '' })} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Another Child</button>
+                    <button type="button" onClick={addNewChild} className="text-black px-20 py-2 mt-6 rounded-md whitespace-nowrap">+ Add Another Child</button>
                 </div>
 
                 <p className="font-medium text-xl">Notes</p>

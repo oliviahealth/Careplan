@@ -1,17 +1,17 @@
-import React, { /*useEffect,*/ useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Accordion from "../Accordion";
 import useAppStore from "../../store/useAppStore";
-import { CurrentMedicationList } from "../Forms/MaternalMedicalHistory";
-import { Diagnoses } from "../Forms/PsychiatricHistory";
-import { SubstanceUseMedications } from "../Forms/MedicalServicesForSubstanceUse";
-import { AdditionalDrugs, Drugs } from "../Forms/SubstanceUseHistory";
-import { DrugTests } from "../Forms/DrugScreeningResults";
-import { Children, HouseholdMembers } from "../Forms/FamilyAndSupports";
-import { InfantCareNeeds, InfantMeds } from "../Forms/InfantInformation";
-import { AdditionalServices, Services } from "../Forms/ReferralsAndServices";
-import { Caregivers } from "../Forms/RelapsePreventionPlan";
+import { ICurrentMedication } from "../Forms/MaternalMedicalHistory";
+import { IDiagnosis } from "../Forms/PsychiatricHistory";
+import { IMedication } from "../Forms/MedicalServicesForSubstanceUse";
+import { AdditionalDrugSchema, IDrug } from "../Forms/SubstanceUseHistory";
+import { IDrugTest } from "../Forms/DrugScreeningResults";
+import { IChild, IHouseholdMembers } from "../Forms/FamilyAndSupports";
+import { IInfantCareNeeds, IInfantMeds } from "../Forms/InfantInformation";
+import { AdditionalServiceSchema, ServiceSchema } from "../Forms/ReferralsAndServices";
+import { ICaregiver } from "../Forms/RelapsePreventionPlan";
 
 interface FormSelectorProps {
   name: string;
@@ -209,12 +209,12 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       total_num_live_births: "Number of Live Births",
       total_num_children_with_mother: "Number of Children Currently Living with Mother",
       prior_complications: "Complications During Prior Pregnancies",
-      med_problems_diagnoses: "Medical Problems Requiring Ongoing Care",
+      med_problems_diagnosis: "Medical Problems Requiring Ongoing Care",
       current_medication_list: "Current Medication List",
       notes: "Notes",
     },
     psychiatricHistory: {
-      diagnoses: "Diagnoses",
+      diagnosis: "Diagnosis",
       notes: "Notes",
     },
     medicalServicesForSubstanceUse: {
@@ -336,7 +336,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     },
   };
 
-  const MaternalMedicalHistoryMedicationList = (data: CurrentMedicationList[]) => {
+  const MaternalMedicalHistoryMedicationList = (data: ICurrentMedication[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -349,7 +349,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const PsychiatricHistoryDiagnoses = (data: Diagnoses[]) => {
+  const PsychiatricHistoryDiagnosis = (data: IDiagnosis[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -363,7 +363,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const MedicalServicesForSubstanceUseMedications = (data: SubstanceUseMedications[]) => {
+  const MedicalServicesForSubstanceUseMedications = (data: IMedication[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -374,7 +374,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const SubstanceUseHistoryDrugs = (data: Drugs | null | undefined) => {
+  const SubstanceUseHistoryDrugs = (data: IDrug | null | undefined) => {
 
     const namesMap: { [key: string]: string } = {
       ever_used: "Ever Used",
@@ -387,7 +387,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       <div>
         {Object.keys(namesMap).map((key) => (
           <div key={key}>
-            {namesMap[key]}: {data?.[key as keyof Drugs] || 'N/A'}
+            {namesMap[key]}: {data?.[key as keyof IDrug] || 'N/A'}
           </div>
         ))}
       </div>
@@ -407,7 +407,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const DrugScreeningResultsTests = (data: DrugTests[]) => {
+  const DrugScreeningResultsTests = (data: IDrugTest[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -424,7 +424,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsPeopleInHome = (data: HouseholdMembers[]) => {
+  const FamilyAndSupportsPeopleInHome = (data: IHouseholdMembers[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -436,7 +436,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const FamilyAndSupportsChildrenNotHome = (data: Children[]) => {
+  const FamilyAndSupportsChildrenNotHome = (data: IChild[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -449,7 +449,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const InfantInformationInfantCareNeeds = (data: InfantCareNeeds[]) => {
+  const InfantInformationInfantCareNeeds = (data: IInfantCareNeeds[]) => {
     const namesMap: { [key: string]: string } = {
       breast_pump: "Breast Pump",
       breast_pump_notes: "Breast Pump Notes",
@@ -481,7 +481,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
             {Object.keys(item).map((key: string, idx: number) => (
               <div key={idx}>
                 <div>
-                  {namesMap[key] || key}: {item[key as keyof InfantCareNeeds]}
+                  {namesMap[key] || key}: {item[key as keyof IInfantCareNeeds]}
                 </div>
               </div>
             ))}
@@ -491,7 +491,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  const InfantInformationMedications = (data: InfantMeds[]) => {
+  const InfantInformationMedications = (data: IInfantMeds[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -536,7 +536,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     });
   };
 
-  const RelapsePreventionPlanSafeCaregivers = (data: Caregivers[]) => {
+  const RelapsePreventionPlanSafeCaregivers = (data: ICaregiver[]) => {
     return data.map((x, index) => {
       return (
         <div key={index}>
@@ -549,49 +549,49 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   };
 
   interface MaternalMedicalHistoryData {
-    [key: string]: string | CurrentMedicationList[] | null;
-    current_medication_list: CurrentMedicationList[];
+    [key: string]: string | ICurrentMedication[] | null;
+    current_medication_list: ICurrentMedication[];
   }
 
   interface PsychiatricHistoryData {
-    [key: string]: string | Diagnoses[] | null;
-    diagnoses: Diagnoses[];
+    [key: string]: string | IDiagnosis[] | null;
+    diagnosis: IDiagnosis[];
   }
   interface MedicalServicesForSubstanceUseData {
-    [key: string]: string | SubstanceUseMedications[] | null;
-    medications: SubstanceUseMedications[];
+    [key: string]: string | IMedication[] | null;
+    medications: IMedication[];
   }
 
   interface SubstanceUseHistoryData {
-    [key: string]: string | Drugs | AdditionalDrugs[] | null;
-    alcohol: Drugs,
-    benzodiazepines: Drugs,
-    cocaine: Drugs,
-    heroin: Drugs,
-    kush: Drugs,
-    marijuana: Drugs,
-    methamphetamine: Drugs,
-    prescription_drugs: Drugs,
-    tobacco: Drugs,
+    [key: string]: string | IDrug | AdditionalDrugs[] | null;
+    alcohol: IDrug,
+    benzodiazepines: IDrug,
+    cocaine: IDrug,
+    heroin: IDrug,
+    kush: IDrug,
+    marijuana: IDrug,
+    methamphetamine: IDrug,
+    prescription_drugs: IDrug,
+    tobacco: IDrug,
     other_drugs: AdditionalDrugs[];
     notes: string | null;
   }
 
   interface DrugScreeningResultsData {
-    [key: string]: string | DrugTests[] | null;
-    tests: DrugTests[];
+    [key: string]: string | IDrugTest[] | null;
+    tests: IDrugTest[];
   }
 
   interface FamilyAndSupportsData {
-    [key: string]: string | HouseholdMembers[] | Children[] | null;
-    people_living_in_home: HouseholdMembers[];
-    clients_children_not_living_in_home: Children[];
+    [key: string]: string | IHouseholdMembers[] | IChild[] | null;
+    people_living_in_home: IHouseholdMembers[];
+    clients_children_not_living_in_home: IChild[];
   }
 
   interface InfantInformationData {
-    [key: string]: string | InfantCareNeeds[] | InfantMeds[] | null;
-    infant_care_needs_items: InfantCareNeeds[];
-    infant_medications: InfantMeds[];
+    [key: string]: string | IInfantCareNeeds[] | IInfantMeds[] | null;
+    infant_care_needs_items: IInfantCareNeeds[];
+    infant_medications: IInfantMeds[];
   }
 
   interface ReferralsAndServicesData {
@@ -638,8 +638,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({
   }
 
   interface RelapsePreventionPlanData {
-    [key: string]: string | Caregivers[] | null;
-    safe_caregivers: Caregivers[];
+    [key: string]: string | ICaregiver[] | null;
+    safe_caregivers: ICaregiver[];
   }
 
   const renderMaternalDemographics = (fields: { [key: string]: string }) => {
@@ -768,7 +768,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
       "total_num_children_with_mother",
       "prior_complications"
     ];
-    const medicalProblemsFields = ["med_problems_diagnoses"];
+    const medicalProblemsFields = ["med_problems_diagnosis"];
   
     const formatDate = (dateString: string) => {
       const options: Intl.DateTimeFormatOptions = {
@@ -841,7 +841,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
         <div className="  rounded-lg p-4 bg-neutral-100">
           <h3 className="text-lg mb-4" style={{ color: '#797474' }}>Current Medication List</h3>
           <div>
-            {medicationList.map((medication: CurrentMedicationList, index: number) => (
+            {medicationList.map((medication: ICurrentMedication, index: number) => (
               <div key={index} className="mb-4">
                 <div className="font-semibold">{medication.name}</div>
                 <div>Dose: {medication.dose}</div>
@@ -871,17 +871,17 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       <div>
                         {MaternalMedicalHistoryMedicationList(
                           Array.isArray((formData as MaternalMedicalHistoryData)?.[formDataKey])
-                            ? ((formData as MaternalMedicalHistoryData)?.[formDataKey] as CurrentMedicationList[])
+                            ? ((formData as MaternalMedicalHistoryData)?.[formDataKey] as ICurrentMedication[])
                             : []
                         )}
                       </div>
                     );
-                  } else if (fieldNames.psychiatricHistory[key] && key === "diagnoses") {
+                  } else if (fieldNames.psychiatricHistory[key] && key === "diagnosis") {
                     return (
                       <div>
-                        {PsychiatricHistoryDiagnoses(
+                        {PsychiatricHistoryDiagnosis(
                           Array.isArray((formData as PsychiatricHistoryData)?.[formDataKey])
-                            ? ((formData as PsychiatricHistoryData)?.[formDataKey] as Diagnoses[])
+                            ? ((formData as PsychiatricHistoryData)?.[formDataKey] as IDiagnosis[])
                             : []
                         )}
                       </div>
@@ -891,7 +891,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       <div>
                         {MedicalServicesForSubstanceUseMedications(
                           Array.isArray((formData as MedicalServicesForSubstanceUseData)?.[formDataKey])
-                            ? ((formData as MedicalServicesForSubstanceUseData)?.[formDataKey] as SubstanceUseMedications[])
+                            ? ((formData as MedicalServicesForSubstanceUseData)?.[formDataKey] as IMedication[])
                             : []
                         )}
                       </div>
@@ -913,7 +913,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       return (
                         <div>
                           {SubstanceUseHistoryDrugs(
-                            (formData as SubstanceUseHistoryData)?.[formDataKey] as Drugs
+                            (formData as SubstanceUseHistoryData)?.[formDataKey] as IDrug
                           )}
                         </div>
                       );
@@ -923,7 +923,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                       <div>
                         {DrugScreeningResultsTests(
                           Array.isArray((formData as DrugScreeningResultsData)?.[formDataKey])
-                            ? ((formData as DrugScreeningResultsData)?.[formDataKey] as DrugTests[])
+                            ? ((formData as DrugScreeningResultsData)?.[formDataKey] as IDrugTest[])
                             : []
                         )}
                       </div>
@@ -932,7 +932,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {FamilyAndSupportsPeopleInHome(
-                          (formData as FamilyAndSupportsData)?.[formDataKey] as HouseholdMembers[]
+                          (formData as FamilyAndSupportsData)?.[formDataKey] as IHouseholdMembers[]
                         )}
                       </div>
                     );
@@ -940,7 +940,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {FamilyAndSupportsChildrenNotHome(
-                          (formData as FamilyAndSupportsData)?.[formDataKey] as Children[]
+                          (formData as FamilyAndSupportsData)?.[formDataKey] as IChild[]
                         )}
                       </div>
                     );
@@ -948,7 +948,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {InfantInformationInfantCareNeeds(
-                          (formData as InfantInformationData)?.[formDataKey] as InfantCareNeeds[]
+                          (formData as InfantInformationData)?.[formDataKey] as IInfantCareNeeds[]
                         )}
                       </div>
                     );
@@ -956,7 +956,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {InfantInformationMedications(
-                          (formData as InfantInformationData)?.[formDataKey] as InfantMeds[]
+                          (formData as InfantInformationData)?.[formDataKey] as IInfantMeds[]
                         )}
                       </div>
                     );
@@ -991,7 +991,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {RelapsePreventionPlanSafeCaregivers(
-                          (formData as RelapsePreventionPlanData)?.[formDataKey] as Caregivers[]
+                          (formData as RelapsePreventionPlanData)?.[formDataKey] as ICaregiver[]
                         )}
                       </div>
                     );
