@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ..database import User, db, bcrypt, revoked_tokens
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_jwt_identity
 from datetime import datetime, timezone
 
 users_bp = Blueprint('users', __name__, url_prefix = '/api')
@@ -33,7 +33,7 @@ def signup():
     Adds a record of the user's information to the database. 
     
     Request JSON Parameters:
-        - username (str): The user's unique username.
+        - email (str): The user's unique email.
         - name (str): The user's name.
         - age (str): The user's age.
         
@@ -84,6 +84,7 @@ def signout():
    
    
 @users_bp.route('/get_user', methods = ['GET'])
+@jwt_required()
 def get_user():
     """
     Get a record of a single user's information. 
@@ -96,8 +97,7 @@ def get_user():
         - If the user does not exist, returns a message with the error code 400.
         - If there is an unexpected error, returns a JSON error message with the error code 500.
     """
-    data = request.get_json()
-    id = data.get('id')
+    id = get_jwt_identity()
 
     try:
         user = db.session.query(User).filter_by(id=id).first()
@@ -109,7 +109,7 @@ def get_user():
     
     return jsonify({
         "id": user.id,
-        "username": user.username,
+        "email": user.email,
         "name": user.name
     }), 200
 
@@ -120,7 +120,7 @@ def update_user():
     
     Request JSON Parameters:
         - id (int): The user's unique database ID.
-        - username (str): The user's unique username.
+        - email (str): The user's unique email.
         - name (str): The user's name.
 
     Returns:
@@ -131,7 +131,7 @@ def update_user():
 
     data = request.get_json()
     id = data.get('id')
-    username = data.get('username')
+    email = data.get('email')
     name = data.get('name')
 
     try:
@@ -140,12 +140,12 @@ def update_user():
         if(not user):
             return jsonify("There is no user with this information."), 400
 
-        user.username = username
+        user.email = email
         user.name = name
         db.session.commit()
     except Exception as e:
         return jsonify(f"Error processing request: {e}"), 500
-    return jsonify({ 'id': user.id, 'username': user.username, 'name': user.name}), 200
+    return jsonify({ 'id': user.id, 'email': user.email, 'name': user.name}), 200
     
 @users_bp.route('/delete_user', methods = ['DELETE'])
 def delete_user():

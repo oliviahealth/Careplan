@@ -42,7 +42,6 @@ const SignUp: React.FC = () => {
         onSuccess: (response) => {
             if (response) {
                 setAccessToken(response.access_token);
-                sessionStorage.setItem('access_token', response.access_token);
                 setUser(response);
                 return navigate("/")
             }

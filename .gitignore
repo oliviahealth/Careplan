@@ -56,3 +56,6 @@ dist/
 
 # Miscellaneous
 .DS_Store
+
+# Script
+careplan.sh
