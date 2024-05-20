@@ -17,6 +17,7 @@ from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+from datetime import timedelta
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ def create_app():
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     
     register_blueprints(app)

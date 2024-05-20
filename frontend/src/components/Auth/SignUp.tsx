@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 
-import useAppStore, { UserSchema, User } from "../../store/useAppStore";
+import useAppStore from "../../store/useAppStore";
+import { IUser, UserSchema } from "../../utils/interfaces";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
@@ -29,21 +30,20 @@ const SignUp: React.FC = () => {
     const { register, handleSubmit: handleSignup, formState: { errors } } = useForm<SignupFormData>({ resolver: zodResolver(SignUpSchema) });
 
     const { mutate: signupUser, isLoading } = useMutation(async (data: SignupFormData) => {
-        interface SignupResponse extends User {
+        interface SignupResponse extends IUser {
             access_token: string
         }
 
         const user: SignupResponse = ((await axios.post(`http://127.0.0.1:5000/api/signup`, { ...data }))).data
         UserSchema.parse(user)
 
-        console.log(user)
         return user
     }, {
         onSuccess: (response) => {
             if (response) {
                 setAccessToken(response.access_token);
-                sessionStorage.setItem('access_token', response.access_token);
                 setUser(response);
+
                 return navigate("/")
             }
         },

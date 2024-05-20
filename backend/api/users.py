@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from ..database import User, db, bcrypt, revoked_tokens
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from datetime import datetime, timezone
 
 users_bp = Blueprint('users', __name__, url_prefix = '/api')
@@ -82,22 +82,18 @@ def signout():
     
     return jsonify({ 'Success': 'User signed out successfully' })
    
-   
-@users_bp.route('/get_user', methods = ['GET'])
+@users_bp.route('/get_user', methods = ['POST'])
+@jwt_required()
 def get_user():
     """
     Get a record of a single user's information. 
-    
-    Request JSON Parameters:
-        - id (int): The user's unique database ID.
         
     Returns:
         - If successful, returns the user's information.
         - If the user does not exist, returns a message with the error code 400.
         - If there is an unexpected error, returns a JSON error message with the error code 500.
     """
-    data = request.get_json()
-    id = data.get('id')
+    id = get_jwt_identity()
 
     try:
         user = db.session.query(User).filter_by(id=id).first()
@@ -109,7 +105,7 @@ def get_user():
     
     return jsonify({
         "id": user.id,
-        "username": user.username,
+        "email": user.email,
         "name": user.name
     }), 200
 
