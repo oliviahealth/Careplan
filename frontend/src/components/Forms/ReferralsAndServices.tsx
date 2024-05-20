@@ -1,4 +1,4 @@
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FieldErrors } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -229,7 +229,7 @@ export default function ReferralsAndServices() {
         }
     })
 
-    const generateFormFields = (keys: string[], errors: any) => {
+    const generateFormFields = (keys: string[], errors: FieldErrors<IReferralsAndServicesInputs>) => {
         return keys.map((key, index) => (
             <div key={index}>
                 <p className="font-medium text-xl pt-6">{displayNames[key]}</p>
@@ -247,6 +247,7 @@ export default function ReferralsAndServices() {
                         </label>
                     ))}
                 </div>
+                { /* @ts-expect-error: Overriding ts checks */ }
                 {errors[key]?.service_status && <span className="label-text-alt text-red-500">{errors[key]?.service_status.message}</span>}
 
                 <p className="font-medium pt-6">Organization</p>
@@ -254,12 +255,14 @@ export default function ReferralsAndServices() {
                     {...register(`${key}.organization` as keyof IReferralsAndServicesInputs)}
                     className="border border-gray-300 px-4 py-2 rounded-md w-full"
                 />
+                { /* @ts-expect-error: Overriding ts checks */ }
                 {errors[key]?.organization && <span className="label-text-alt text-red-500">{errors[key]?.organization.message}</span>}
                 <p className="font-medium pt-6">Organization Contact Information</p>
                 <input
                     {...register(`${key}.organization_contact_information` as keyof IReferralsAndServicesInputs)}
                     className="border border-gray-300 px-4 py-2 rounded-md w-full"
                 />
+                { /* @ts-expect-error: Overriding ts checks */ }
                 {errors[key]?.organization_contact_information && <span className="label-text-alt text-red-500">{errors[key]?.organization_contact_information.message}</span>}
             </div>
         ));
