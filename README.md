@@ -1,0 +1,94 @@
+# Olivia - Careplan
+
+Olivia Careplan is a digitized implementation of the Plan Of Safe Care.
+
+The original Plan Of Safe Care is a collection of documents designed by the Texas A&M School of Nursing to address the social and health concerns of families and is intended to be completed by the family in collaboration with relevant providers.
+
+The Olivia Careplan project aims to make the Plan of Safe Care more accessible and user friendly for the families we serve.
+
+- Implements all forms in the original Plan Of Safe Care in a digital format
+- Ensures full CRUD functionality of data in a user friendly manner
+- Ability to create user accounts to electronically store and revisit past data
+- Future plans include fine grained access controls to allow families to share data
+
+## Screenshots
+
+<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.39.43%20AM.png?token=GHSAT0AAAAAACF66JDDAIUWIED3ENWET4YEZSK4SPQ" />
+
+<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.39.57%20AM.png?token=GHSAT0AAAAAACF66JDCLUUPA4UIIZNOASRCZSK4S6A" />
+
+<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.40.16%20AM.png?token=GHSAT0AAAAAACF66JDCO6O4TV4PUF5CLPL6ZSK4THQ" />
+
+## Tech Stack  
+
+**Client:** TypeScript, React, React Query, Zod, Zustand, TailwindCSS
+
+**Server:** Python, Flask, Flask-JWT, PostgreSQL, SQLAlchemy
+
+## Environment Variables
+Contact @sumitnalavade for details
+
+**Frontend:** `VITE_API_URL`
+
+**Backend:** `SQLALCHEMY_DATABASE_URI` `SECRET_KEY`
+
+
+## Run Locally  
+Clone the project  
+~~~bash  
+  git clone https://github.com/oliviahealth/Careplan.git
+~~~
+
+Go to the project directory  
+~~~bash  
+  cd Careplan
+~~~
+
+Install frontend dependencies  
+~~~bash  
+cd frontend
+~~~
+
+~~~bash  
+npm install
+~~~
+
+Add frontend environment Variables
+~~~bash  
+touch .env
+~~~
+
+~~~bash  
+VITE_API_URL
+~~~
+
+Start frontend client
+~~~bash  
+npm run dev
+~~~
+
+Install backend dependencies
+~~~bash  
+cd backend
+~~~
+
+~~~bash  
+pip install -r requirements.txt
+~~~
+
+Add backend environment variables
+~~~bash  
+touch .env
+~~~
+
+~~~bash  
+SQLALCHEMY_DATABASE_URI
+
+SECRET_KEY
+~~~
+
+Start the server  
+~~~bash  
+python wsgi.py
+~~~  
+
