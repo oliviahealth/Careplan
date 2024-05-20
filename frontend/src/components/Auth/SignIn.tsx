@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 
-import useAppStore, { UserSchema, User } from "../../store/useAppStore";
+import useAppStore from "../../store/useAppStore";
+import { IUser, UserSchema } from "../../utils/interfaces";
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ const SignUp: React.FC = () => {
     const { register, handleSubmit: handleSignIn, formState: { errors } } = useForm<SignInFormData>({ resolver: zodResolver(SignInSchema) });
 
     const { mutate: signInUser, isLoading } = useMutation(async (data: SignInFormData) => {
-        interface SignInResponse extends User {
+        interface SignInResponse extends IUser {
             access_token: string
         }
 

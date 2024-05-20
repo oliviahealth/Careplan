@@ -1,16 +1,9 @@
 import { create } from "zustand";
-import { z } from "zod";
-
-export const UserSchema = z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    email: z.string(),
-});
-export type User = z.infer<typeof UserSchema>;
+import { IUser } from '../utils/interfaces';
 
 interface AppState {
-    user: User | null;
-    setUser: (user: User | null) => void;
+    user: IUser | null;
+    setUser: (user: IUser | null) => void;
 
     access_token: string | null;
     setAccessToken: (accessToken: string | null) => void;
@@ -21,7 +14,13 @@ const useAppStore = create<AppState>()((set) => ({
     setUser: (user) => set(() => ({ user })),
 
     access_token: null,
-    setAccessToken: (access_token) => set(() => ({ access_token })),
+    setAccessToken: (access_token) => set(() => {
+        if(access_token) {
+            sessionStorage.setItem('access_token', access_token);
+        }
+
+        return ({ access_token })
+    }),
 }));
 
 export default useAppStore;
