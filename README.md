@@ -12,15 +12,13 @@ The Olivia Careplan project aims to make the Plan of Safe Care more accessible a
 - Future plans include fine grained access controls to allow families to share data
 
 ## Screenshots
+<img src="https://github.com/oliviahealth/Careplan/assets/48499839/8793da7c-ea37-4fbb-b4df-cbe2566d1d5f" />
 
-<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.39.43%20AM.png?token=GHSAT0AAAAAACF66JDDAIUWIED3ENWET4YEZSK4SPQ" />
+<img src="https://github.com/oliviahealth/Careplan/assets/48499839/5f1e9f65-ee94-42b6-b746-b65b7174c2aa" />
 
-<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.39.57%20AM.png?token=GHSAT0AAAAAACF66JDCLUUPA4UIIZNOASRCZSK4S6A" />
-
-<img src="https://raw.githubusercontent.com/oliviahealth/Careplan/main/screenshots/Screenshot%202024-05-20%20at%2012.40.16%20AM.png?token=GHSAT0AAAAAACF66JDCO6O4TV4PUF5CLPL6ZSK4THQ" />
+<img src="https://github.com/oliviahealth/Careplan/assets/48499839/8d0c07c6-47d2-48c7-be40-cc1828dfbf9d" />
 
 ## Tech Stack  
-
 **Client:** TypeScript, React, React Query, Zod, Zustand, TailwindCSS
 
 **Server:** Python, Flask, Flask-JWT, PostgreSQL, SQLAlchemy
