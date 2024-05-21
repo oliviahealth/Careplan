@@ -265,7 +265,7 @@ def get_substance_use_history(id=None):
         return jsonify(f"Error processing request: {e}"), 500
     
 @substance_use_history_bp.route('/delete_substance_use_history/<id>', methods = ['DELETE'])
-@jwt_required
+@jwt_required()
 def delete_substance_use_history(id):
     """
     Gets a substance_use_history record for the user.
