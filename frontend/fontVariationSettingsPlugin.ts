@@ -1,6 +1,6 @@
-const plugin = require("tailwindcss/plugin");
+import plugin from "tailwindcss/plugin";
 
-const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities: Function }) {
+const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities }) {
   // predefined font stretch amounts
   const stretch: { [key: string]: number } = {
     ultracondensed: 50,
@@ -29,7 +29,7 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities:
   // weights, weights + italic, weights + stretch, weights + stretch + italic
   Object.entries(weights).forEach(([key, value]) => {
     const select = `.font-${key}`;
-    const baseData: { [key: string]: any } = {};
+    const baseData: { [key: string]: { fontWeight: number, fontVariationSettings: string } } = {};
     baseData[select] = {
       fontWeight: value,
       fontVariationSettings: `'wght' ${value}`,
@@ -54,13 +54,10 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities:
   // stretch, stretch + italics
   Object.entries(stretch).forEach(([key, value]) => {
     const select = `.font-${key}`;
-    const stretchData: { [key: string]: any } = {};
+    const stretchData: { [key: string]: { fontStretch: string, fontVariationSettings: string,  } } = {};
     stretchData[select] = {
       fontStretch: value.toString() + '%',
       fontVariationSettings: `'wdth' ${value}`,
-      '&.italic': {
-        fontVariationSettings: `'slnt' 1, 'wdth' ${value}`,
-      },
     };
     addUtilities(stretchData);
   });
