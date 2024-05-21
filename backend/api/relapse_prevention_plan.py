@@ -58,7 +58,7 @@ def add_relapse_prevention_plan():
             have_naloxone=have_naloxone,
             comments=comments,
             date_created=datetime.now(timezone.utc),
-            date_modified=datetime.now(timezone.utc)
+            date_last_modified=datetime.now(timezone.utc)
         )
         
         db.session.add(new_relapse_prevention_plan)
