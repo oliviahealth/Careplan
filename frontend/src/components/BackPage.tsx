@@ -2,13 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 type BackPageProps = {
-    children: React.ReactNode;
+  children: React.ReactNode;
 };
 
 const BackPage: React.FC<BackPageProps> = ({ children }) => (
   <>
-    <Link className='group absolute top-[6.25rem] left-[5.75rem] flex flex-row hover:text-black text-gray-500 items-center gap-4 transition-colors duration-200 ease-in-out' to={"/dashboard"}>
-    <svg
+    <Link
+      className="group absolute top-[6.25rem] left-[5.75rem] flex flex-row hover:text-black text-gray-500 items-center gap-4 transition-colors duration-200 ease-in-out"
+      to={'/dashboard'}
+    >
+      <svg
         viewBox="0 0 15 26"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -1,23 +1,23 @@
-import React from "react";
+import React from 'react';
 
 type ChevronProps = {
-  direction: "left" | "right" | "up" | "down";
+  direction: 'left' | 'right' | 'up' | 'down';
   className?: string;
 };
 
 const Chevron: React.FC<ChevronProps> = ({ direction, className }) => {
-  const rotationMap: { [key in ChevronProps["direction"]]: string } = {
-    up: "270deg",
-    right: "0deg",
-    down: "90deg",
-    left: "180deg",
+  const rotationMap: { [key in ChevronProps['direction']]: string } = {
+    up: '270deg',
+    right: '0deg',
+    down: '90deg',
+    left: '180deg',
   };
 
   const rotation = rotationMap[direction];
 
   const style = {
     transform: `rotate(${rotation})`,
-    transition: "transform 0.2s ease-in-out",
+    transition: 'transform 0.2s ease-in-out',
   };
 
   return (

@@ -1,6 +1,10 @@
-import plugin from "tailwindcss/plugin";
+import plugin from 'tailwindcss/plugin';
 
-const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities }) {
+const fontVariationSettings = plugin(function ({
+  addUtilities,
+}: {
+  addUtilities;
+}) {
   // predefined font stretch amounts
   const stretch: { [key: string]: number } = {
     ultracondensed: 50,
@@ -29,7 +33,9 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities 
   // weights, weights + italic, weights + stretch, weights + stretch + italic
   Object.entries(weights).forEach(([key, value]) => {
     const select = `.font-${key}`;
-    const baseData: { [key: string]: { fontWeight: number, fontVariationSettings: string } } = {};
+    const baseData: {
+      [key: string]: { fontWeight: number; fontVariationSettings: string };
+    } = {};
     baseData[select] = {
       fontWeight: value,
       fontVariationSettings: `'wght' ${value}`,
@@ -45,7 +51,7 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities 
         fontVariationSettings: `'wdth' ${sValue}, 'wght' ${value}`,
       };
     });
-    baseData[select]["&.italic"] = {
+    baseData[select]['&.italic'] = {
       fontVariationSettings: `'slnt' 1, 'wght' ${value}`,
     };
     addUtilities(baseData);
@@ -54,7 +60,9 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities 
   // stretch, stretch + italics
   Object.entries(stretch).forEach(([key, value]) => {
     const select = `.font-${key}`;
-    const stretchData: { [key: string]: { fontStretch: string, fontVariationSettings: string,  } } = {};
+    const stretchData: {
+      [key: string]: { fontStretch: string; fontVariationSettings: string };
+    } = {};
     stretchData[select] = {
       fontStretch: value.toString() + '%',
       fontVariationSettings: `'wdth' ${value}`,
@@ -64,8 +72,8 @@ const fontVariationSettings = plugin(function ({ addUtilities }: { addUtilities 
 
   // italics
   addUtilities({
-    ".italic": {
-      fontStyle: "italic",
+    '.italic': {
+      fontStyle: 'italic',
       fontVariationSettings: "'slnt' 1",
     },
   });
