@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import axios from "axios";
 
@@ -10,6 +10,9 @@ import { useEffect } from "react";
 
 const Layout = () => {
   const navigate = useNavigate();
+
+  const user = useAppStore(state => state.user);
+  const accessToken = useAppStore(state => state.access_token);
 
   const setUser = useAppStore(state => state.setUser);
   const setAccessToken = useAppStore(state => state.setAccessToken);
@@ -53,7 +56,7 @@ const Layout = () => {
   return (
     <div className="flex flex-col justify-between h-[100vh]">
       <Navbar />
-        <Outlet />
+        { user && accessToken ? <Outlet /> : <Navigate to={'/sign-in'} /> }
       <Footer />
     </div>
   );
