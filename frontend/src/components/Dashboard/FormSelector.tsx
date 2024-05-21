@@ -157,16 +157,6 @@ const FormSelector: React.FC<FormSelectorProps> = ({
     );
   };
 
-  // useEffect(() => {
-  //   let allFieldsCompleted = true;
-  //   Object.entries(formData).forEach(([_key, value]) => {
-  //     if (value === "" || value === null) {
-  //       allFieldsCompleted = false;
-  //     }
-  //   });
-  //   setCompleted(allFieldsCompleted);
-  // }, [formData]);
-
   const fieldNames: {
     maternalDemographics: { [key: string]: string };
     maternalMedicalHistory: { [key: string]: string };
@@ -954,7 +944,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {FamilyAndSupportsPeopleInHome(
-                          (formData as FamilyAndSupportsData)?.[formDataKey] as IHouseholdMembers[]
+                          Array.isArray((formData as FamilyAndSupportsData)?.[formDataKey]) ? (formData as FamilyAndSupportsData)?.[formDataKey] as IHouseholdMembers[] : []
                         )}
                       </div>
                     );
@@ -962,7 +952,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {FamilyAndSupportsChildrenNotHome(
-                          (formData as FamilyAndSupportsData)?.[formDataKey] as IChild[]
+                          Array.isArray((formData as FamilyAndSupportsData)?.[formDataKey]) ? (formData as FamilyAndSupportsData)?.[formDataKey] as IChild[] : []
                         )}
                       </div>
                     );
@@ -970,7 +960,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {InfantInformationInfantCareNeeds(
-                          (formData as InfantInformationData)?.[formDataKey] as IInfantCareNeeds[]
+                          Array.isArray((formData as InfantInformationData)?.[formDataKey]) ? (formData as InfantInformationData)?.[formDataKey] as IInfantCareNeeds[] : []                
                         )}
                       </div>
                     );
@@ -978,7 +968,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {InfantInformationMedications(
-                          (formData as InfantInformationData)?.[formDataKey] as IInfantMeds[]
+                          Array.isArray((formData as InfantInformationData)?.[formDataKey]) ? (formData as InfantInformationData)?.[formDataKey] as IInfantMeds[] : []
                         )}
                       </div>
                     );
@@ -1013,7 +1003,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({
                     return (
                       <div>
                         {RelapsePreventionPlanSafeCaregivers(
-                          (formData as RelapsePreventionPlanData)?.[formDataKey] as ICaregiver[]
+                          Array.isArray((formData as RelapsePreventionPlanData)?.[formDataKey]) ? (formData as RelapsePreventionPlanData)?.[formDataKey] as ICaregiver[] : []
                         )}
                       </div>
                     );
