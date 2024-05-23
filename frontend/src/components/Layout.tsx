@@ -7,6 +7,8 @@ import Footer from './Footer';
 import { IUser, UserSchema } from '../utils/interfaces';
 import useAppStore from '../store/useAppStore';
 import { useEffect } from 'react';
+import ErrorComponent from './ErrorComponent';
+import SuccessComponent from './SuccessComponent';
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -16,6 +18,8 @@ const Layout = () => {
 
   const setUser = useAppStore((state) => state.setUser);
   const setAccessToken = useAppStore((state) => state.setAccessToken);
+
+  const setError = useAppStore(state => state.setError);
 
   // Load the user from the session storage into the application state
   const { mutate: getUser } = useMutation(
@@ -43,6 +47,8 @@ const Layout = () => {
         return navigate('/dashboard');
       },
       onError: () => {
+        setError("Something went wrong! Please try again later")
+
         return navigate('/sign-in');
       },
     }
@@ -58,12 +64,20 @@ const Layout = () => {
       getUser(accessToken);
     };
 
-    fetchUser();
-  }, [getUser]);
+    try {
+      fetchUser();
+    } catch (error) {
+      setError("Something went wrong! Please try again later");
+    }
+  }, [getUser, setError]);
 
   return (
     <div className="flex flex-col justify-between h-[100vh]">
       <Navbar />
+
+      <SuccessComponent />
+      <ErrorComponent />
+
       {user && accessToken ? <Outlet /> : <Navigate to={'/sign-in'} />}
       <Footer />
     </div>

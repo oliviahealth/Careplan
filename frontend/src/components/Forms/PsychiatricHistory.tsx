@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import axios from 'axios';
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
+import ChatLoadingSkeleton from '../LoadingSkeleton';
 
 const DiagnosisSchema = z.object({
   diagnosis: z.string().min(1, 'Diagnosis is required'),
@@ -28,6 +29,7 @@ const PsychiatricHistoryResponseSchema = PsychiatricHistoryInputsSchema.extend({
   id: z.string(),
   user_id: z.string(),
 });
+type IPsychiatricHistoryResponse = z.infer<typeof PsychiatricHistoryResponseSchema>;
 
 export default function PsychiatricHistory() {
   const navigate = useNavigate();
@@ -36,8 +38,10 @@ export default function PsychiatricHistory() {
   const user = useAppStore((state) => state.user);
   const access_token = useAppStore((state) => state.access_token);
 
-  const headers = useMemo(
-    () => ({
+  const setSuccessMessage = useAppStore(state => state.setSuccessMessage);
+  const setError = useAppStore(state => state.setError);
+
+  const headers = useMemo(() => ({
       Authorization: 'Bearer ' + access_token,
       userId: user?.id,
     }),
@@ -79,42 +83,42 @@ export default function PsychiatricHistory() {
       taking_medication: '',
     });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (submissionId) {
-        try {
-          const response = await axios.get(
-            `http://127.0.0.1:5000/api/get_psychiatric_history/${submissionId}`,
-            { headers: { ...headers } }
-          );
-          const pastResponseData = response.data;
+  const { isFetching, refetch } = useQuery({
+    enabled: false,
+    queryKey: [submissionId],
+    queryFn: async() => {
+      if(!submissionId) return;
 
-          PsychiatricHistoryResponseSchema.parse(pastResponseData);
+      const response = await axios.get(`http://127.0.0.1:5000/api/get_psychiatric_history/${submissionId}`, { headers: { ...headers } });
 
-          Object.keys(pastResponseData).forEach((key) => {
-            if (key === 'id' || key === 'user_id') return;
+      return response.data;
+    },
+    onSuccess: (data: IPsychiatricHistoryResponse) => {
+      PsychiatricHistoryResponseSchema.parse(data);
 
-            const formKey = key as keyof IPsychiatricHistoryInputs;
-            if (key === 'date_of_diagnosis') {
-              const newDate = new Date(pastResponseData[key])
-                .toISOString()
-                .split('T')[0];
+      Object.keys(data).forEach((key) => {
+        if (key === 'id' || key === 'user_id') return;
 
-              setValue(formKey, newDate);
-            }
-            setValue(formKey, pastResponseData[key]);
-          });
-        } catch (error) {
-          alert('Something went wrong!');
+        const formKey = key as keyof IPsychiatricHistoryInputs;
 
-          console.error('Error fetching user data:', error);
+        if (key === 'diagnosis') {
+          const newDate = new Date(data[key][0].date_of_diagnosis).toISOString().split('T')[0];
+
+          setValue(formKey, newDate);
         }
-      }
-    };
-    fetchUserData();
-  }, [submissionId, headers, setValue]);
+        setValue(formKey, data[key as keyof IPsychiatricHistoryInputs]);
+      });
+    },
+    onError: () => setError("Something went wrong! Please try again later")
+  })
 
-  const { mutate } = useMutation(
+  useEffect(() => {
+    if(!submissionId) return;
+
+    refetch();
+  }, [submissionId, headers, refetch])
+
+  const { mutate: updateMutation, isLoading: isMutationLoading } = useMutation(
     async (data: IPsychiatricHistoryInputs) => {
       let responseData;
       let method;
@@ -143,7 +147,7 @@ export default function PsychiatricHistory() {
       onSuccess: (data) => {
         const { userData, method } = data;
 
-        alert(`Psychiatric History ${method} successfully!`);
+        setSuccessMessage(`Psychiatric History ${method} successfully!`);
         console.log(
           `PsychiatricHistory data ${method} successfully.`,
           userData
@@ -152,15 +156,19 @@ export default function PsychiatricHistory() {
         navigate('/dashboard');
       },
       onError: () => {
-        alert('Error while adding/updating PsychiatricHistory data.');
+        setError('Something went wrong! Please try again later');
       },
     }
   );
 
+  if(isFetching) {
+    return <ChatLoadingSkeleton />
+  }
+
   return (
     <div className="flex  justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form
-        onSubmit={handleSubmit((data) => mutate(data))}
+        onSubmit={handleSubmit((data) => updateMutation(data))}
         className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4"
       >
         <p className="font-semibold text-red-700">
@@ -270,6 +278,7 @@ export default function PsychiatricHistory() {
             type="submit"
             className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md"
           >
+            { isMutationLoading && <span className="loading loading-spinner loading-sm"></span> }
             Save
           </button>
         </div>

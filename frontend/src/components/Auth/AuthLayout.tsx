@@ -2,12 +2,17 @@ import { Outlet } from 'react-router-dom';
 
 import Navbar from '../Navbar';
 import Footer from '../Footer';
+import ErrorComponent from '../ErrorComponent';
+import SuccessComponent from '../SuccessComponent';
 
 const AuthLayout = () => {
   return (
     <div className="flex flex-col justify-between text-black h-screen">
       <div className="bg-white">
         <Navbar />
+
+        <SuccessComponent />
+        <ErrorComponent />
       </div>
 
       <div className="w-full mx-auto flex h-full">

@@ -7,6 +7,12 @@ interface AppState {
 
   access_token: string | null;
   setAccessToken: (accessToken: string | null) => void;
+
+  error: string | null;
+  setError: (error: string | null) => void;
+
+  successMessage: string | null,
+  setSuccessMessage: (successMessage: string | null) => void
 }
 
 const useAppStore = create<AppState>()((set) => ({
@@ -22,6 +28,10 @@ const useAppStore = create<AppState>()((set) => ({
 
       return { access_token };
     }),
+    error: null,
+    setError: (error) => set(() => ({ error })),
+    successMessage: null,
+    setSuccessMessage: (successMessage) => set(() => ({ successMessage }))
 }));
 
 export default useAppStore;

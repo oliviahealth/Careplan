@@ -1,11 +1,12 @@
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore.ts';
+import ChatLoadingSkeleton from '../LoadingSkeleton.tsx';
 
 const DrugTestSchema = z.object({
   test_ordered: z.string().min(1, 'Test name required'),
@@ -31,6 +32,7 @@ const DrugScreeningResultsResponseSchema =
     id: z.string(),
     user_id: z.string(),
   });
+type IDrugScreeningResultsResponse = z.infer<typeof DrugScreeningResultsInputsSchema>
 
 export default function DrugScreeningResults() {
   const navigate = useNavigate();
@@ -39,11 +41,10 @@ export default function DrugScreeningResults() {
   const user = useAppStore((state) => state.user);
   const access_token = useAppStore((state) => state.access_token);
 
-  const headers = useMemo(
-    () => ({
-      Authorization: 'Bearer ' + access_token,
-      userId: user?.id,
-    }),
+  const setSuccessMessage = useAppStore(state => state.setSuccessMessage);
+  const setError = useAppStore(state => state.setError);
+
+  const headers = useMemo(() => ({ Authorization: 'Bearer ' + access_token, userId: user?.id, }),
     [access_token, user?.id]
   );
 
@@ -101,44 +102,47 @@ export default function DrugScreeningResults() {
 
   const removeLastDrugTest = () => remove(fields.length - 1);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (submissionId) {
-        try {
-          const response = await axios.get(
-            `http://127.0.0.1:5000/api/get_drug_screening_results/${submissionId}`,
-            { headers: { ...headers } }
-          );
-          const pastSubmissionData = response.data;
+  const { isFetching, refetch } = useQuery({
+    enabled: false,
+    queryKey: [submissionId],
+    queryFn: async () => {
+      if(!submissionId) return;
 
-          DrugScreeningResultsResponseSchema.parse(pastSubmissionData);
+      const response = await axios.get(`http://127.0.0.1:5000/api/get_drug_screening_results/${submissionId}`, { headers: { ...headers } });
 
-          Object.keys(pastSubmissionData).forEach((key) => {
-            if (key === 'id' || key === 'user_id') {
-              return;
-            }
+     return response.data;      
+    },
+    onSuccess: (data: IDrugScreeningResultsResponse) => {
+      DrugScreeningResultsResponseSchema.parse(data);
 
-            const formKey = key as keyof IDrugScreeningResultsInputs;
-            setValue(formKey, pastSubmissionData[key]);
-
-            if (key === 'tests') {
-              const newShowDateReviewed = pastSubmissionData[key].map(
-                (test: IDrugTest) => test.provider_reviewed === 'Yes'
-              );
-              setShowDateReviewed(newShowDateReviewed);
-            }
-          });
-        } catch (error) {
-          alert('Something went wrong!');
-
-          console.error('Error fetching user data:', error);
+      Object.keys(data).forEach((key) => {
+        if (key === 'id' || key === 'user_id') {
+          return;
         }
-      }
-    };
-    fetchUserData();
-  }, [submissionId, headers, setValue]);
 
-  const { mutate } = useMutation(
+        const formKey = key as keyof IDrugScreeningResultsInputs;
+        setValue(formKey, data[key as keyof typeof data]);
+
+        if (key === 'tests') {
+          const newShowDateReviewed = data[key].map(
+            (test: IDrugTest) => test.provider_reviewed === 'Yes'
+          );
+          setShowDateReviewed(newShowDateReviewed);
+        }
+      });
+    },
+    onError: () => {
+      setError("Something went wrong! Please try again later");
+    }
+  })
+
+  useEffect(() => {
+    if(!submissionId) return;
+
+    refetch()
+  }, [submissionId, headers, refetch])
+
+  const { mutate: updateMutation, isLoading: isMutationLoading } = useMutation(
     async (data: IDrugScreeningResultsInputs) => {
       let responseData;
       let method;
@@ -167,7 +171,7 @@ export default function DrugScreeningResults() {
       onSuccess: (data) => {
         const { userData, method } = data;
 
-        alert(`Drug screening results ${method} successfully!`);
+        setSuccessMessage(`Drug screening results ${method} successfully!`)
         console.log(
           `DrugScreeningResults data ${method} successfully.`,
           userData
@@ -176,15 +180,19 @@ export default function DrugScreeningResults() {
         navigate('/dashboard');
       },
       onError: () => {
-        alert('Error while adding/updating DrugScreeningResults data.');
+        setError("Something went wrong! Please try again later");
       },
     }
   );
 
+  if(isFetching) {
+    return <ChatLoadingSkeleton />
+  }
+
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form
-        onSubmit={handleSubmit((data) => mutate(data))}
+        onSubmit={handleSubmit((data) => updateMutation(data))}
         className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4"
       >
         <p className="font-semibold text-red-700">
@@ -329,7 +337,8 @@ export default function DrugScreeningResults() {
           <button
             type="submit"
             className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md"
-          >
+          >          
+            { isMutationLoading && <span className="loading loading-spinner loading-sm"></span> }
             Save
           </button>
         </div>

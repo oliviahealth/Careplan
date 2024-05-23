@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 import useAppStore from '../../store/useAppStore';
 import { IUser, UserSchema } from '../../utils/interfaces';
@@ -14,7 +14,8 @@ const SignUp: React.FC = () => {
 
   const setUser = useAppStore((state) => state.setUser);
   const setAccessToken = useAppStore((state) => state.setAccessToken);
-  const [errorDetected, setErrorDetected] = useState(false);
+  
+  const setError = useAppStore(state => state.setError);
 
   const SignInSchema = z.object({
     email: z.string().email().min(1, 'Email is required'),
@@ -50,10 +51,8 @@ const SignUp: React.FC = () => {
           return navigate('/dashboard');
         }
       },
-      onError: (error: AxiosError) => {
-        setErrorDetected(true);
-
-        console.error(error);
+      onError: () => {
+        setError("Something went wrong! Please try again later");
       },
     }
   );
@@ -63,12 +62,6 @@ const SignUp: React.FC = () => {
       <div>
         <p className="font-semibold text-2xl">Welcome Back!</p>
         <p className="text-sm">Sign in to your account</p>
-
-        {errorDetected && (
-          <p className="text-sm text-red-500">
-            Something went wrong. Please try again
-          </p>
-        )}
       </div>
 
       <form
