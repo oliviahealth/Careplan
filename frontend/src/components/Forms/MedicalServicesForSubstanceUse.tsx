@@ -127,7 +127,7 @@ export default function MedicalServicesForSubstanceUse() {
         if (key === 'date_used_mat' || key === 'date_used_medicine_service') {
           if(!data[key]) return;
           
-          const newDate = new Date(data[key]).toISOString().split('T')[0];
+          const newDate = new Date(data[key]!).toISOString().split('T')[0];
 
           setValue(formKey, newDate);
         } else {

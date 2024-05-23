@@ -134,7 +134,7 @@ export default function MaternalMedicalHistory() {
         if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
           if(!data[key]) return;
 
-          const newDate = new Date(data[key]).toISOString().split('T')[0];
+          const newDate = new Date(data[key]!).toISOString().split('T')[0];
 
           setValue(formKey, newDate);
         } else {
