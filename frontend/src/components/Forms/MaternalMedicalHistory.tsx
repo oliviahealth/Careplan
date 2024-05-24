@@ -1,11 +1,12 @@
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import axios from 'axios';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
+import ChatLoadingSkeleton from '../LoadingSkeleton';
 
 const CurrentMedicationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -54,6 +55,7 @@ const MaternalMedicalHistoryResponse =
     id: z.string(),
     user_id: z.string(),
   });
+type IMaternalMedicalHistoryResponse = z.infer<typeof MaternalMedicalHistoryResponse>;
 
 export default function MaternalMedicalHistory() {
   const navigate = useNavigate();
@@ -62,8 +64,10 @@ export default function MaternalMedicalHistory() {
   const user = useAppStore((state) => state.user);
   const access_token = useAppStore((state) => state.access_token);
 
-  const headers = useMemo(
-    () => ({
+  const setSuccessMessage = useAppStore(state => state.setSuccessMessage);
+  const setError = useAppStore(state => state.setError);
+
+  const headers = useMemo(() => ({
       Authorization: 'Bearer ' + access_token,
       userId: user?.id,
     }),
@@ -108,52 +112,48 @@ export default function MaternalMedicalHistory() {
   const addNewMedication = () =>
     append({ name: '', dose: '', prescriber: '', notes: '' });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (submissionId) {
-        try {
-          const response = await axios.get(
-            `http://127.0.0.1:5000/api/get_maternal_medical_history/${submissionId}`,
-            { headers: { ...headers } }
-          );
-          const pastSubmissionData = response.data;
+  const { isFetching, refetch } = useQuery({
+    enabled: false,
+    queryKey: [submissionId],
+    queryFn: async () => {
+      if(!submissionId) return;
 
-          MaternalMedicalHistoryResponse.parse(pastSubmissionData);
+      const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${submissionId}`, { headers: { ...headers } });
 
-          Object.keys(pastSubmissionData).forEach((key) => {
-            if (key === 'id' || key === 'user_id') {
-              return;
-            }
+      return response.data;
+    },
+    onSuccess: (data: IMaternalMedicalHistoryResponse) => {
+      MaternalMedicalHistoryResponse.parse(data);
 
-            const formKey = key as keyof IMaternalMedicalHistoryInputs;
-            if (
-              key === 'anticipated_delivery_date' ||
-              key === 'postpartum_visit_date'
-            ) {
-              const newDate = new Date(pastSubmissionData[key])
-                .toISOString()
-                .split('T')[0];
-
-              setValue(formKey, newDate);
-            } else {
-              setValue(formKey, pastSubmissionData[key]);
-            }
-          });
-
-          setShowPostpartumLocationDate(
-            pastSubmissionData.attended_postpartum_visit === 'Yes'
-          );
-        } catch (error) {
-          alert('Something went wrong!');
-
-          console.error('Error fetching user data:', error);
+      Object.keys(data).forEach((key) => {
+        if (key === 'id' || key === 'user_id') {
+          return;
         }
-      }
-    };
-    fetchUserData();
-  }, [submissionId, headers, setValue]);
 
-  const { mutate } = useMutation(
+        const formKey = key as keyof IMaternalMedicalHistoryInputs;
+        if (key === 'anticipated_delivery_date' || key === 'postpartum_visit_date') {
+          if(!data[key]) return;
+
+          const newDate = new Date(data[key]!).toISOString().split('T')[0];
+
+          setValue(formKey, newDate);
+        } else {
+          setValue(formKey, data[key as keyof IMaternalMedicalHistoryInputs]);
+        }
+      });
+
+      setShowPostpartumLocationDate(data.attended_postpartum_visit === 'Yes');
+    },
+    onError: () => setError("Something went wrong! Please try again later")
+  })
+
+  useEffect(() => {
+    if(!submissionId) return;
+
+    refetch();
+  }, [submissionId, headers, refetch])
+
+  const { mutate: updateMutation, isLoading: isMutationLoading } = useMutation(
     async (data: IMaternalMedicalHistoryInputs) => {
       let responseData;
       let method;
@@ -182,7 +182,7 @@ export default function MaternalMedicalHistory() {
       onSuccess: (data) => {
         const { userData, method } = data;
 
-        alert(`Maternal Medical History ${method} successfully!`);
+        setSuccessMessage(`Maternal Medical History ${method} successfully!`);
         console.log(
           `Maternal Medical History data ${method} successfully.`,
           userData
@@ -191,15 +191,19 @@ export default function MaternalMedicalHistory() {
         navigate('/dashboard');
       },
       onError: () => {
-        alert('Error while adding/updating MaternalMedicalHistory data.');
+        setError('Something went wrong! Please try again later');
       },
     }
   );
 
+  if(isFetching) {
+    return <ChatLoadingSkeleton />
+  }
+
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form
-        onSubmit={handleSubmit((data) => mutate(data))}
+        onSubmit={handleSubmit((data) => updateMutation(data))}
         className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input]:px-4"
       >
         <p className="font-semibold text-red-700">
@@ -490,6 +494,7 @@ export default function MaternalMedicalHistory() {
             type="submit"
             className="bg-[#AFAFAFAF] text-black px-20 py-2 mt-6 rounded-md"
           >
+            { isMutationLoading && <span className="loading loading-spinner loading-sm"></span> }
             Save
           </button>
         </div>

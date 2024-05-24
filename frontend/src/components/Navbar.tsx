@@ -14,11 +14,14 @@ const Navbar: React.FC = () => {
   };
 
   const user = useAppStore((state) => state.user);
-  const access_token = useAppStore((state) => state.access_token);
   const setUser = useAppStore((state) => state.setUser);
+  
+  const access_token = useAppStore((state) => state.access_token);
   const setAccessToken = useAppStore((state) => state.setAccessToken);
 
-  const { mutate } = useMutation(
+  const setError = useAppStore(state => state.setError);
+
+  const { mutate, isLoading } = useMutation(
     async () => {
       const headers = {
         Authorization: 'Bearer ' + access_token,
@@ -28,13 +31,18 @@ const Navbar: React.FC = () => {
       });
     },
     {
-      onSettled: () => {
+      onSuccess: () => {
         sessionStorage.removeItem('access_token');
         setUser(null);
         setAccessToken(null);
 
         navigate('/sign-in');
       },
+      onError: () => {
+        setError("Something went wrong! Please try again later");
+
+        return navigate('/sign-in');
+      }
     }
   );
 
@@ -85,9 +93,10 @@ const Navbar: React.FC = () => {
 
             {user ? (
               <button
-                className="block md:flex button md:button-filled md:rounded-full"
+                className="block md:flex button md:button-filled md:rounded-full gap-x-2"
                 onClick={() => mutate()}
               >
+                { isLoading && <span className="loading loading-spinner loading-sm"></span> } 
                 Sign Out
               </button>
             ) : (

@@ -1,11 +1,12 @@
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useEffect, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore';
+import ChatLoadingSkeleton from '../LoadingSkeleton';
 
 const InfantCareNeedsSchema = z.object({
   breast_pump: z.string().min(1, 'Breast pump information required'),
@@ -98,6 +99,7 @@ const InfantInformationResponseSchema = InfantInformationInputsSchema.extend({
   id: z.string(),
   user_id: z.string(),
 });
+type IInfantInformationResponse = z.infer<typeof InfantInformationResponseSchema>;
 
 export default function InfantInformation() {
   const navigate = useNavigate();
@@ -106,8 +108,10 @@ export default function InfantInformation() {
   const user = useAppStore((state) => state.user);
   const access_token = useAppStore((state) => state.access_token);
 
-  const headers = useMemo(
-    () => ({
+  const setSuccessMessage = useAppStore(state => state.setSuccessMessage);
+  const setError = useAppStore(state => state.setError);
+
+  const headers = useMemo(() => ({
       Authorization: 'Bearer ' + access_token,
       userId: user?.id,
     }),
@@ -190,55 +194,59 @@ export default function InfantInformation() {
   const addInfantMed = () =>
     appendInfantMed({ medication: '', dose: '', prescriber: '', notes: '' });
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (submissionId) {
-        try {
-          const response = await axios.get(
-            `http://127.0.0.1:5000/api/get_infant_information/${submissionId}`,
-            { headers: { ...headers } }
-          );
-          const pastSubmissionData = response.data;
+  const { isFetching, refetch } = useQuery({
+    enabled: false,
+    queryKey: [submissionId],
+    queryFn: async () => {
+      if(!submissionId) return;
 
-          InfantInformationResponseSchema.parse(pastSubmissionData);
+      const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${submissionId}`, { headers: { ...headers } });
 
-          Object.keys(pastSubmissionData).forEach((key) => {
-            if (key === 'id' || key === 'user_id') {
-              return;
-            }
+      return response.data;
+    },
+    onSuccess: (data: IInfantInformationResponse) => {
+      InfantInformationResponseSchema.parse(data);
 
-            const formKey = key as keyof IInfantInformationInputs;
-            if (key === 'date_of_birth' || key === 'father_date_of_birth') {
-              const newDate = new Date(pastSubmissionData[key])
-                .toISOString()
-                .split('T')[0];
-
-              setValue(formKey, newDate);
-            } else {
-              setValue(formKey, pastSubmissionData[key]);
-            }
-          });
-
-          if (pastSubmissionData.NICU_stay === 'Yes') {
-            setShowNICUStay(true);
-          } else {
-            setShowNICUStay(false);
-          }
-
-          if (pastSubmissionData.NICU_stay === 'No') {
-            setValue('NICU_length_of_stay', null);
-          }
-        } catch (error) {
-          alert('Something went wrong!');
-
-          console.error('Error fetching user data:', error);
+      Object.keys(data).forEach((key) => {
+        if (key === 'id' || key === 'user_id') {
+          return;
         }
-      }
-    };
-    fetchUserData();
-  }, [submissionId, headers, setValue]);
+        
+        const formKey = key as keyof IInfantInformationInputs;
+        if (key === 'date_of_birth' || key === 'father_date_of_birth') {
+          const newDate = new Date(data[key])
+            .toISOString()
+            .split('T')[0];
 
-  const { mutate } = useMutation(
+          setValue(formKey, newDate);
+        } else {
+          setValue(formKey, data[key as keyof IInfantInformationInputs]);
+        }
+      });
+
+      if (data.NICU_stay === 'Yes') {
+        setShowNICUStay(true);
+      } else {
+        setShowNICUStay(false);
+      }
+
+      if (data.NICU_stay === 'No') {
+        setValue('NICU_length_of_stay', null);
+      }
+    },
+    onError: () => {
+      setError('Something went wrong! Please try again later');
+    }
+  })
+
+  useEffect(() => {
+    if(!submissionId) return;
+
+    refetch();
+
+  }, [submissionId, headers, refetch]);
+
+  const { mutate: updateMutation, isLoading: isMutationLoading } = useMutation(
     async (data: IInfantInformationInputs) => {
       let responseData;
       let method;
@@ -267,21 +275,25 @@ export default function InfantInformation() {
       onSuccess: (data) => {
         const { userData, method } = data;
 
-        alert(`Infant Information ${method} successfully!`);
+        setSuccessMessage(`Family And Supports ${method} successfully!`)
         console.log(`InfantInformation data ${method} successfully.`, userData);
 
         navigate('/dashboard');
       },
       onError: () => {
-        alert('Error while adding/updating InfantInformation data.');
+        setError("Something went wrong! Please try again later");
       },
     }
   );
 
+  if(isFetching) {
+    return <ChatLoadingSkeleton />
+  }
+
   return (
     <div className="flex justify-center w-full p-2 mt-2 text-base font-OpenSans">
       <form
-        onSubmit={handleSubmit((data) => mutate(data))}
+        onSubmit={handleSubmit((data) => updateMutation(data))}
         className="w-[40rem] md:w-[30rem] m-5 md:m-0 space-y-1 [&>p]:pt-6 [&>p]:pb-1 [&>input,&>textarea]:px-4"
       >
         <p className="font-semibold text-red-700">Complete with Pediatrician</p>
@@ -1137,6 +1149,7 @@ export default function InfantInformation() {
             type="submit"
             className="bg-[#AFAFAFAF] text-black px-20 py-2 rounded-md"
           >
+            { isMutationLoading && <span className="loading loading-spinner loading-sm"></span> }
             Save
           </button>
         </div>

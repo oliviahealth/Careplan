@@ -28,7 +28,6 @@ interface Submission {
 
 const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
   const [formData, setFormData] = useState<Record<string, string | null>>({});
-  // const [completed, setCompleted] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedSubmissionID, setSelectedSubmissionID] = useState<
@@ -39,6 +38,8 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
     [key: string]: boolean;
   }>({});
   const [lastModifiedDate, setLastModifiedDate] = useState<string>('');
+
+  const setError = useAppStore(state => state.setError);
 
   const updateSubmissionsExist = (key: string, value: boolean) => {
     setSubmissionsExist((prevState) => ({
@@ -78,7 +79,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
       }
       setSubmissionsFetched(true);
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      setError("Something went wrong! Please try again later");
     }
     setIsLoading(false);
   };
@@ -108,7 +109,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
         fetchSubmissions();
         setFormData({});
       } catch (error) {
-        console.error('Error deleting submission:', error);
+        setError("Something went wrong! Please try again later");
       }
     }
   };
