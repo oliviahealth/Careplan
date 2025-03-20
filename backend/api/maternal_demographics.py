@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from ..database import MaternalDemographics, db, User
+from database import MaternalDemographics, db, User
 from datetime import datetime, timezone
 
 maternal_demo_bp = Blueprint('maternal_demographics', __name__, url_prefix='/api')

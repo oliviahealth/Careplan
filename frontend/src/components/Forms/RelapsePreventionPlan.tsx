@@ -84,7 +84,7 @@ export default function RelapsePreventionPlan() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_relapse_prevention_plan/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/get_relapse_prevention_plan/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },
@@ -113,14 +113,14 @@ export default function RelapsePreventionPlan() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_relapse_prevention_plan/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_relapse_prevention_plan/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_relapse_prevention_plan',
+          `${import.meta.env.VITE_API_URL}/add_relapse_prevention_plan`,
           { ...data },
           { headers: { ...headers } }
         );

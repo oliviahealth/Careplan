@@ -97,7 +97,7 @@ export default function MaternalDemographics() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_demographics/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_maternal_demographics/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },
@@ -136,14 +136,14 @@ export default function MaternalDemographics() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_maternal_demographics/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_maternal_demographics/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          `http://127.0.0.1:5000/api/add_maternal_demographics`,
+          `${import.meta.env.VITE_API_URL}/add_maternal_demographics`,
           { ...data },
           { headers: { ...headers } }
         );

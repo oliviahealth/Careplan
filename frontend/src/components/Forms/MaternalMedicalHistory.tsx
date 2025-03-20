@@ -118,7 +118,7 @@ export default function MaternalMedicalHistory() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_maternal_medical_history/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_maternal_medical_history/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },
@@ -159,14 +159,14 @@ export default function MaternalMedicalHistory() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_maternal_medical_history/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_maternal_medical_history/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_maternal_medical_history',
+          `${import.meta.env.VITE_API_URL}/add_maternal_medical_history`,
           { ...data },
           { headers: { ...headers } }
         );

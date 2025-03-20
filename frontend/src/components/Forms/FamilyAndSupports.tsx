@@ -123,7 +123,7 @@ export default function FamilyAndSupports() {
       queryFn: async () => {
         if(!submissionId) return;
 
-        const response = await axios.get(`http://127.0.0.1:5000/api/get_family_and_supports/${submissionId}`, { headers: { ...headers } });
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_family_and_supports/${submissionId}`, { headers: { ...headers } });
 
         return response.data;
       },
@@ -156,14 +156,14 @@ export default function FamilyAndSupports() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_family_and_supports/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_family_and_supports/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_family_and_supports',
+          `${import.meta.env.VITE_API_URL}/add_family_and_supports`,
           { ...data },
           { headers: { ...headers } }
         );

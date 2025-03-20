@@ -248,7 +248,7 @@ export default function ReferralsAndServices() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_referrals_and_services/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_referrals_and_services/${submissionId}`, { headers: { ...headers } });
 
       return response.data
     },
@@ -277,14 +277,14 @@ export default function ReferralsAndServices() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_referrals_and_services/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_referrals_and_services/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_referrals_and_services',
+          `${import.meta.env.VITE_API_URL}/add_referrals_and_services`,
           { ...data },
           { headers: { ...headers } }
         );

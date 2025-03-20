@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from ..database import RelapsePreventionPlan, db, User
+from database import RelapsePreventionPlan, db, User
 from datetime import datetime, timezone
 
 relapse_prevention_plan_bp = Blueprint('relapse_prevention_plan', __name__, url_prefix='/api')

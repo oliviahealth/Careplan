@@ -113,7 +113,7 @@ export default function MedicalServicesForSubstanceUse() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_medical_services_for_substance_use/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_medical_services_for_substance_use/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },
@@ -155,14 +155,14 @@ export default function MedicalServicesForSubstanceUse() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_medical_services_for_substance_use/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_medical_services_for_substance_use/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_medical_services_for_substance_use',
+          `${import.meta.env.VITE_API_URL}/add_medical_services_for_substance_use`,
           { ...data },
           { headers: { ...headers } }
         );

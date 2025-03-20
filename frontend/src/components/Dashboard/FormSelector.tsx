@@ -60,7 +60,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://127.0.0.1:5000/api/get_${apiUrl}`,
+        `${import.meta.env.VITE_API_URL}/get_${apiUrl}`,
         { headers: { ...headers } }
       );
       const allSubmissions = response.data;
@@ -103,7 +103,7 @@ const FormSelector: React.FC<FormSelectorProps> = ({ name, path, apiUrl }) => {
     if (confirmed) {
       try {
         await axios.delete(
-          `http://127.0.0.1:5000/api/delete_${apiUrl}/${submissionID}`,
+          `${import.meta.env.VITE_API_URL}/delete_${apiUrl}/${submissionID}`,          
           { headers: { ...headers } }
         );
         fetchSubmissions();

@@ -200,7 +200,7 @@ export default function InfantInformation() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`http://127.0.0.1:5000/api/get_infant_information/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_infant_information/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },
@@ -252,14 +252,14 @@ export default function InfantInformation() {
       let method;
       if (submissionId) {
         responseData = await axios.put(
-          `http://127.0.0.1:5000/api/update_infant_information/${submissionId}`,
+          `${import.meta.env.VITE_API_URL}/update_infant_information/${submissionId}`,
           { ...data },
           { headers: { ...headers } }
         );
         method = 'updated';
       } else {
         responseData = await axios.post(
-          'http://127.0.0.1:5000/api/add_infant_information',
+          `${import.meta.env.VITE_API_URL}/add_infant_information`,
           { ...data },
           { headers: { ...headers } }
         );

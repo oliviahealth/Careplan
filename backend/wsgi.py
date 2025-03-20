@@ -1,17 +1,17 @@
 from flask import Flask
 from flask_cors import CORS
-from .api.users import users_bp
-from .api.maternal_demographics import maternal_demo_bp
-from .api.maternal_medical_history import medical_history_bp
-from .api.substance_use_history import substance_use_history_bp
-from .api.medical_services_for_substance_use import medical_services_for_substance_use_bp
-from .api.psychiatric_history import psychiatric_history_bp
-from .api.referrals_and_services import referrals_and_services_bp
-from .api.infant_information import infant_information_bp
-from .api.family_and_supports import family_and_supports_bp
-from .api.drug_screening_results import drug_screening_results_bp
-from .api.relapse_prevention_plan import relapse_prevention_plan_bp
-from .database import db, bcrypt, revoked_tokens
+from api.users import users_bp
+from api.maternal_demographics import maternal_demo_bp
+from api.maternal_medical_history import medical_history_bp
+from api.substance_use_history import substance_use_history_bp
+from api.medical_services_for_substance_use import medical_services_for_substance_use_bp
+from api.psychiatric_history import psychiatric_history_bp
+from api.referrals_and_services import referrals_and_services_bp
+from api.infant_information import infant_information_bp
+from api.family_and_supports import family_and_supports_bp
+from api.drug_screening_results import drug_screening_results_bp
+from api.relapse_prevention_plan import relapse_prevention_plan_bp
+from database import db, bcrypt, revoked_tokens
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os

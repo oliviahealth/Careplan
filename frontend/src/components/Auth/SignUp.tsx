@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
       }
 
       const user: SignupResponse = (
-        await axios.post(`http://127.0.0.1:5000/api/signup`, { ...data })
+        await axios.post(`${import.meta.env.VITE_API_URL}/signup`, { ...data })
       ).data;
       UserSchema.parse(user);
 
