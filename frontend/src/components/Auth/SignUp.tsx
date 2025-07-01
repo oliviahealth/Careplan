@@ -43,7 +43,7 @@ const SignUp: React.FC = () => {
       }
 
       const user: SignupResponse = (
-        await axios.post(`${import.meta.env.VITE_API_URL}/signup`, { ...data })
+        await axios.post(`${import.meta.env.VITE_API_URL}/signup`, { ...data, email: data.email.toLowerCase() })
       ).data;
       UserSchema.parse(user);
 
