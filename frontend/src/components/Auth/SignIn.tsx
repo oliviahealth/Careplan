@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from 'react-query';
 import { z } from 'zod';
@@ -8,14 +8,17 @@ import axios from 'axios';
 
 import useAppStore from '../../store/useAppStore';
 import { IUser, UserSchema } from '../../utils/interfaces';
+import { RiEyeFill, RiEyeOffFill } from 'react-icons/ri';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
   const setUser = useAppStore((state) => state.setUser);
   const setAccessToken = useAppStore((state) => state.setAccessToken);
-  
+
   const setError = useAppStore(state => state.setError);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const SignInSchema = z.object({
     email: z.string().email().min(1, 'Email is required'),
@@ -72,11 +75,14 @@ const SignUp: React.FC = () => {
           <label className="label">
             <span className="label-text text-black font-medium">Email</span>
           </label>
-          <input
-            {...register('email')}
-            type="email"
-            className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none"
-          />
+          <div className="flex w-full items-center border border-gray-200 rounded-xl p-1">
+            <input
+              {...register('email')}
+              type="email"
+              className="input flex-1 border-0 focus:border-transparent focus:ring-0 focus:outline-none"
+              placeholder="you@example.com"
+            />
+          </div>
           {errors.email && (
             <span className="label-text-alt text-red-500">
               {errors.email.message}
@@ -88,11 +94,23 @@ const SignUp: React.FC = () => {
           <label className="label">
             <span className="label-text text-black font-medium">Password</span>
           </label>
-          <input
-            {...register('password')}
-            type="password"
-            className="input w-full border-gray-200 focus:border-[#5D1B2A] focus:outline-none"
-          />
+          <div className="flex w-full items-center gap-2 border border-gray-200 rounded-xl p-1">
+            <input
+              {...register('password')}
+              type={showPassword ? 'text' : 'password'}
+              className="input flex-1 border-0 focus:border-transparent focus:ring-0 focus:outline-none"
+              placeholder="Password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="text-gray-500 text-sm px-2"
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
+            </button>
+          </div>
+
           {errors.password && (
             <span className="label-text-alt text-red-500">
               {errors.password.message}
