@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import ReferralsAndServices, db, User
 from datetime import datetime, timezone
 
-referrals_and_services_bp = Blueprint('referrals_and_services', __name__, url_prefix='/api')
+referrals_and_services_bp = Blueprint('referrals_and_services', __name__)
 
 @referrals_and_services_bp.route('/add_referrals_and_services', methods=['POST'])
 @jwt_required()

@@ -3,7 +3,7 @@ from database import User, db, bcrypt, revoked_tokens
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from datetime import datetime, timezone
 
-users_bp = Blueprint('users', __name__, url_prefix = '/api')
+users_bp = Blueprint('users', __name__)
 
 @users_bp.route('/signin', methods = ['POST'])
 def signin():

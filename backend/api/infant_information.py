@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import InfantInformation, db, User
 from datetime import datetime, timezone
 
-infant_information_bp = Blueprint('infant_information', __name__, url_prefix = '/api')
+infant_information_bp = Blueprint('infant_information', __name__)
 
 @infant_information_bp.route('/add_infant_information', methods = ['POST'])
 @jwt_required()

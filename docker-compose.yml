@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: careplan-db
+    environment:
+      POSTGRES_USER: careplan
+      POSTGRES_PASSWORD: careplan
+      POSTGRES_DB: careplan
+    ports:
+      - "5432:5432"
+    volumes:
+      - careplan_pgdata:/var/lib/postgresql/data
+    networks:
+      - careplan-net
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: careplan-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+    networks:
+      - careplan-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: careplan-frontend
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules/
+    depends_on:
+      - backend
+    networks:
+      - careplan-net
+
+networks:
+  careplan-net:
+    driver: bridge
+
+volumes:
+  careplan_pgdata:

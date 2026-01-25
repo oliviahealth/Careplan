@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import User, db, PsychiatricHistory
 from datetime import datetime, timezone
 
-psychiatric_history_bp = Blueprint('psychiatric_history', __name__, url_prefix = '/api')
+psychiatric_history_bp = Blueprint('psychiatric_history', __name__)
 
 @psychiatric_history_bp.route('/add_psychiatric_history', methods = ['POST'])
 @jwt_required()

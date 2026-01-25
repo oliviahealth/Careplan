@@ -31,7 +31,7 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename="/careplan">
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<LandingPage />} />

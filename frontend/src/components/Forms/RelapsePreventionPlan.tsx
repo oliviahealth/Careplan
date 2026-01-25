@@ -84,7 +84,7 @@ export default function RelapsePreventionPlan() {
     queryFn: async () => {
       if(!submissionId) return;
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/get_relapse_prevention_plan/${submissionId}`, { headers: { ...headers } });
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/get_relapse_prevention_plan/${submissionId}`, { headers: { ...headers } });
 
       return response.data;
     },

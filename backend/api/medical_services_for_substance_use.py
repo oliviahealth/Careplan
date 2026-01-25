@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import MedicalServicesForSubstanceUse, db, User
 from datetime import datetime, timezone
 
-medical_services_for_substance_use_bp = Blueprint('medical_services_for_substance_use', __name__, url_prefix = '/api')
+medical_services_for_substance_use_bp = Blueprint('medical_services_for_substance_use', __name__)
 
 @medical_services_for_substance_use_bp.route('/add_medical_services_for_substance_use', methods = ['POST'])
 @jwt_required()

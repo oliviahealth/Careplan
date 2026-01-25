@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import FamilyAndSupports, db, User
 from datetime import datetime, timezone
 
-family_and_supports_bp = Blueprint('family_and_supports', __name__, url_prefix = '/api')
+family_and_supports_bp = Blueprint('family_and_supports', __name__)
 
 @family_and_supports_bp.route('/add_family_and_supports', methods = ['POST'])
 @jwt_required()
