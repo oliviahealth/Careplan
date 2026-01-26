@@ -8,8 +8,6 @@ services:
       POSTGRES_USER: careplan
       POSTGRES_PASSWORD: careplan
       POSTGRES_DB: careplan
-    ports:
-      - "5432:5432"
     volumes:
       - careplan_pgdata:/var/lib/postgresql/data
     networks:
@@ -39,8 +37,11 @@ services:
       dockerfile: Dockerfile
     container_name: careplan-frontend
     ports:
-      - "5173:5173"
+      - "5174:5174"
     restart: unless-stopped
+    # Optional: if you have Vite env vars for API base URL, etc.
+    # env_file:
+    #   - ./frontend/.env
     volumes:
       - ./frontend:/app
       - /app/node_modules/
