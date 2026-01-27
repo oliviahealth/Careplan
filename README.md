@@ -23,70 +23,63 @@ The Olivia Careplan project aims to make the Plan of Safe Care more accessible a
 
 **Server:** Python, Flask, Flask-JWT, PostgreSQL, SQLAlchemy
 
-## Environment Variables
-Contact @sumitnalavade for details
+## Careplan Local Development Guide
+This guide covers the necessary dependencies and steps to run the Careplan application locally.
 
-**Frontend:** `VITE_API_URL`
+The application runs using two Docker containers:
+- Frontend: React application
+- Backend: Flask application
 
-**Backend:** `SQLALCHEMY_DATABASE_URI` `SECRET_KEY`
+### Prerequisites
+You must have the following installed:
+- Docker
+- Git
 
+### Step 1: Clone the Repository
+``` bash
+git clone https://github.com/oliviahealth/Careplan.git
+cd Careplan
+```
 
-## Run Locally  
-Clone the project  
-~~~bash  
-  git clone https://github.com/oliviahealth/Careplan.git
-~~~
+### Step 2: Create Environment Variables
+#### Backend
+In the `backend` subdirectory, create a file named:
+``` bash
+.env
+```
+Add the following contents:
+``` bash
+SECRET_KEY=super-secret-dev-key
+SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://careplan:careplan@db:5432/careplan
+```
 
-Go to the project directory  
-~~~bash  
-  cd Careplan
-~~~
+#### Frontend
+In the `frontend` subdirectory, create a file named:
+``` bash
+.env
+```
+Add the following contents:
+``` bash
+VITE_API_URL='http://localhost:8000'
+```
 
-Install frontend dependencies  
-~~~bash  
-cd frontend
-~~~
+### Step 3: Build and Run Containers
+From the root directory, run:
+``` bash
+docker compose up
+```
 
-~~~bash  
-npm install
-~~~
+### Step 4: Access application
+#### Frontend
+``` bash
+http://localhost:5174/careplan/
+```
 
-Add frontend environment Variables
-~~~bash  
-touch .env
-~~~
-
-~~~bash  
-VITE_API_URL
-~~~
-
-Start frontend client
-~~~bash  
-npm run dev
-~~~
-
-Install backend dependencies
-~~~bash  
-cd backend
-~~~
-
-~~~bash  
-pip install -r requirements.txt
-~~~
-
-Add backend environment variables
-~~~bash  
-touch .env
-~~~
-
-~~~bash  
-SQLALCHEMY_DATABASE_URI
-
-SECRET_KEY
-~~~
-
-Start the server  
-~~~bash  
-python wsgi.py
-~~~  
-
+#### Backend
+``` bash
+http://localhost:5000/
+```
+### Step 5: Stop the Application
+``` bash
+docker compose down
+```
