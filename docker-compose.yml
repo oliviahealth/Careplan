@@ -13,6 +13,11 @@ services:
     networks:
       - careplan-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careplan -d careplan"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   backend:
     build:
@@ -21,15 +26,16 @@ services:
     container_name: careplan-backend
     ports:
       - "8000:8000"
-    restart: unless-stopped
     env_file:
       - ./backend/.env
     volumes:
       - ./backend:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - careplan-net
+    restart: unless-stopped
 
   frontend:
     build:
@@ -38,7 +44,6 @@ services:
     container_name: careplan-frontend
     ports:
       - "5174:5174"
-    restart: unless-stopped
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -47,9 +52,11 @@ services:
       - WATCHPACK_POLLING=true
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5174", "--strictPort"]
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks:
       - careplan-net
+    restart: unless-stopped
 
 networks:
   careplan-net:
